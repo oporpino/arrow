@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Reference for arch aur commands — install, search, and upgrade packages from the Arch User Repository.">
+        <meta name="description" content="Reference for arrow aur commands — install, search, and upgrade packages from the Arch User Repository.">
       
       
         <meta name="author" content="oporpino">
@@ -965,15 +965,15 @@
 
 
 <h1 id="aur-commands">AUR Commands<a class="headerlink" href="#aur-commands" title="Permanent link">&para;</a></h1>
-<p><code>arch aur</code> delegates to the first available AUR helper on your system. Supported helpers (checked in order):</p>
+<p><code>arrow aur</code> delegates to the first available AUR helper on your system. Supported helpers (checked in order):</p>
 <ol>
 <li><a href="https://github.com/Jguer/yay"><code>yay</code></a></li>
 <li><a href="https://github.com/morganamilo/paru"><code>paru</code></a></li>
 </ol>
-<p>If neither is installed, <code>arch aur</code> will exit with an error.</p>
+<p>If neither is installed, <code>arrow aur</code> will exit with an error.</p>
 <div class="admonition tip">
 <p class="admonition-title">Install an AUR helper</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>arch<span class="w"> </span>add<span class="w"> </span>base-devel<span class="w"> </span>git
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>arrow<span class="w"> </span>add<span class="w"> </span>base-devel<span class="w"> </span>git
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>git<span class="w"> </span>clone<span class="w"> </span>https://aur.archlinux.org/yay.git<span class="w"> </span>/tmp/yay
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nb">cd</span><span class="w"> </span>/tmp/yay<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>makepkg<span class="w"> </span>-si
 </code></pre></div>
@@ -981,34 +981,34 @@
 <hr />
 <h2 id="aur-add">aur add<a class="headerlink" href="#aur-add" title="Permanent link">&para;</a></h2>
 <p>Install one or more packages from the Arch User Repository.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>arch aur add &lt;package&gt; [package2 …]
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>arrow aur add &lt;package&gt; [package2 …]
 </code></pre></div>
 <p><strong>Examples:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>arch<span class="w"> </span>aur<span class="w"> </span>add<span class="w"> </span>visual-studio-code-bin
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>arch<span class="w"> </span>aur<span class="w"> </span>add<span class="w"> </span>spotify<span class="w"> </span>ttf-ms-fonts
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>arrow<span class="w"> </span>aur<span class="w"> </span>add<span class="w"> </span>visual-studio-code-bin
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>arrow<span class="w"> </span>aur<span class="w"> </span>add<span class="w"> </span>spotify<span class="w"> </span>ttf-ms-fonts
 </code></pre></div>
 <hr />
 <h2 id="aur-search">aur search<a class="headerlink" href="#aur-search" title="Permanent link">&para;</a></h2>
 <p>Search the AUR for packages matching a term.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>arch aur search &lt;term&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>arrow aur search &lt;term&gt;
 </code></pre></div>
 <p><strong>Examples:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>arch<span class="w"> </span>aur<span class="w"> </span>search<span class="w"> </span>spotify
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>arch<span class="w"> </span>aur<span class="w"> </span>search<span class="w"> </span><span class="s2">&quot;discord&quot;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>arrow<span class="w"> </span>aur<span class="w"> </span>search<span class="w"> </span>spotify
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>arrow<span class="w"> </span>aur<span class="w"> </span>search<span class="w"> </span><span class="s2">&quot;discord&quot;</span>
 </code></pre></div>
 <hr />
 <h2 id="aur-upgrade">aur upgrade<a class="headerlink" href="#aur-upgrade" title="Permanent link">&para;</a></h2>
 <p>Upgrade all installed AUR packages.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>arch aur upgrade
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>arrow aur upgrade
 </code></pre></div>
 <p><strong>Example:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>arch<span class="w"> </span>aur<span class="w"> </span>upgrade
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>arrow<span class="w"> </span>aur<span class="w"> </span>upgrade
 </code></pre></div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>To upgrade both official and AUR packages in one step, run:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>arch<span class="w"> </span>upgrade<span class="w">       </span><span class="c1"># official repositories</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>arch<span class="w"> </span>aur<span class="w"> </span>upgrade<span class="w">   </span><span class="c1"># AUR packages</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>arrow<span class="w"> </span>upgrade<span class="w">       </span><span class="c1"># official repositories</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>arrow<span class="w"> </span>aur<span class="w"> </span>upgrade<span class="w">   </span><span class="c1"># AUR packages</span>
 </code></pre></div></p>
 </div>
 

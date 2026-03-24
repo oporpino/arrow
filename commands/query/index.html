@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Reference for arch list and arch history commands.">
+        <meta name="description" content="Reference for arrow list and arrow history commands.">
       
       
         <meta name="author" content="oporpino">
@@ -956,28 +956,28 @@
 <h1 id="query-commands">Query Commands<a class="headerlink" href="#query-commands" title="Permanent link">&para;</a></h1>
 <h2 id="list">list<a class="headerlink" href="#list" title="Permanent link">&para;</a></h2>
 <p>List all installed packages. Optionally filter by a search term.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>arch list [filter]
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>arrow list [filter]
 </code></pre></div>
 <p><strong>Alias:</strong> <code>ls</code></p>
 <p><strong>Examples:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>arch<span class="w"> </span>list<span class="w">               </span><span class="c1"># all installed packages</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>arch<span class="w"> </span>list<span class="w"> </span>python<span class="w">        </span><span class="c1"># packages whose name contains &quot;python&quot;</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>arch<span class="w"> </span>list<span class="w"> </span><span class="p">|</span><span class="w"> </span>wc<span class="w"> </span>-l<span class="w">       </span><span class="c1"># count installed packages</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>arrow<span class="w"> </span>list<span class="w">               </span><span class="c1"># all installed packages</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>arrow<span class="w"> </span>list<span class="w"> </span>python<span class="w">        </span><span class="c1"># packages whose name contains &quot;python&quot;</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>arrow<span class="w"> </span>list<span class="w"> </span><span class="p">|</span><span class="w"> </span>wc<span class="w"> </span>-l<span class="w">       </span><span class="c1"># count installed packages</span>
 </code></pre></div>
 <p><strong>pacman equivalent:</strong> <code>pacman -Q</code></p>
 <hr />
 <h2 id="history">history<a class="headerlink" href="#history" title="Permanent link">&para;</a></h2>
 <p>Show recent pacman log entries (installs, removals, upgrades).</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>arch history [n]
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>arrow history [n]
 </code></pre></div>
 <ul>
 <li><code>n</code> — number of entries to show (default: <strong>20</strong>)</li>
 </ul>
 <p><strong>Alias:</strong> <code>log</code></p>
 <p><strong>Examples:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>arch<span class="w"> </span><span class="nb">history</span><span class="w">        </span><span class="c1"># last 20 operations</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>arch<span class="w"> </span><span class="nb">history</span><span class="w"> </span><span class="m">50</span><span class="w">     </span><span class="c1"># last 50 operations</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>arch<span class="w"> </span><span class="nb">history</span><span class="w"> </span><span class="m">5</span><span class="w">      </span><span class="c1"># just the last 5</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>arrow<span class="w"> </span><span class="nb">history</span><span class="w">        </span><span class="c1"># last 20 operations</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>arrow<span class="w"> </span><span class="nb">history</span><span class="w"> </span><span class="m">50</span><span class="w">     </span><span class="c1"># last 50 operations</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>arrow<span class="w"> </span><span class="nb">history</span><span class="w"> </span><span class="m">5</span><span class="w">      </span><span class="c1"># just the last 5</span>
 </code></pre></div>
 <p><strong>Example output:</strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>[2025-06-01T12:34:56+0000] [ALPM] installed firefox (126.0-1)

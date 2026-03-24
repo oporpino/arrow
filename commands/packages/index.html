@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Reference for arch add, del, search, info, files, own, and deps commands.">
+        <meta name="description" content="Reference for arrow add, delete, search, info, files, own, and deps commands.">
       
       
         <meta name="author" content="oporpino">
@@ -710,10 +710,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#del" class="md-nav__link">
+  <a href="#delete" class="md-nav__link">
     <span class="md-ellipsis">
       
-        del
+        delete
       
     </span>
   </a>
@@ -1011,15 +1011,15 @@
 <h1 id="package-commands">Package Commands<a class="headerlink" href="#package-commands" title="Permanent link">&para;</a></h1>
 <h2 id="add">add<a class="headerlink" href="#add" title="Permanent link">&para;</a></h2>
 <p>Install one or more packages from the sync repositories.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>arch add &lt;package&gt; [package2 …]
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>arrow add &lt;package&gt; [package2 …]
 </code></pre></div>
 <p><strong>Examples:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>arch<span class="w"> </span>add<span class="w"> </span>firefox
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>arch<span class="w"> </span>add<span class="w"> </span>git<span class="w"> </span>base-devel<span class="w"> </span>neovim<span class="w"> </span>ripgrep<span class="w"> </span>fd
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>arrow<span class="w"> </span>add<span class="w"> </span>firefox
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>arrow<span class="w"> </span>add<span class="w"> </span>git<span class="w"> </span>base-devel<span class="w"> </span>neovim<span class="w"> </span>ripgrep<span class="w"> </span>fd
 </code></pre></div>
 <p><strong>pacman equivalent:</strong> <code>pacman -S &lt;package&gt;</code></p>
 <hr />
-<h2 id="del">del<a class="headerlink" href="#del" title="Permanent link">&para;</a></h2>
+<h2 id="delete">delete<a class="headerlink" href="#delete" title="Permanent link">&para;</a></h2>
 <p>Remove packages along with their now-unneeded dependencies and configuration files.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>arrow delete &lt;package&gt; [package2 …]
 </code></pre></div>
@@ -1027,66 +1027,66 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>arrow<span class="w"> </span>delete<span class="w"> </span>gimp
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>arrow<span class="w"> </span>delete<span class="w"> </span>vlc<span class="w"> </span>ffmpeg
 </code></pre></div>
-<p><strong>Aliases:</strong> <code>rm</code>, <code>remove</code></p>
+<p><strong>Aliases:</strong> <code>del</code>, <code>rm</code>, <code>remove</code></p>
 <p><strong>pacman equivalent:</strong> <code>pacman -Rns &lt;package&gt;</code></p>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
-<p>Unlike a plain <code>pacman -R</code>, <code>arch del</code> also removes orphaned dependencies (<code>-s</code>) and configuration files (<code>-n</code>), leaving a cleaner system.</p>
+<p>Unlike a plain <code>pacman -R</code>, <code>arrow delete</code> also removes orphaned dependencies (<code>-s</code>) and configuration files (<code>-n</code>), leaving a cleaner system.</p>
 </div>
 <hr />
 <h2 id="search">search<a class="headerlink" href="#search" title="Permanent link">&para;</a></h2>
 <p>Search the sync databases for packages matching a term.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>arch search &lt;term&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>arrow search &lt;term&gt;
 </code></pre></div>
 <p><strong>Examples:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>arch<span class="w"> </span>search<span class="w"> </span>python
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>arch<span class="w"> </span>search<span class="w"> </span><span class="s2">&quot;video editor&quot;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>arrow<span class="w"> </span>search<span class="w"> </span>python
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>arrow<span class="w"> </span>search<span class="w"> </span><span class="s2">&quot;video editor&quot;</span>
 </code></pre></div>
 <p><strong>Aliases:</strong> <code>find</code>, <code>s</code></p>
 <p><strong>pacman equivalent:</strong> <code>pacman -Ss &lt;term&gt;</code></p>
 <hr />
 <h2 id="info">info<a class="headerlink" href="#info" title="Permanent link">&para;</a></h2>
 <p>Show detailed information about a package. Checks the sync database first; if the package is not found there, checks the local (installed) database.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>arch info &lt;package&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>arrow info &lt;package&gt;
 </code></pre></div>
 <p><strong>Examples:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>arch<span class="w"> </span>info<span class="w"> </span>firefox
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>arch<span class="w"> </span>info<span class="w"> </span>base
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>arrow<span class="w"> </span>info<span class="w"> </span>firefox
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>arrow<span class="w"> </span>info<span class="w"> </span>base
 </code></pre></div>
 <p><strong>pacman equivalent:</strong> <code>pacman -Si &lt;package&gt;</code> / <code>pacman -Qi &lt;package&gt;</code></p>
 <hr />
 <h2 id="files">files<a class="headerlink" href="#files" title="Permanent link">&para;</a></h2>
 <p>List all files installed by a package.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>arch files &lt;package&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>arrow files &lt;package&gt;
 </code></pre></div>
 <p><strong>Examples:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>arch<span class="w"> </span>files<span class="w"> </span>bash
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>arch<span class="w"> </span>files<span class="w"> </span>neovim
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>arrow<span class="w"> </span>files<span class="w"> </span>bash
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>arrow<span class="w"> </span>files<span class="w"> </span>neovim
 </code></pre></div>
 <p><strong>pacman equivalent:</strong> <code>pacman -Ql &lt;package&gt;</code></p>
 <hr />
 <h2 id="own">own<a class="headerlink" href="#own" title="Permanent link">&para;</a></h2>
 <p>Find which installed package owns a given file.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>arch own &lt;file&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>arrow own &lt;file&gt;
 </code></pre></div>
 <p><strong>Examples:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>arch<span class="w"> </span>own<span class="w"> </span>/usr/bin/git
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>arch<span class="w"> </span>own<span class="w"> </span>/etc/pacman.conf
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>arrow<span class="w"> </span>own<span class="w"> </span>/usr/bin/git
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>arrow<span class="w"> </span>own<span class="w"> </span>/etc/pacman.conf
 </code></pre></div>
 <p><strong>pacman equivalent:</strong> <code>pacman -Qo &lt;file&gt;</code></p>
 <hr />
 <h2 id="deps">deps<a class="headerlink" href="#deps" title="Permanent link">&para;</a></h2>
 <p>Display the full dependency tree of a package. Uses <code>pactree</code> if available; falls back to <code>pacman -Si</code> otherwise.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>arch deps &lt;package&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>arrow deps &lt;package&gt;
 </code></pre></div>
 <p><strong>Examples:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>arch<span class="w"> </span>deps<span class="w"> </span>firefox
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>arch<span class="w"> </span>deps<span class="w"> </span>python
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>arrow<span class="w"> </span>deps<span class="w"> </span>firefox
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>arrow<span class="w"> </span>deps<span class="w"> </span>python
 </code></pre></div>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
 <p>Install <code>pactree</code> for a richer tree view:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>arch<span class="w"> </span>add<span class="w"> </span>pacman-contrib
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>arrow<span class="w"> </span>add<span class="w"> </span>pacman-contrib
 </code></pre></div></p>
 </div>
 

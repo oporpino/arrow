@@ -1038,67 +1038,67 @@
 
 <h1 id="quick-start">Quick Start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h1>
 <h2 id="your-first-commands">Your first commands<a class="headerlink" href="#your-first-commands" title="Permanent link">&para;</a></h2>
-<p>After installing, run <code>arch help</code> to see all available commands:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>arch<span class="w"> </span><span class="nb">help</span>
+<p>After installing, run <code>arrow help</code> to see all available commands:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>arrow<span class="w"> </span><span class="nb">help</span>
 </code></pre></div>
 <h3 id="install-a-package">Install a package<a class="headerlink" href="#install-a-package" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>arch<span class="w"> </span>add<span class="w"> </span>firefox
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>arrow<span class="w"> </span>add<span class="w"> </span>firefox
 </code></pre></div>
 <p>Install multiple packages at once:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>arch<span class="w"> </span>add<span class="w"> </span>git<span class="w"> </span>base-devel<span class="w"> </span>neovim<span class="w"> </span>ripgrep
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>arrow<span class="w"> </span>add<span class="w"> </span>git<span class="w"> </span>base-devel<span class="w"> </span>neovim<span class="w"> </span>ripgrep
 </code></pre></div>
 <h3 id="remove-a-package">Remove a package<a class="headerlink" href="#remove-a-package" title="Permanent link">&para;</a></h3>
-<p><code>arch del</code> removes the package <em>and</em> any dependencies that are no longer needed — no leftover cruft:</p>
+<p><code>arrow delete</code> removes the package <em>and</em> any dependencies that are no longer needed — no leftover cruft:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>arrow<span class="w"> </span>delete<span class="w"> </span>gimp
 </code></pre></div>
 <h3 id="search-for-packages">Search for packages<a class="headerlink" href="#search-for-packages" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>arch<span class="w"> </span>search<span class="w"> </span>video<span class="w"> </span>editor
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>arrow<span class="w"> </span>search<span class="w"> </span>video<span class="w"> </span>editor
 </code></pre></div>
 <h3 id="keep-your-system-up-to-date">Keep your system up to date<a class="headerlink" href="#keep-your-system-up-to-date" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>arch<span class="w"> </span>upgrade
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>arrow<span class="w"> </span>upgrade
 </code></pre></div>
 <hr />
 <h2 id="system-hygiene">System hygiene<a class="headerlink" href="#system-hygiene" title="Permanent link">&para;</a></h2>
 <p>Over time, Arch systems accumulate orphaned packages (dependencies of packages you've removed). Check for them regularly:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>arch<span class="w"> </span>orphans
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>arrow<span class="w"> </span>orphans
 </code></pre></div>
 <p>Remove them all at once:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>arch<span class="w"> </span>purge
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>arrow<span class="w"> </span>purge
 </code></pre></div>
 <p>Clean the package cache to free disk space:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>arch<span class="w"> </span>clean<span class="w">         </span><span class="c1"># keeps one version of each package</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>arch<span class="w"> </span>clean<span class="w"> </span>--all<span class="w">   </span><span class="c1"># wipes everything from the cache</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>arrow<span class="w"> </span>clean<span class="w">         </span><span class="c1"># keeps one version of each package</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>arrow<span class="w"> </span>clean<span class="w"> </span>--all<span class="w">   </span><span class="c1"># wipes everything from the cache</span>
 </code></pre></div>
 <hr />
 <h2 id="useful-inspection-commands">Useful inspection commands<a class="headerlink" href="#useful-inspection-commands" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># what do you know about this package?</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>arch<span class="w"> </span>info<span class="w"> </span>htop
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>arrow<span class="w"> </span>info<span class="w"> </span>htop
 <a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
 <a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="c1"># what files does a package install?</span>
-<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>arch<span class="w"> </span>files<span class="w"> </span>bash
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>arrow<span class="w"> </span>files<span class="w"> </span>bash
 <a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>
 <a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="c1"># which package owns this file?</span>
-<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>arch<span class="w"> </span>own<span class="w"> </span>/usr/bin/python
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>arrow<span class="w"> </span>own<span class="w"> </span>/usr/bin/python
 <a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>
 <a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="c1"># what has pacman been doing lately?</span>
-<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>arch<span class="w"> </span><span class="nb">history</span>
-<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>arch<span class="w"> </span><span class="nb">history</span><span class="w"> </span><span class="m">50</span><span class="w">   </span><span class="c1"># last 50 entries</span>
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>arrow<span class="w"> </span><span class="nb">history</span>
+<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>arrow<span class="w"> </span><span class="nb">history</span><span class="w"> </span><span class="m">50</span><span class="w">   </span><span class="c1"># last 50 entries</span>
 </code></pre></div>
 <hr />
 <h2 id="aur-packages">AUR packages<a class="headerlink" href="#aur-packages" title="Permanent link">&para;</a></h2>
 <p>If you have <a href="https://github.com/Jguer/yay">yay</a> or <a href="https://github.com/morganamilo/paru">paru</a> installed, you can manage AUR packages too:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>arch<span class="w"> </span>aur<span class="w"> </span>add<span class="w"> </span>visual-studio-code-bin
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>arch<span class="w"> </span>aur<span class="w"> </span>search<span class="w"> </span>spotify
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>arch<span class="w"> </span>aur<span class="w"> </span>upgrade
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>arrow<span class="w"> </span>aur<span class="w"> </span>add<span class="w"> </span>visual-studio-code-bin
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>arrow<span class="w"> </span>aur<span class="w"> </span>search<span class="w"> </span>spotify
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>arrow<span class="w"> </span>aur<span class="w"> </span>upgrade
 </code></pre></div>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
 <p>Don't have an AUR helper yet? Install one first:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>arch<span class="w"> </span>add<span class="w"> </span>base-devel<span class="w"> </span>git
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>arrow<span class="w"> </span>add<span class="w"> </span>base-devel<span class="w"> </span>git
 <a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>git<span class="w"> </span>clone<span class="w"> </span>https://aur.archlinux.org/yay.git<span class="w"> </span>/tmp/yay
 <a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="nb">cd</span><span class="w"> </span>/tmp/yay<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>makepkg<span class="w"> </span>-si
 </code></pre></div>
-Then <code>arch aur add anything-from-the-aur</code> just works.</p>
+Then <code>arrow aur add anything-from-the-aur</code> just works.</p>
 </div>
 <hr />
 <h2 id="aliases">Aliases<a class="headerlink" href="#aliases" title="Permanent link">&para;</a></h2>
