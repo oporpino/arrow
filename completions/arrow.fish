@@ -11,6 +11,7 @@ function __arrow_no_subcommand
         info files own deps \
         list ls history log \
         orphans clean purge \
+        self-update selfupdate \
         aur help version
 end
 
@@ -54,7 +55,9 @@ complete -c arrow -f -n __arrow_no_subcommand -a log     -d 'Alias for history'
 complete -c arrow -f -n __arrow_no_subcommand -a orphans -d 'List orphaned packages'
 complete -c arrow -f -n __arrow_no_subcommand -a clean   -d 'Clean package cache'
 complete -c arrow -f -n __arrow_no_subcommand -a purge   -d 'Remove all orphaned packages'
-complete -c arrow -f -n __arrow_no_subcommand -a aur     -d 'AUR helper commands'
+complete -c arrow -f -n __arrow_no_subcommand -a self-update  -d 'Update arrow to the latest version'
+complete -c arrow -f -n __arrow_no_subcommand -a selfupdate   -d 'Alias for self-update'
+complete -c arrow -f -n __arrow_no_subcommand -a aur          -d 'AUR helper commands'
 complete -c arrow -f -n __arrow_no_subcommand -a help    -d 'Show help'
 complete -c arrow -f -n __arrow_no_subcommand -a version -d 'Print version'
 

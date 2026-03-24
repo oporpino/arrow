@@ -37,6 +37,8 @@ _arrow() {
         'orphans:list orphaned packages'
         'clean:clean the package cache'
         'purge:remove all orphaned packages'
+        'self-update:update arrow to the latest version'
+        'selfupdate:alias for self-update'
         'aur:AUR helper commands'
         'help:show this help'
         'version:print version'

@@ -29,6 +29,8 @@ $(echo -e "${BOLD}SISTEMA${RESET}")
   $(echo -e "${YELLOW}orphans${RESET}")                 Lista pacotes órfãos
   $(echo -e "${YELLOW}purge${RESET}")                   Remove todos os pacotes órfãos
 
+  $(echo -e "${MAGENTA}self-update${RESET}")              Atualiza o arrow para a versão mais recente
+
 $(echo -e "${BOLD}LISTAGEM${RESET}")
   $(echo -e "${CYAN}list${RESET}")    [filtro]        Lista pacotes instalados
   $(echo -e "${CYAN}history${RESET}") [n=20]          Histórico de operações

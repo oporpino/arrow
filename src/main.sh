@@ -16,11 +16,12 @@ main() {
     deps)                   cmd_deps    "$@" ;;
 
     # system
-    update)                 cmd_update  "$@" ;;
-    upgrade | up)           cmd_upgrade "$@" ;;
-    clean)                  cmd_clean   "$@" ;;
-    orphans)                cmd_orphans "$@" ;;
-    purge)                  cmd_purge   "$@" ;;
+    update)                       cmd_update       "$@" ;;
+    upgrade | up)                 cmd_upgrade      "$@" ;;
+    clean)                        cmd_clean        "$@" ;;
+    orphans)                      cmd_orphans      "$@" ;;
+    purge)                        cmd_purge        "$@" ;;
+    self-update | selfupdate)     cmd_self_update  "$@" ;;
 
     # query
     list | ls)              cmd_list    "$@" ;;

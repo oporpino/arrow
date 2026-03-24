@@ -17,6 +17,7 @@ _arrow() {
     info files own deps
     list ls history log
     orphans clean purge
+    self-update selfupdate
     aur
     help version
   )

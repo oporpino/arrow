@@ -55,6 +55,24 @@ cmd_orphans() {
   fi
 }
 
+# arrow self-update
+# Download and run the latest install.sh, replacing the current version.
+cmd_self_update() {
+  local install_url="https://raw.githubusercontent.com/${REPO}/main/install.sh"
+
+  _need_pkg curl
+
+  _preview "Atualizar o arrow" \
+    "curl -fsSL ${install_url} | bash"
+
+  _ask "Substituir a versão atual ($(arrow version 2>/dev/null || echo '?')) pela mais recente?" \
+    || { _warn "Cancelado."; return; }
+
+  _blank
+  _info "Baixando e executando o installer…"
+  bash <(curl -fsSL "$install_url")
+}
+
 # arrow purge
 # Remove all orphaned packages in one shot.
 cmd_purge() {
