@@ -29,7 +29,7 @@ source /usr/share/bash-completion/completions/arch
 Ensure `bash-completion` is installed:
 
 ```bash
-arch add bash-completion
+arrow add bash-completion
 ```
 
 ## zsh

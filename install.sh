@@ -77,7 +77,9 @@ _check_deps() {
     _warn "Missing dependencies: ${missing[*]}"
     if command -v pacman &>/dev/null; then
       _info "Installing via pacman…"
-      sudo pacman -S --noconfirm "${missing[@]}"
+      local _sudo=""
+      [[ $EUID -ne 0 ]] && _sudo="sudo"
+      ${_sudo} pacman -S --noconfirm "${missing[@]}"
     else
       _die "Please install manually: ${missing[*]}"
     fi
@@ -103,7 +105,7 @@ _build() {
 
 _install() {
   local need_sudo=""
-  [[ ! -w "${PREFIX}/bin" ]] && need_sudo="sudo"
+  [[ $EUID -ne 0 && ! -w "${PREFIX}/bin" ]] && need_sudo="sudo"
 
   _info "Installing to ${BOLD}${PREFIX}${RESET}…"
   ${need_sudo} make -C "$WORK_DIR/src" install PREFIX="$PREFIX" --silent

@@ -10,13 +10,13 @@ description: Reference for arch update, upgrade, clean, orphans, and purge comma
 Synchronise the local package databases with the upstream mirrors.
 
 ```
-arch update
+arrow update
 ```
 
 **pacman equivalent:** `pacman -Sy`
 
 !!! warning
-    Running `update` without `upgrade` can leave your system in a partially updated state. Prefer `arch upgrade` for day-to-day maintenance.
+    Running `update` without `upgrade` can leave your system in a partially updated state. Prefer `arrow upgrade` for day-to-day maintenance.
 
 ---
 
@@ -25,7 +25,7 @@ arch update
 Synchronise databases and upgrade all installed packages to their latest versions.
 
 ```
-arch upgrade
+arrow upgrade
 ```
 
 **Alias:** `up`
@@ -35,7 +35,7 @@ arch upgrade
 **Example:**
 
 ```bash
-arch upgrade
+arrow upgrade
 ```
 
 ---
@@ -45,7 +45,7 @@ arch upgrade
 Remove outdated package versions from the local package cache to free disk space.
 
 ```
-arch clean [--all]
+arrow clean [--all]
 ```
 
 | Flag | Behaviour |
@@ -56,8 +56,8 @@ arch clean [--all]
 **Examples:**
 
 ```bash
-arch clean        # light clean
-arch clean --all  # full wipe
+arrow clean        # light clean
+arrow clean --all  # full wipe
 ```
 
 **pacman equivalent:** `pacman -Sc` / `pacman -Scc`
@@ -69,7 +69,7 @@ arch clean --all  # full wipe
 List packages that were installed as dependencies but are no longer required by any installed package.
 
 ```
-arch orphans
+arrow orphans
 ```
 
 **pacman equivalent:** `pacman -Qdtq`
@@ -83,16 +83,16 @@ perl-error
 python-chardet
 ```
 
-Use `arch purge` to remove them all at once.
+Use `arrow purge` to remove them all at once.
 
 ---
 
 ## purge
 
-Remove all orphaned packages (as reported by `arch orphans`) in a single step.
+Remove all orphaned packages (as reported by `arrow orphans`) in a single step.
 
 ```
-arch purge
+arrow purge
 ```
 
 **pacman equivalent:** `pacman -Rns $(pacman -Qdtq)`
@@ -100,6 +100,6 @@ arch purge
 !!! tip "Routine maintenance"
     Running these two commands periodically keeps your system lean:
     ```bash
-    arch purge    # remove orphans
-    arch clean    # trim the cache
+    arrow purge    # remove orphans
+    arrow clean    # trim the cache
     ```

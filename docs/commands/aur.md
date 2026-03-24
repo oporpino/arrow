@@ -1,20 +1,20 @@
 ---
 title: AUR Commands
-description: Reference for arch aur commands — install, search, and upgrade packages from the Arch User Repository.
+description: Reference for arrow aur commands — install, search, and upgrade packages from the Arch User Repository.
 ---
 
 # AUR Commands
 
-`arch aur` delegates to the first available AUR helper on your system. Supported helpers (checked in order):
+`arrow aur` delegates to the first available AUR helper on your system. Supported helpers (checked in order):
 
 1. [`yay`](https://github.com/Jguer/yay)
 2. [`paru`](https://github.com/morganamilo/paru)
 
-If neither is installed, `arch aur` will exit with an error.
+If neither is installed, `arrow aur` will exit with an error.
 
 !!! tip "Install an AUR helper"
     ```bash
-    arch add base-devel git
+    arrow add base-devel git
     git clone https://aur.archlinux.org/yay.git /tmp/yay
     cd /tmp/yay && makepkg -si
     ```
@@ -26,14 +26,14 @@ If neither is installed, `arch aur` will exit with an error.
 Install one or more packages from the Arch User Repository.
 
 ```
-arch aur add <package> [package2 …]
+arrow aur add <package> [package2 …]
 ```
 
 **Examples:**
 
 ```bash
-arch aur add visual-studio-code-bin
-arch aur add spotify ttf-ms-fonts
+arrow aur add visual-studio-code-bin
+arrow aur add spotify ttf-ms-fonts
 ```
 
 ---
@@ -43,14 +43,14 @@ arch aur add spotify ttf-ms-fonts
 Search the AUR for packages matching a term.
 
 ```
-arch aur search <term>
+arrow aur search <term>
 ```
 
 **Examples:**
 
 ```bash
-arch aur search spotify
-arch aur search "discord"
+arrow aur search spotify
+arrow aur search "discord"
 ```
 
 ---
@@ -60,18 +60,18 @@ arch aur search "discord"
 Upgrade all installed AUR packages.
 
 ```
-arch aur upgrade
+arrow aur upgrade
 ```
 
 **Example:**
 
 ```bash
-arch aur upgrade
+arrow aur upgrade
 ```
 
 !!! note
     To upgrade both official and AUR packages in one step, run:
     ```bash
-    arch upgrade       # official repositories
-    arch aur upgrade   # AUR packages
+    arrow upgrade       # official repositories
+    arrow aur upgrade   # AUR packages
     ```

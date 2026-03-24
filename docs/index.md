@@ -13,7 +13,7 @@ arrow makes Arch accessible — whether you're installing packages, setting up a
 
 ```bash
 arrow add firefox neovim       # install packages
-arrow delete vlc                  # remove + clean orphans
+arrow delete vlc               # remove + clean orphans
 arrow upgrade                  # full system upgrade
 arrow setup gnome              # install and configure GNOME
 arrow howto                    # interactive post-install guide
@@ -44,7 +44,7 @@ arrow wraps pacman with memorable commands. Under the hood it's still pacman —
 | arrow | pacman | What it does |
 |---|---|---|
 | `arrow add firefox` | `pacman -S firefox` | Install a package |
-| `arrow deleteete vlc` | `pacman -Rns vlc` | Remove + clean deps |
+| `arrow delete vlc` | `pacman -Rns vlc` | Remove + clean deps |
 | `arrow search python` | `pacman -Ss python` | Search repos |
 | `arrow upgrade` | `pacman -Syu` | Full upgrade |
 | `arrow orphans` | `pacman -Qdtq` | List unused deps |

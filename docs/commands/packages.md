@@ -1,6 +1,6 @@
 ---
 title: Package Commands
-description: Reference for arch add, del, search, info, files, own, and deps commands.
+description: Reference for arrow add, delete, search, info, files, own, and deps commands.
 ---
 
 # Package Commands
@@ -10,21 +10,21 @@ description: Reference for arch add, del, search, info, files, own, and deps com
 Install one or more packages from the sync repositories.
 
 ```
-arch add <package> [package2 …]
+arrow add <package> [package2 …]
 ```
 
 **Examples:**
 
 ```bash
-arch add firefox
-arch add git base-devel neovim ripgrep fd
+arrow add firefox
+arrow add git base-devel neovim ripgrep fd
 ```
 
 **pacman equivalent:** `pacman -S <package>`
 
 ---
 
-## del
+## delete
 
 Remove packages along with their now-unneeded dependencies and configuration files.
 
@@ -39,12 +39,12 @@ arrow delete gimp
 arrow delete vlc ffmpeg
 ```
 
-**Aliases:** `rm`, `remove`
+**Aliases:** `del`, `rm`, `remove`
 
 **pacman equivalent:** `pacman -Rns <package>`
 
 !!! info
-    Unlike a plain `pacman -R`, `arch del` also removes orphaned dependencies (`-s`) and configuration files (`-n`), leaving a cleaner system.
+    Unlike a plain `pacman -R`, `arrow delete` also removes orphaned dependencies (`-s`) and configuration files (`-n`), leaving a cleaner system.
 
 ---
 
@@ -53,14 +53,14 @@ arrow delete vlc ffmpeg
 Search the sync databases for packages matching a term.
 
 ```
-arch search <term>
+arrow search <term>
 ```
 
 **Examples:**
 
 ```bash
-arch search python
-arch search "video editor"
+arrow search python
+arrow search "video editor"
 ```
 
 **Aliases:** `find`, `s`
@@ -74,14 +74,14 @@ arch search "video editor"
 Show detailed information about a package. Checks the sync database first; if the package is not found there, checks the local (installed) database.
 
 ```
-arch info <package>
+arrow info <package>
 ```
 
 **Examples:**
 
 ```bash
-arch info firefox
-arch info base
+arrow info firefox
+arrow info base
 ```
 
 **pacman equivalent:** `pacman -Si <package>` / `pacman -Qi <package>`
@@ -93,14 +93,14 @@ arch info base
 List all files installed by a package.
 
 ```
-arch files <package>
+arrow files <package>
 ```
 
 **Examples:**
 
 ```bash
-arch files bash
-arch files neovim
+arrow files bash
+arrow files neovim
 ```
 
 **pacman equivalent:** `pacman -Ql <package>`
@@ -112,14 +112,14 @@ arch files neovim
 Find which installed package owns a given file.
 
 ```
-arch own <file>
+arrow own <file>
 ```
 
 **Examples:**
 
 ```bash
-arch own /usr/bin/git
-arch own /etc/pacman.conf
+arrow own /usr/bin/git
+arrow own /etc/pacman.conf
 ```
 
 **pacman equivalent:** `pacman -Qo <file>`
@@ -131,18 +131,18 @@ arch own /etc/pacman.conf
 Display the full dependency tree of a package. Uses `pactree` if available; falls back to `pacman -Si` otherwise.
 
 ```
-arch deps <package>
+arrow deps <package>
 ```
 
 **Examples:**
 
 ```bash
-arch deps firefox
-arch deps python
+arrow deps firefox
+arrow deps python
 ```
 
 !!! tip
     Install `pactree` for a richer tree view:
     ```bash
-    arch add pacman-contrib
+    arrow add pacman-contrib
     ```

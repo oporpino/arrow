@@ -1,6 +1,6 @@
 ---
 title: Query Commands
-description: Reference for arch list and arch history commands.
+description: Reference for arrow list and arrow history commands.
 ---
 
 # Query Commands
@@ -10,7 +10,7 @@ description: Reference for arch list and arch history commands.
 List all installed packages. Optionally filter by a search term.
 
 ```
-arch list [filter]
+arrow list [filter]
 ```
 
 **Alias:** `ls`
@@ -18,9 +18,9 @@ arch list [filter]
 **Examples:**
 
 ```bash
-arch list               # all installed packages
-arch list python        # packages whose name contains "python"
-arch list | wc -l       # count installed packages
+arrow list               # all installed packages
+arrow list python        # packages whose name contains "python"
+arrow list | wc -l       # count installed packages
 ```
 
 **pacman equivalent:** `pacman -Q`
@@ -32,7 +32,7 @@ arch list | wc -l       # count installed packages
 Show recent pacman log entries (installs, removals, upgrades).
 
 ```
-arch history [n]
+arrow history [n]
 ```
 
 - `n` — number of entries to show (default: **20**)
@@ -42,9 +42,9 @@ arch history [n]
 **Examples:**
 
 ```bash
-arch history        # last 20 operations
-arch history 50     # last 50 operations
-arch history 5      # just the last 5
+arrow history        # last 20 operations
+arrow history 50     # last 50 operations
+arrow history 5      # just the last 5
 ```
 
 **Example output:**
