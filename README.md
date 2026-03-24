@@ -1,6 +1,6 @@
-# arrow — Arch Linux for humans
+# arrow — The missing interface for Arch
 
-> A friendlier interface to Arch Linux's package manager.
+> **A**nother **R**idiculously **R**eadable **O**verlay **W**rapper
 
 ```bash
 arrow add firefox neovim     # install packages

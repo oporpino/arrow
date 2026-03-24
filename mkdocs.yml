@@ -1,5 +1,5 @@
 site_name: arrow
-site_description: An intuitive wrapper for pacman — Arch Linux's package manager with plain English commands.
+site_description: The missing interface for Arch. Another Ridiculously Readable Overlay Wrapper.
 site_url: https://oporpino.github.io/arrow
 site_author: oporpino
 repo_url: https://github.com/oporpino/arrow

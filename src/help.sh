@@ -7,7 +7,7 @@ cmd_version() {
 cmd_help() {
   cat <<EOF
 
-$(echo -e "${BOLD}${CYAN}arrow${RESET} ${DIM}v${VERSION}${RESET}") — Arch Linux for humans
+$(echo -e "${BOLD}${CYAN}arrow${RESET} ${DIM}v${VERSION}${RESET}") — The missing interface for Arch
 $(echo -e "${DIM}${REPO}${RESET}")
 
 $(echo -e "${BOLD}USO${RESET}")

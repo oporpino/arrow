@@ -1,11 +1,13 @@
 ---
-title: arrow — Arch Linux for humans
-description: A friendly CLI for Arch Linux. Manage packages, set up your desktop, and configure your system — without memorising pacman flags or wiki pages.
+title: arrow — The missing interface for Arch
+description: The missing interface for Arch. Another Ridiculously Readable Overlay Wrapper — manage packages, set up your desktop, and configure your system without memorising pacman flags or wiki pages.
 ---
 
 # arrow
 
-**Arch Linux for humans.**
+**The missing interface for Arch.**
+
+*Another Ridiculously Readable Overlay Wrapper.*
 
 arrow makes Arch accessible — whether you're installing packages, setting up a desktop environment, or taking your first steps after a fresh install.
 
