@@ -1,9 +1,9 @@
-site_name: arch
+site_name: arrow
 site_description: An intuitive wrapper for pacman — Arch Linux's package manager with plain English commands.
-site_url: https://oporpino.github.io/arch
+site_url: https://oporpino.github.io/arrow
 site_author: oporpino
-repo_url: https://github.com/oporpino/arch
-repo_name: oporpino/arch
+repo_url: https://github.com/oporpino/arrow
+repo_name: oporpino/arrow
 edit_uri: edit/main/docs/
 
 theme:
@@ -65,7 +65,7 @@ markdown_extensions:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/oporpino/arch
+      link: https://github.com/oporpino/arrow
   version:
     provider: mike
 

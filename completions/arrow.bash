@@ -1,11 +1,11 @@
 # bash completion for arch(1)
-# Source this file or drop it in /usr/share/bash-completion/completions/arch
+# Source this file or drop it in /usr/share/bash-completion/completions/arrow
 
-_arch_installed_packages() {
+_arrow_installed_packages() {
   pacman -Qq 2>/dev/null
 }
 
-_arch() {
+_arrow() {
   local cur prev words cword
   _init_completion || return
 
@@ -30,7 +30,7 @@ _arch() {
       return
       ;;
     del | rm | remove | files | info | deps)
-      COMPREPLY=($(compgen -W "$(_arch_installed_packages)" -- "$cur"))
+      COMPREPLY=($(compgen -W "$(_arrow_installed_packages)" -- "$cur"))
       return
       ;;
     own)
@@ -55,7 +55,7 @@ _arch() {
       ;;
   esac
 
-  # Nested: arch aur <sub>
+  # Nested: arrow aur <sub>
   if [[ ${#words[@]} -ge 3 && "${words[1]}" == "aur" ]]; then
     case "$prev" in
       add | search)
@@ -73,4 +73,4 @@ _arch() {
   COMPREPLY=($(compgen -W "${commands[*]}" -- "$cur"))
 }
 
-complete -F _arch arch
+complete -F _arrow arrow

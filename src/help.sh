@@ -1,17 +1,17 @@
 # ── Help & version ────────────────────────────────────────────────────────────
 
 cmd_version() {
-  echo "arch v${VERSION}"
+  echo "arrow v${VERSION}"
 }
 
 cmd_help() {
   cat <<EOF
 
-$(echo -e "${BOLD}${CYAN}arch${RESET} ${DIM}v${VERSION}${RESET}") — wrapper intuitivo para o pacman
+$(echo -e "${BOLD}${CYAN}arrow${RESET} ${DIM}v${VERSION}${RESET}") — Arch Linux for humans
 $(echo -e "${DIM}${REPO}${RESET}")
 
 $(echo -e "${BOLD}USO${RESET}")
-  arch <comando> [argumentos]
+  arrow <comando> [argumentos]
 
 $(echo -e "${BOLD}PACOTES${RESET}")
   $(echo -e "${GREEN}add${RESET}")     <pkg…>         Instala pacote(s)
@@ -39,11 +39,11 @@ $(echo -e "${BOLD}AUR${RESET}")
   $(echo -e "${BLUE}aur upgrade${RESET}")               Atualiza pacotes AUR
 
 $(echo -e "${DIM}Exemplos:
-  arch add firefox neovim
-  arch del vlc
-  arch search python
-  arch upgrade
-  arch aur add yay${RESET}")
+  arrow add firefox neovim
+  arrow del vlc
+  arrow search python
+  arrow upgrade
+  arrow aur add yay${RESET}")
 
 EOF
 }

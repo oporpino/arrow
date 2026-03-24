@@ -16,7 +16,7 @@ description: How to install arch, the intuitive pacman wrapper, on Arch Linux an
 The fastest way to install the latest release:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/oporpino/arch/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/oporpino/arrow/main/install.sh | bash
 ```
 
 This will:
@@ -29,21 +29,21 @@ This will:
 
 ## Install a specific version
 
-Pin to a release tag with the `ARCH_VERSION` variable:
+Pin to a release tag with the `ARROW_VERSION` variable:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/oporpino/arch/main/install.sh \
-  | ARCH_VERSION=v1.0.0 bash
+curl -fsSL https://raw.githubusercontent.com/oporpino/arrow/main/install.sh \
+  | ARROW_VERSION=v1.0.0 bash
 ```
 
-Find all available versions on the [releases page](https://github.com/oporpino/arch/releases).
+Find all available versions on the [releases page](https://github.com/oporpino/arrow/releases).
 
 ## Custom install prefix
 
 Install without `sudo` by specifying a custom `PREFIX`:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/oporpino/arch/main/install.sh \
+curl -fsSL https://raw.githubusercontent.com/oporpino/arrow/main/install.sh \
   | PREFIX=~/.local bash
 ```
 
@@ -57,9 +57,9 @@ export PATH="$PATH:$HOME/.local/bin"
 ## From source
 
 ```bash
-git clone https://github.com/oporpino/arch
+git clone https://github.com/oporpino/arrow
 cd arch
-make build          # produces dist/arch
+make build          # produces dist/arrow
 sudo make install   # installs to /usr/local
 ```
 
@@ -67,7 +67,7 @@ Available make targets:
 
 | Target | Description |
 |---|---|
-| `make build` | Compile sources into `dist/arch` |
+| `make build` | Compile sources into `dist/arrow` |
 | `make install` | Install binary, completions, and man page |
 | `make uninstall` | Remove all installed files |
 | `make clean-dist` | Delete the `dist/` directory |

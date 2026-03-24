@@ -20,10 +20,10 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 - Query commands: `list`, `history`
 - AUR subcommand: `aur add`, `aur search`, `aur upgrade` (delegates to yay/paru)
 - Shell completion for **bash**, **zsh**, and **fish**
-- Man page (`man arch`)
-- `install.sh` one-liner with version pinning (`ARCH_VERSION=vx.x.x`)
+- Man page (`man arrow`)
+- `install.sh` one-liner with version pinning (`ARROW_VERSION=vx.x.x`)
 - `Makefile` with `build`, `install`, `uninstall`, `clean-dist` targets
 - Colour-aware output (ANSI codes disabled when stdout is not a TTY)
 - Command aliases: `rm`/`remove`, `find`/`s`, `up`, `ls`, `log`
 
-[v1.0.0]: https://github.com/oporpino/arch/releases/tag/v1.0.0
+[v1.0.0]: https://github.com/oporpino/arrow/releases/tag/v1.0.0

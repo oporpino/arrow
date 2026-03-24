@@ -1,6 +1,6 @@
 # ──────────────────────────────────────────────────────────────────────────────
-#  arch — Makefile
-#  Targets: build  install  uninstall  clean-dist
+#  arrow — Makefile
+#  Targets: build  install  uninstall  clean-dist  docs  docs-build
 # ──────────────────────────────────────────────────────────────────────────────
 
 # Installation prefix (override with: make install PREFIX=~/.local)
@@ -25,7 +25,7 @@ SRCS := \
 	src/main.sh
 
 VERSION := $(shell grep -oP '(?<=VERSION=")[^"]+' src/version.sh)
-DIST    := dist/arch
+DIST    := dist/arrow
 
 # ── Targets ───────────────────────────────────────────────────────────────────
 
@@ -33,13 +33,13 @@ DIST    := dist/arch
 
 all: build
 
-## build — concatenate source files into a single executable at dist/arch
+## build — concatenate source files into a single executable at dist/arrow
 build: $(DIST)
 
 $(DIST): $(SRCS) | dist/
 	@printf '#!/usr/bin/env bash\n'                               >  $@
-	@printf '# arch v%s\n' "$(VERSION)"                          >> $@
-	@printf '# %s\n'       "$(shell grep -oP '(?<=REPO=")[^"]+' src/version.sh)" >> $@
+	@printf '# arrow v%s\n' "$(VERSION)"                         >> $@
+	@printf '# %s\n' "$(shell grep -oP '(?<=REPO=")[^"]+' src/version.sh)" >> $@
 	@printf '# SPDX-License-Identifier: MIT\n\n'                 >> $@
 	@for f in $(SRCS); do                     \
 	    sed '/^[[:space:]]*#/d; /^$$/d' "$$f" >> $@; \
@@ -51,23 +51,25 @@ $(DIST): $(SRCS) | dist/
 dist/:
 	@mkdir -p $@
 
-## install — install binary, man page, and shell completions (may require sudo)
+## install — install binary, alias, man page, and shell completions
 install: build
-	install -Dm755 $(DIST)                   $(DESTDIR)$(BINDIR)/arch
-	install -Dm644 man/arch.1                $(DESTDIR)$(MANDIR)/arch.1
-	install -Dm644 completions/arch.bash     $(DESTDIR)$(BASH_COMP)/arch
-	install -Dm644 completions/_arch         $(DESTDIR)$(ZSH_COMP)/_arch
-	install -Dm644 completions/arch.fish     $(DESTDIR)$(FISH_COMP)/arch.fish
-	@printf '  Installed arch to %s\n' "$(DESTDIR)$(BINDIR)"
+	install -Dm755 $(DIST)                    $(DESTDIR)$(BINDIR)/arrow
+	ln -sf arrow                              $(DESTDIR)$(BINDIR)/arw
+	install -Dm644 man/arrow.1                $(DESTDIR)$(MANDIR)/arrow.1
+	install -Dm644 completions/arrow.bash     $(DESTDIR)$(BASH_COMP)/arrow
+	install -Dm644 completions/_arrow         $(DESTDIR)$(ZSH_COMP)/_arrow
+	install -Dm644 completions/arrow.fish     $(DESTDIR)$(FISH_COMP)/arrow.fish
+	@printf '  Installed arrow (+ arw alias) to %s\n' "$(DESTDIR)$(BINDIR)"
 
 ## uninstall — remove all installed files
 uninstall:
-	rm -f $(DESTDIR)$(BINDIR)/arch
-	rm -f $(DESTDIR)$(MANDIR)/arch.1
-	rm -f $(DESTDIR)$(BASH_COMP)/arch
-	rm -f $(DESTDIR)$(ZSH_COMP)/_arch
-	rm -f $(DESTDIR)$(FISH_COMP)/arch.fish
-	@printf '  Uninstalled arch\n'
+	rm -f $(DESTDIR)$(BINDIR)/arrow
+	rm -f $(DESTDIR)$(BINDIR)/arw
+	rm -f $(DESTDIR)$(MANDIR)/arrow.1
+	rm -f $(DESTDIR)$(BASH_COMP)/arrow
+	rm -f $(DESTDIR)$(ZSH_COMP)/_arrow
+	rm -f $(DESTDIR)$(FISH_COMP)/arrow.fish
+	@printf '  Uninstalled arrow\n'
 
 ## clean-dist — remove the dist/ directory
 clean-dist:

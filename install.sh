@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 # ──────────────────────────────────────────────────────────────────────────────
-#  arch — one-shot installer
+#  arrow — one-shot installer
 #
-#  Installs the 'arch' pacman wrapper, its shell completions, and the man page.
+#  Installs arrow, its shell completions, the arw alias, and the man page.
 #
 #  Usage (always installs latest):
-#    curl -fsSL https://raw.githubusercontent.com/oporpino/arch/main/install.sh | bash
+#    curl -fsSL https://raw.githubusercontent.com/oporpino/arrow/main/install.sh | bash
 #
 #  Install a specific version:
-#    curl -fsSL https://raw.githubusercontent.com/oporpino/arch/main/install.sh \
-#      | ARCH_VERSION=v1.2.0 bash
+#    curl -fsSL https://raw.githubusercontent.com/oporpino/arrow/main/install.sh \
+#      | ARROW_VERSION=v1.2.0 bash
 #
 #  Custom prefix (no sudo required):
 #    curl ... | PREFIX=~/.local bash
@@ -19,21 +19,21 @@ set -euo pipefail
 
 # ── Configuration ─────────────────────────────────────────────────────────────
 
-REPO="oporpino/arch"
+REPO="oporpino/arrow"
 REPO_URL="https://github.com/${REPO}"
 
-# ARCH_VERSION can be a tag like "v1.0.0" or "main" for the bleeding edge.
-ARCH_VERSION="${ARCH_VERSION:-main}"
+# ARROW_VERSION can be a tag like "v1.0.0" or "main" for the bleeding edge.
+ARROW_VERSION="${ARROW_VERSION:-main}"
 
 # Resolve the archive URL based on the version.
-if [[ "$ARCH_VERSION" == "main" ]]; then
+if [[ "$ARROW_VERSION" == "main" ]]; then
   ARCHIVE_URL="${REPO_URL}/archive/refs/heads/main.tar.gz"
 else
-  ARCHIVE_URL="${REPO_URL}/archive/refs/tags/${ARCH_VERSION}.tar.gz"
+  ARCHIVE_URL="${REPO_URL}/archive/refs/tags/${ARROW_VERSION}.tar.gz"
 fi
 
 PREFIX="${PREFIX:-/usr/local}"
-WORK_DIR="$(mktemp -d /tmp/arch-install.XXXXXX)"
+WORK_DIR="$(mktemp -d /tmp/arrow-install.XXXXXX)"
 
 # ── Terminal helpers ───────────────────────────────────────────────────────────
 
@@ -60,7 +60,7 @@ trap _cleanup EXIT
 
 _check_os() {
   if ! command -v pacman &>/dev/null; then
-    _warn "pacman not found — arch is designed for Arch Linux / Arch-based systems."
+    _warn "pacman not found — arrow is designed for Arch Linux / Arch-based systems."
     printf "Continue anyway? [y/N] "
     read -r ans
     [[ "${ans,,}" == "y" ]] || _die "Installation cancelled."
@@ -87,11 +87,11 @@ _check_deps() {
 # ── Install steps ─────────────────────────────────────────────────────────────
 
 _download() {
-  _info "Downloading ${BOLD}arch ${ARCH_VERSION}${RESET}…"
-  curl -fsSL "$ARCHIVE_URL" -o "$WORK_DIR/arch.tar.gz" \
+  _info "Downloading ${BOLD}arrow ${ARROW_VERSION}${RESET}…"
+  curl -fsSL "$ARCHIVE_URL" -o "$WORK_DIR/arrow.tar.gz" \
     || _die "Download failed. Check your internet connection."
   mkdir -p "$WORK_DIR/src"
-  tar -xzf "$WORK_DIR/arch.tar.gz" -C "$WORK_DIR/src" --strip-components=1
+  tar -xzf "$WORK_DIR/arrow.tar.gz" -C "$WORK_DIR/src" --strip-components=1
   _ok "Downloaded."
 }
 
@@ -111,10 +111,10 @@ _install() {
 }
 
 _verify() {
-  if command -v arch &>/dev/null && arch version &>/dev/null 2>&1; then
-    _ok "$(arch version) is ready."
+  if command -v arrow &>/dev/null && arrow version &>/dev/null 2>&1; then
+    _ok "$(arrow version) is ready."
   else
-    _warn "'arch' is not in your PATH yet."
+    _warn "'arrow' is not in your PATH yet."
     _warn "Add ${PREFIX}/bin to your PATH:"
     echo -e "  ${DIM}export PATH=\"\$PATH:${PREFIX}/bin\"${RESET}"
   fi
@@ -124,7 +124,7 @@ _verify() {
 
 main() {
   echo
-  echo -e "  ${BOLD}${CYAN}arch${RESET} — installer"
+  echo -e "  ${BOLD}${CYAN}arrow${RESET} — installer"
   echo -e "  ${DIM}${REPO_URL}${RESET}"
   _sep
 
@@ -136,7 +136,7 @@ main() {
   _verify
 
   _sep
-  echo -e "  ${BOLD}Done!${RESET} Run ${CYAN}arch help${RESET} to get started."
+  echo -e "  ${BOLD}Done!${RESET} Run ${CYAN}arrow help${RESET} to get started."
   echo
 }
 
