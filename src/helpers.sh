@@ -86,6 +86,24 @@ _run() {
   fi
 }
 
+# ── Privilege escalation ──────────────────────────────────────────────────────
+#
+#   Runs a command as root: directly if already root, else via sudo or doas.
+#   Dies with a helpful message if no escalation tool is available.
+#
+_asroot() {
+  if [[ $EUID -eq 0 ]]; then
+    "$@"
+  elif command -v sudo &>/dev/null; then
+    sudo "$@"
+  elif command -v doas &>/dev/null; then
+    doas "$@"
+  else
+    _die "Permissão de root necessária, mas sudo/doas não estão instalados." \
+         "Instale sudo: pacman -S sudo   ou execute como root."
+  fi
+}
+
 # ── Guards ────────────────────────────────────────────────────────────────────
 
 _require_not_root() {
@@ -109,5 +127,5 @@ _aur_helper() {
   echo ""
 }
 
-# Runs pacman non-interactively with sudo and coloured output.
-_pacman() { sudo pacman --noconfirm --color=always "$@"; }
+# Runs pacman non-interactively as root with coloured output.
+_pacman() { _asroot pacman --noconfirm --color=always "$@"; }

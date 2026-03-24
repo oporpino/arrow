@@ -3,19 +3,19 @@
 # arrow update
 # Synchronise the package databases.
 cmd_update() {
-  _preview "Sincronizar base de dados" "sudo pacman -Sy"
+  _preview "Sincronizar base de dados" "pacman -Sy"
   _ask "Continuar?" || { _warn "Cancelado."; return; }
   _blank
-  _run sudo pacman --noconfirm --color=always -Sy
+  _run _asroot pacman --noconfirm --color=always -Sy
 }
 
 # arrow upgrade
 # Synchronise databases and upgrade all packages.
 cmd_upgrade() {
-  _preview "Atualizar o sistema" "sudo pacman -Syu"
+  _preview "Atualizar o sistema" "pacman -Syu"
   _ask "Continuar?" || { _warn "Cancelado."; return; }
   _blank
-  _run sudo pacman --noconfirm --color=always -Syu
+  _run _asroot pacman --noconfirm --color=always -Syu
 }
 
 # arrow clean [--all]
@@ -23,17 +23,17 @@ cmd_upgrade() {
 # With --all, wipe the entire cache.
 cmd_clean() {
   if [[ "${1:-}" == "--all" ]]; then
-    _preview "Limpar TODO o cache de pacotes" "sudo pacman -Scc"
+    _preview "Limpar TODO o cache de pacotes" "pacman -Scc"
     _ask "Isso removerá todos os pacotes em cache. Continuar?" || { _warn "Cancelado."; return; }
   else
-    _preview "Limpar versões antigas do cache" "sudo pacman -Sc"
+    _preview "Limpar versões antigas do cache" "pacman -Sc"
     _ask "Continuar?" || { _warn "Cancelado."; return; }
   fi
   _blank
   if [[ "${1:-}" == "--all" ]]; then
-    _run sudo pacman --noconfirm --color=always -Scc
+    _run _asroot pacman --noconfirm --color=always -Scc
   else
-    _run sudo pacman --noconfirm --color=always -Sc
+    _run _asroot pacman --noconfirm --color=always -Sc
   fi
 }
 
@@ -68,9 +68,9 @@ cmd_purge() {
   local pkg_list
   pkg_list=$(echo "$pkgs" | tr '\n' ' ')
 
-  _preview "Remover pacotes órfãos" "sudo pacman -Rns ${pkg_list}"
+  _preview "Remover pacotes órfãos" "pacman -Rns ${pkg_list}"
   _ask "Remover?" || { _warn "Cancelado."; return; }
   _blank
   # shellcheck disable=SC2086
-  _run sudo pacman --noconfirm --color=always -Rns $pkgs
+  _run _asroot pacman --noconfirm --color=always -Rns $pkgs
 }

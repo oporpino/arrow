@@ -4,10 +4,10 @@
 # Install one or more packages from the official repositories.
 cmd_add() {
   [[ $# -eq 0 ]] && _die "Uso: arrow add <pacote> [pacote2 …]"
-  _preview "Instalar pacote(s)" "sudo pacman -S $*"
+  _preview "Instalar pacote(s)" "pacman -S $*"
   _ask "Instalar?" || { _warn "Cancelado."; return; }
   _blank
-  _run sudo pacman --noconfirm --color=always -S "$@"
+  _run _asroot pacman --noconfirm --color=always -S "$@"
 }
 
 # arrow delete <pkg> [pkg2 …]
@@ -15,10 +15,10 @@ cmd_add() {
 # Aliases: del, rm, remove
 cmd_delete() {
   [[ $# -eq 0 ]] && _die "Uso: arrow delete <pacote> [pacote2 …]"
-  _preview "Remover pacote(s) e dependências órfãs" "sudo pacman -Rns $*"
+  _preview "Remover pacote(s) e dependências órfãs" "pacman -Rns $*"
   _ask "Remover?" || { _warn "Cancelado."; return; }
   _blank
-  _run sudo pacman --noconfirm --color=always -Rns "$@"
+  _run _asroot pacman --noconfirm --color=always -Rns "$@"
 }
 
 # arrow search <term>
