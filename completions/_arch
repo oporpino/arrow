@@ -1,0 +1,86 @@
+#compdef arch
+# zsh completion for arch(1)
+# Install to a directory listed in $fpath, e.g. /usr/share/zsh/site-functions/
+
+_arch() {
+  local context state state_descr line
+  typeset -A opt_args
+
+  _arguments -C \
+    '(-h --help)'{-h,--help}'[show help and exit]' \
+    '(-v --version)'{-v,--version}'[print version and exit]' \
+    '1:command:->command' \
+    '*:argument:->argument'
+
+  case $state in
+    command)
+      local -a cmds
+      cmds=(
+        'add:install one or more packages'
+        'del:remove packages and orphaned deps'
+        'rm:alias for del'
+        'remove:alias for del'
+        'search:search sync databases'
+        'find:alias for search'
+        's:alias for search'
+        'update:synchronise package databases'
+        'upgrade:upgrade all installed packages'
+        'up:alias for upgrade'
+        'info:show package details'
+        'files:list files owned by a package'
+        'own:find the package that owns a file'
+        'deps:show dependency tree'
+        'list:list installed packages'
+        'ls:alias for list'
+        'history:show pacman log entries'
+        'log:alias for history'
+        'orphans:list orphaned packages'
+        'clean:clean the package cache'
+        'purge:remove all orphaned packages'
+        'aur:AUR helper commands'
+        'help:show this help'
+        'version:print version'
+      )
+      _describe -t commands 'arch command' cmds
+      ;;
+
+    argument)
+      case $words[2] in
+        del | rm | remove | files | info | deps)
+          local -a pkgs
+          pkgs=(${(f)"$(pacman -Qq 2>/dev/null)"})
+          _values 'installed package' $pkgs
+          ;;
+        own)
+          _files
+          ;;
+        list | ls)
+          _message 'optional filter string'
+          ;;
+        history | log)
+          _message 'number of entries (default 20)'
+          ;;
+        clean)
+          _values 'option' '--all[wipe the entire package cache]'
+          ;;
+        aur)
+          local -a aur_cmds
+          aur_cmds=(
+            'add:install a package from the AUR'
+            'search:search the AUR'
+            'upgrade:upgrade AUR packages'
+          )
+          _describe -t aur-commands 'aur subcommand' aur_cmds
+          ;;
+        add | search | find | s)
+          # Sync database package names (may be slow)
+          local -a sync_pkgs
+          sync_pkgs=(${(f)"$(pacman -Slq 2>/dev/null)"})
+          _values 'package' $sync_pkgs
+          ;;
+      esac
+      ;;
+  esac
+}
+
+_arch "$@"
