@@ -8,7 +8,7 @@ cmd_help() {
   cat <<EOF
 
 $(echo -e "${BOLD}${CYAN}arrow${RESET} ${DIM}v${VERSION}${RESET}") — The missing interface for Arch
-$(echo -e "${DIM}${REPO}${RESET}")
+$(echo -e "${DIM}${REPO_URL}${RESET}")
 
 $(echo -e "${BOLD}USO${RESET}")
   arrow <comando> [argumentos]
