@@ -1,4 +1,4 @@
-# arch — an intuitive wrapper for pacman
+# arrow — Arch Linux for humans
 
 > A friendlier interface to Arch Linux's package manager.
 
@@ -62,28 +62,28 @@ The installer checks that `pacman` is present, installs any missing build depend
 | `arrow add <pkg…>` | `pacman -S` | Install one or more packages |
 | `arrow del <pkg…>` | `pacman -Rns` | Remove packages and orphaned deps |
 | `arrow search <term>` | `pacman -Ss` | Search the sync databases |
-| `arch info <pkg>` | `pacman -Si / -Qi` | Show package details |
-| `arch files <pkg>` | `pacman -Ql` | List files owned by an installed package |
-| `arch own <file>` | `pacman -Qo` | Find which package owns a file |
-| `arch deps <pkg>` | `pactree` | Show the full dependency tree |
+| `arrow info <pkg>` | `pacman -Si / -Qi` | Show package details |
+| `arrow files <pkg>` | `pacman -Ql` | List files owned by an installed package |
+| `arrow own <file>` | `pacman -Qo` | Find which package owns a file |
+| `arrow deps <pkg>` | `pactree` | Show the full dependency tree |
 
 ### System
 
 | Command | pacman equivalent | Description |
 |---|---|---|
-| `arch update` | `pacman -Sy` | Sync package databases |
+| `arrow update` | `pacman -Sy` | Sync package databases |
 | `arrow upgrade` | `pacman -Syu` | Sync databases and upgrade all packages |
-| `arch clean` | `pacman -Sc` | Remove outdated packages from cache |
-| `arch clean --all` | `pacman -Scc` | Wipe the entire package cache |
-| `arch orphans` | `pacman -Qdtq` | List packages no longer required |
-| `arch purge` | `pacman -Rns $(…)` | Remove all orphaned packages |
+| `arrow clean` | `pacman -Sc` | Remove outdated packages from cache |
+| `arrow clean --all` | `pacman -Scc` | Wipe the entire package cache |
+| `arrow orphans` | `pacman -Qdtq` | List packages no longer required |
+| `arrow purge` | `pacman -Rns $(…)` | Remove all orphaned packages |
 
 ### Query
 
 | Command | Description |
 |---|---|
-| `arch list [filter]` | List installed packages, optionally filtered |
-| `arch history [n]` | Show the last *n* pacman log entries (default 20) |
+| `arrow list [filter]` | List installed packages, optionally filtered |
+| `arrow history [n]` | Show the last *n* pacman log entries (default 20) |
 
 ### AUR
 

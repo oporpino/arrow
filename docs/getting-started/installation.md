@@ -58,7 +58,7 @@ export PATH="$PATH:$HOME/.local/bin"
 
 ```bash
 git clone https://github.com/oporpino/arrow
-cd arch
+cd arrow
 make build          # produces dist/arrow
 sudo make install   # installs to /usr/local
 ```
