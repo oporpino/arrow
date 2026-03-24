@@ -13,8 +13,8 @@ arrow makes Arch accessible — whether you're installing packages, setting up a
 arrow add firefox neovim       # install packages
 arrow del vlc                  # remove + clean orphans
 arrow upgrade                  # full system upgrade
-arrow setup de gnome           # install and configure GNOME
-arrow first-steps              # interactive post-install guide
+arrow setup gnome              # install and configure GNOME
+arrow howto                    # interactive post-install guide
 arrow doctor                   # check system health
 ```
 
@@ -26,9 +26,9 @@ Arch Linux is one of the most powerful and transparent Linux distributions — b
 
 arrow is a single tool that covers the full journey:
 
-- **Day zero** — guided post-install setup via `first-steps`
+- **Day zero** — guided post-install walkthrough via `howto`
 - **Day to day** — plain English package management without memorising pacman flags
-- **As you grow** — `setup` commands for common configurations (desktop environments, audio, printing…)
+- **As you grow** — `setup` commands for common configurations (desktop, audio, printing…)
 - **System health** — `doctor` checks mirrors, orphans, cache, and more
 
 Everything arrow does is a direct, transparent call to `pacman`, `systemctl`, or other standard tools — no hidden state, no magic.
@@ -59,10 +59,10 @@ arrow wraps pacman with memorable commands. Under the hood it's still pacman —
 `arrow setup` handles the things that send newcomers to the wiki.
 
 ```bash
-arrow first-steps              # interactive post-install checklist
-arrow setup de gnome           # install GNOME and enable GDM
-arrow setup de kde             # install KDE Plasma
-arrow setup de hyprland        # install Hyprland (Wayland)
+arrow howto                    # interactive post-install walkthrough
+arrow setup gnome              # install GNOME and enable GDM
+arrow setup kde                # install KDE Plasma
+arrow setup hyprland           # install Hyprland (Wayland)
 arrow setup audio              # configure PipeWire
 arrow setup bluetooth          # enable and configure Bluetooth
 arrow setup printer            # CUPS + common drivers
