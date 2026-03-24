@@ -1,0 +1,216 @@
+.TH ARCH 1 "2025" "arch 1.0.0" "User Commands"
+.SH NAME
+arch \- an intuitive wrapper for pacman
+.SH SYNOPSIS
+.B arch
+.I command
+.RI [ arguments ]
+.SH DESCRIPTION
+.B arch
+is a command-line wrapper around
+.BR pacman (8)
+that replaces cryptic flags with plain English subcommands.
+It adds no hidden state or database \(em every operation is a direct call to
+.B pacman
+under the hood.
+.SH COMMANDS
+.SS Package management
+.TP
+.BI "add " "pkg" " [" "pkg2" " \&...]"
+Install one or more packages from the sync repositories.
+Equivalent to
+.BR "pacman \-S" .
+.TP
+.BI "del " "pkg" " [" "pkg2" " \&...]"
+Remove packages along with their unneeded dependencies and configuration files.
+Equivalent to
+.BR "pacman \-Rns" .
+Aliases:
+.BR rm ,
+.BR remove .
+.TP
+.BI "search " term
+Search the sync databases for packages matching
+.IR term .
+Equivalent to
+.BR "pacman \-Ss" .
+Aliases:
+.BR find ,
+.BR s .
+.TP
+.BI "info " pkg
+Display detailed information about a package.
+Checks the sync database first, then the local database.
+Equivalent to
+.BR "pacman \-Si" " / " "pacman \-Qi" .
+.TP
+.BI "files " pkg
+List all files installed by
+.IR pkg .
+Equivalent to
+.BR "pacman \-Ql" .
+.TP
+.BI "own " file
+Find the package that owns
+.IR file .
+Equivalent to
+.BR "pacman \-Qo" .
+.TP
+.BI "deps " pkg
+Display the dependency tree of
+.IR pkg .
+Uses
+.BR pactree (8)
+if available; falls back to
+.BR "pacman \-Si" .
+.SS System maintenance
+.TP
+.B update
+Synchronise the package databases.
+Equivalent to
+.BR "pacman \-Sy" .
+.TP
+.B upgrade
+Synchronise databases and upgrade all packages.
+Equivalent to
+.BR "pacman \-Syu" .
+Alias:
+.BR up .
+.TP
+.BR "clean " [ \-\-all ]
+Remove outdated packages from the package cache.
+With
+.BR \-\-all ,
+wipes the entire cache.
+Equivalent to
+.BR "pacman \-Sc" " / " "pacman \-Scc" .
+.TP
+.B orphans
+List packages that were installed as dependencies but are no longer required.
+Equivalent to
+.BR "pacman \-Qdtq" .
+.TP
+.B purge
+Remove all orphaned packages (as reported by
+.BR orphans ).
+Equivalent to
+.BR "pacman \-Rns $(pacman \-Qdtq)" .
+.SS Query
+.TP
+.BI "list " [ filter ]
+List all installed packages.
+If
+.I filter
+is provided, the output is piped through
+.BR grep (1).
+Equivalent to
+.BR "pacman \-Q" .
+Alias:
+.BR ls .
+.TP
+.BI "history " [ n ]
+Show the last
+.I n
+operations from
+.IR /var/log/pacman.log .
+Defaults to 20.
+Alias:
+.BR log .
+.SS AUR
+.B arch aur
+delegates to the first available AUR helper
+.RB ( yay (1)
+or
+.BR paru (1)).
+.TP
+.BI "aur add " pkg " [" "pkg2" " \&...]"
+Install a package from the AUR.
+.TP
+.BI "aur search " term
+Search the AUR.
+.TP
+.B aur upgrade
+Upgrade all installed AUR packages.
+.SS Meta
+.TP
+.BR "help " [ \-h | \-\-help ]
+Display the help message.
+.TP
+.BR "version " [ \-v | \-\-version ]
+Print the version string and exit.
+.SH EXAMPLES
+Install Firefox and Neovim:
+.PP
+.RS 4
+.EX
+arch add firefox neovim
+.EE
+.RE
+.PP
+Remove VLC and clean up:
+.PP
+.RS 4
+.EX
+arch del vlc
+.EE
+.RE
+.PP
+Search for Python-related packages:
+.PP
+.RS 4
+.EX
+arch search python
+.EE
+.RE
+.PP
+Full system upgrade:
+.PP
+.RS 4
+.EX
+arch upgrade
+.EE
+.RE
+.PP
+Install
+.BR yay (1)
+from the AUR:
+.PP
+.RS 4
+.EX
+arch aur add yay
+.EE
+.RE
+.PP
+List orphaned packages and remove them:
+.PP
+.RS 4
+.EX
+arch orphans
+arch purge
+.EE
+.RE
+.SH FILES
+.TP
+.I /var/log/pacman.log
+Read by
+.BR "arch history" .
+.TP
+.I /usr/share/bash-completion/completions/arch
+Bash completion script.
+.TP
+.I /usr/share/zsh/site-functions/_arch
+Zsh completion script.
+.TP
+.I /usr/share/fish/vendor_completions.d/arch.fish
+Fish completion script.
+.SH SEE ALSO
+.BR pacman (8),
+.BR pactree (8),
+.BR yay (1),
+.BR paru (1)
+.SH BUGS
+Please report bugs at <https://github.com/oporpino/arch/issues>.
+.SH AUTHOR
+oporpino <https://github.com/oporpino>
+.SH LICENSE
+MIT License.
