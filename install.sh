@@ -79,7 +79,10 @@ _check_deps() {
       _info "Installing via pacman…"
       local _sudo=""
       [[ $EUID -ne 0 ]] && _sudo="sudo"
-      ${_sudo} pacman -S --noconfirm "${missing[@]}"
+      # Kernels without Landlock support (e.g. ARM) need --disable-sandbox.
+      local _sandbox=""
+      pacman --disable-sandbox --version &>/dev/null && _sandbox="--disable-sandbox"
+      ${_sudo} pacman -S --noconfirm ${_sandbox} "${missing[@]}"
     else
       _die "Please install manually: ${missing[*]}"
     fi
