@@ -35,6 +35,9 @@ $(echo -e "${BOLD}ARROW${RESET}")
   $(echo -e "${MAGENTA}self remove${RESET}")              Desinstala o arrow do sistema
   $(echo -e "${DIM}sharpen, reforge${RESET}             Aliases para self update${RESET}")
 
+$(echo -e "${BOLD}GUIAS${RESET}")
+  $(echo -e "${WHITE}howto${RESET}")   <guia>         Guias passo a passo (ex: sudoers)
+
 $(echo -e "${BOLD}LISTAGEM${RESET}")
   $(echo -e "${CYAN}list${RESET}")    [filtro]        Lista pacotes instalados
   $(echo -e "${CYAN}history${RESET}") [n=20]          Histórico de operações

@@ -17,6 +17,7 @@ _arrow() {
     info files own deps
     list ls history log
     orphans clean purge
+    howto
     self sharpen reforge
     aur
     help version
@@ -41,6 +42,10 @@ _arrow() {
       ;;
     aur)
       COMPREPLY=($(compgen -W "${aur_cmds[*]}" -- "$cur"))
+      return
+      ;;
+    howto)
+      COMPREPLY=($(compgen -W "sudoers list" -- "$cur"))
       return
       ;;
     self)

@@ -29,6 +29,9 @@ main() {
     # aur
     aur)               cmd_aur      "$@" ;;
 
+    # howto
+    howto)             cmd_howto    "$@" ;;
+
     # self
     self)                          cmd_self         "$@" ;;
     sharpen | reforge)             cmd_self_update  "$@" ;;

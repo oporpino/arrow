@@ -37,6 +37,7 @@ _arrow() {
         'orphans:list orphaned packages'
         'clean:clean the package cache'
         'purge:remove all orphaned packages'
+        'howto:step-by-step guides',
         'self:manage arrow itself (update, remove)'
         'sharpen:update arrow to the latest version'
         'reforge:alias for sharpen'
@@ -65,6 +66,9 @@ _arrow() {
           ;;
         clean)
           _values 'option' '--all[wipe the entire package cache]'
+          ;;
+        howto)
+          _values 'guide' 'sudoers[add user to sudoers]' 'list[list available guides]'
           ;;
         self)
           local -a self_cmds

@@ -11,6 +11,7 @@ function __arrow_no_subcommand
         info files own deps \
         list ls history log \
         orphans clean purge \
+        howto \
         self sharpen reforge \
         aur help version
 end
@@ -55,6 +56,7 @@ complete -c arrow -f -n __arrow_no_subcommand -a log     -d 'Alias for history'
 complete -c arrow -f -n __arrow_no_subcommand -a orphans -d 'List orphaned packages'
 complete -c arrow -f -n __arrow_no_subcommand -a clean   -d 'Clean package cache'
 complete -c arrow -f -n __arrow_no_subcommand -a purge   -d 'Remove all orphaned packages'
+complete -c arrow -f -n __arrow_no_subcommand -a howto   -d 'Step-by-step guides'
 complete -c arrow -f -n __arrow_no_subcommand -a self     -d 'Manage arrow itself'
 complete -c arrow -f -n __arrow_no_subcommand -a sharpen  -d 'Update arrow to the latest version'
 complete -c arrow -f -n __arrow_no_subcommand -a reforge  -d 'Alias for sharpen'
@@ -82,6 +84,10 @@ complete -c arrow -F -n '__arrow_using_subcommand own'
 # 'clean' accepts --all
 complete -c arrow -f -n '__arrow_using_subcommand clean' \
     -a --all -d 'Wipe the entire package cache'
+
+# 'howto' sub-commands
+complete -c arrow -f -n '__arrow_using_subcommand howto' -a sudoers -d 'Add user to sudoers'
+complete -c arrow -f -n '__arrow_using_subcommand howto' -a list    -d 'List available guides'
 
 # 'self' sub-commands
 complete -c arrow -f -n '__arrow_using_subcommand self' -a update -d 'Update arrow to the latest version'
