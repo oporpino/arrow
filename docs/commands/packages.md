@@ -29,14 +29,14 @@ arch add git base-devel neovim ripgrep fd
 Remove packages along with their now-unneeded dependencies and configuration files.
 
 ```
-arch del <package> [package2 …]
+arrow delete <package> [package2 …]
 ```
 
 **Examples:**
 
 ```bash
-arch del gimp
-arch del vlc ffmpeg
+arrow delete gimp
+arrow delete vlc ffmpeg
 ```
 
 **Aliases:** `rm`, `remove`

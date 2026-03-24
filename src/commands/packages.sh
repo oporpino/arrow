@@ -10,10 +10,11 @@ cmd_add() {
   _run sudo pacman --noconfirm --color=always -S "$@"
 }
 
-# arrow del <pkg> [pkg2 …]
+# arrow delete <pkg> [pkg2 …]
 # Remove packages together with any now-orphaned dependencies.
-cmd_del() {
-  [[ $# -eq 0 ]] && _die "Uso: arrow del <pacote> [pacote2 …]"
+# Aliases: del, rm, remove
+cmd_delete() {
+  [[ $# -eq 0 ]] && _die "Uso: arrow delete <pacote> [pacote2 …]"
   _preview "Remover pacote(s) e dependências órfãs" "sudo pacman -Rns $*"
   _ask "Remover?" || { _warn "Cancelado."; return; }
   _blank

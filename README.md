@@ -4,7 +4,7 @@
 
 ```bash
 arrow add firefox neovim     # install packages
-arrow del vlc                # remove + clean orphans
+arrow delete vlc                # remove + clean orphans
 arrow search python          # search repositories
 arrow upgrade                # full system upgrade
 arrow aur add yay            # install from the AUR
@@ -60,7 +60,7 @@ The installer checks that `pacman` is present, installs any missing build depend
 | Command | pacman equivalent | Description |
 |---|---|---|
 | `arrow add <pkg…>` | `pacman -S` | Install one or more packages |
-| `arrow del <pkg…>` | `pacman -Rns` | Remove packages and orphaned deps |
+| `arrow delete <pkg…>` | `pacman -Rns` | Remove packages and orphaned deps |
 | `arrow search <term>` | `pacman -Ss` | Search the sync databases |
 | `arrow info <pkg>` | `pacman -Si / -Qi` | Show package details |
 | `arrow files <pkg>` | `pacman -Ql` | List files owned by an installed package |
@@ -101,7 +101,7 @@ Several commands have short aliases for convenience:
 
 | Alias | Command |
 |---|---|
-| `rm`, `remove` | `del` |
+| `del`, `rm`, `remove` | `delete` |
 | `find`, `s` | `search` |
 | `up` | `upgrade` |
 | `ls` | `list` |

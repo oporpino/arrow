@@ -8,7 +8,7 @@ main() {
   case "$cmd" in
     # packages
     add)                    cmd_add     "$@" ;;
-    del | rm | remove)      cmd_del     "$@" ;;
+    delete | del | rm | remove) cmd_delete "$@" ;;
     search | find | s)      cmd_search  "$@" ;;
     info)                   cmd_info    "$@" ;;
     files)                  cmd_files   "$@" ;;

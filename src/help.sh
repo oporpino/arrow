@@ -15,7 +15,7 @@ $(echo -e "${BOLD}USO${RESET}")
 
 $(echo -e "${BOLD}PACOTES${RESET}")
   $(echo -e "${GREEN}add${RESET}")     <pkg…>         Instala pacote(s)
-  $(echo -e "${RED}del${RESET}")     <pkg…>         Remove pacote(s) e deps órfãs
+  $(echo -e "${RED}delete${RESET}")  <pkg…>         Remove pacote(s) e deps órfãs
   $(echo -e "${BLUE}search${RESET}")  <termo>        Busca nos repositórios
   $(echo -e "${CYAN}info${RESET}")    <pkg>          Detalhes de um pacote
   $(echo -e "${CYAN}files${RESET}")   <pkg>          Arquivos instalados de um pacote
@@ -40,7 +40,7 @@ $(echo -e "${BOLD}AUR${RESET}")
 
 $(echo -e "${DIM}Exemplos:
   arrow add firefox neovim
-  arrow del vlc
+  arrow delete vlc
   arrow search python
   arrow upgrade
   arrow aur add yay${RESET}")

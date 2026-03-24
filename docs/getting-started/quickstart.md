@@ -30,7 +30,7 @@ arch add git base-devel neovim ripgrep
 `arch del` removes the package *and* any dependencies that are no longer needed — no leftover cruft:
 
 ```bash
-arch del gimp
+arrow delete gimp
 ```
 
 ### Search for packages
