@@ -1,8 +1,6 @@
 # ── Entry point ───────────────────────────────────────────────────────────────
 
 main() {
-  _require_not_root
-
   local cmd="${1:-help}"; shift || true
 
   case "$cmd" in
