@@ -1,31 +1,35 @@
 # ── Package commands ──────────────────────────────────────────────────────────
 
-# arch add <pkg> [pkg2 …]
+# arrow add <pkg> [pkg2 …]
 # Install one or more packages from the official repositories.
 cmd_add() {
-  [[ $# -eq 0 ]] && _die "Uso: arch add <pacote> [pacote2 …]"
-  _info "Instalando: ${BOLD}$*${RESET}"
-  _pacman -S "$@"
+  [[ $# -eq 0 ]] && _die "Uso: arrow add <pacote> [pacote2 …]"
+  _preview "Instalar pacote(s)" "sudo pacman -S $*"
+  _ask "Instalar?" || { _warn "Cancelado."; return; }
+  _blank
+  _run sudo pacman --noconfirm --color=always -S "$@"
 }
 
-# arch del <pkg> [pkg2 …]
+# arrow del <pkg> [pkg2 …]
 # Remove packages together with any now-orphaned dependencies.
 cmd_del() {
-  [[ $# -eq 0 ]] && _die "Uso: arch del <pacote> [pacote2 …]"
-  _info "Removendo: ${BOLD}$*${RESET}"
-  _pacman -Rns "$@"
+  [[ $# -eq 0 ]] && _die "Uso: arrow del <pacote> [pacote2 …]"
+  _preview "Remover pacote(s) e dependências órfãs" "sudo pacman -Rns $*"
+  _ask "Remover?" || { _warn "Cancelado."; return; }
+  _blank
+  _run sudo pacman --noconfirm --color=always -Rns "$@"
 }
 
-# arch search <term>
+# arrow search <term>
 # Search package names and descriptions in the sync databases.
 cmd_search() {
-  [[ $# -eq 0 ]] && _die "Uso: arch search <termo>"
+  [[ $# -eq 0 ]] && _die "Uso: arrow search <termo>"
   _info "Buscando por: ${BOLD}$*${RESET}"
   _sep
   pacman -Ss "$@"
 }
 
-# arch info <pkg>
+# arrow info <pkg>
 # Show detailed information for a package (remote or local).
 cmd_info() {
   _need_pkg "${1:-}"
@@ -33,28 +37,28 @@ cmd_info() {
   pacman -Si "$@" 2>/dev/null || pacman -Qi "$@"
 }
 
-# arch files <pkg>
+# arrow files <pkg>
 # List every file owned by an installed package.
 cmd_files() {
   _need_pkg "${1:-}"
   pacman -Ql "$1"
 }
 
-# arch own <file>
+# arrow own <file>
 # Identify which installed package owns the given file.
 cmd_own() {
   _need_pkg "${1:-}"
   pacman -Qo "$1"
 }
 
-# arch deps <pkg>
+# arrow deps <pkg>
 # Display the full dependency tree for a package.
 cmd_deps() {
   _need_pkg "${1:-}"
   if command -v pactree &>/dev/null; then
     pactree "$1"
   else
-    _warn "pactree não encontrado. Instale com: arch add pacman-contrib"
+    _warn "pactree não encontrado. Instale com: arrow add pacman-contrib"
     pacman -Si "$1" | grep "Depends On"
   fi
 }

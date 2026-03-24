@@ -1,33 +1,43 @@
 # ── System commands ───────────────────────────────────────────────────────────
 
-# arch update
+# arrow update
 # Synchronise the package databases.
 cmd_update() {
-  _info "Sincronizando base de dados…"
-  _pacman -Sy
+  _preview "Sincronizar base de dados" "sudo pacman -Sy"
+  _ask "Continuar?" || { _warn "Cancelado."; return; }
+  _blank
+  _run sudo pacman --noconfirm --color=always -Sy
 }
 
-# arch upgrade
+# arrow upgrade
 # Synchronise databases and upgrade all packages.
 cmd_upgrade() {
-  _info "Atualizando o sistema…"
-  _pacman -Syu
+  _preview "Atualizar o sistema" "sudo pacman -Syu"
+  _ask "Continuar?" || { _warn "Cancelado."; return; }
+  _blank
+  _run sudo pacman --noconfirm --color=always -Syu
 }
 
-# arch clean [--all]
+# arrow clean [--all]
 # Remove stale packages from the cache.
 # With --all, wipe the entire cache.
 cmd_clean() {
   if [[ "${1:-}" == "--all" ]]; then
-    _warn "Removendo TODO o cache de pacotes…"
-    _pacman -Scc
+    _preview "Limpar TODO o cache de pacotes" "sudo pacman -Scc"
+    _ask "Isso removerá todos os pacotes em cache. Continuar?" || { _warn "Cancelado."; return; }
   else
-    _info "Limpando versões antigas do cache…"
-    _pacman -Sc
+    _preview "Limpar versões antigas do cache" "sudo pacman -Sc"
+    _ask "Continuar?" || { _warn "Cancelado."; return; }
+  fi
+  _blank
+  if [[ "${1:-}" == "--all" ]]; then
+    _run sudo pacman --noconfirm --color=always -Scc
+  else
+    _run sudo pacman --noconfirm --color=always -Sc
   fi
 }
 
-# arch orphans
+# arrow orphans
 # List packages that were installed as dependencies but are no longer required.
 cmd_orphans() {
   local pkgs
@@ -35,12 +45,17 @@ cmd_orphans() {
   if [[ -z "$pkgs" ]]; then
     _ok "Nenhum pacote órfão encontrado."
   else
-    echo -e "${YELLOW}Pacotes órfãos:${RESET}"
-    echo "$pkgs"
+    _warn "Pacotes órfãos (não mais necessários):"
+    _blank
+    while IFS= read -r pkg; do
+      echo -e "    ${DIM}•${RESET}  ${pkg}"
+    done <<< "$pkgs"
+    _blank
+    _info "Execute ${BOLD}arrow purge${RESET} para removê-los."
   fi
 }
 
-# arch purge
+# arrow purge
 # Remove all orphaned packages in one shot.
 cmd_purge() {
   local pkgs
@@ -49,9 +64,13 @@ cmd_purge() {
     _ok "Nenhum pacote órfão para remover."
     return
   fi
-  _warn "Os seguintes pacotes órfãos serão removidos:"
-  echo "$pkgs"
-  _sep
+
+  local pkg_list
+  pkg_list=$(echo "$pkgs" | tr '\n' ' ')
+
+  _preview "Remover pacotes órfãos" "sudo pacman -Rns ${pkg_list}"
+  _ask "Remover?" || { _warn "Cancelado."; return; }
+  _blank
   # shellcheck disable=SC2086
-  _pacman -Rns $pkgs
+  _run sudo pacman --noconfirm --color=always -Rns $pkgs
 }

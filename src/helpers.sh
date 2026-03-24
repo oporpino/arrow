@@ -1,11 +1,90 @@
-# ── Output helpers ────────────────────────────────────────────────────────────
+# ── Basic output ──────────────────────────────────────────────────────────────
 
-_info() { echo -e "${CYAN}::${RESET} $*"; }
-_ok()   { echo -e "${GREEN}✔${RESET}  $*"; }
-_warn() { echo -e "${YELLOW}⚠${RESET}  $*"; }
-_err()  { echo -e "${RED}✘${RESET}  $*" >&2; }
-_die()  { _err "$*"; exit 1; }
-_sep()  { echo -e "${DIM}────────────────────────────────────${RESET}"; }
+_info()    { echo -e "  ${CYAN}::${RESET} $*"; }
+_ok()      { echo -e "  ${GREEN}✔${RESET}  $*"; }
+_warn()    { echo -e "  ${YELLOW}⚠${RESET}  $*"; }
+_err()     { echo -e "  ${RED}✘${RESET}  $*" >&2; }
+_die()     { _err "$*"; exit 1; }
+_sep()     { echo -e "  ${DIM}────────────────────────────────────────${RESET}"; }
+_blank()   { echo; }
+
+# ── Section header ────────────────────────────────────────────────────────────
+#
+#   ──  Atualizando o sistema  ──────────────────────────────────────────────
+#
+_section() {
+  local title=" $* "
+  local width=60
+  local left="── "
+  local right
+  right=$(printf '%.0s─' $(seq 1 $(( width - ${#title} - ${#left} )) ))
+  echo
+  echo -e "  ${BOLD}${CYAN}${left}${RESET}${BOLD}${title}${RESET}${DIM}${right}${RESET}"
+  echo
+}
+
+# ── Step indicator  ──────────────────────────────────────────────────────────
+#
+#   [1/3] Configurando locale
+#
+_step() {
+  local n="$1" total="$2"; shift 2
+  echo -e "  ${DIM_WHITE}[${n}/${total}]${RESET} ${BOLD}$*${RESET}"
+}
+
+# ── Command preview ───────────────────────────────────────────────────────────
+#
+#   Renders a command the user could run themselves:
+#
+#     $ sudo pacman -S gnome gdm
+#
+_cmd() {
+  echo -e "  ${DIM_CYAN}  \$${RESET}  ${WHITE}$*${RESET}"
+}
+
+# ── Command block ─────────────────────────────────────────────────────────────
+#
+#   Shows a labelled list of commands before asking for confirmation.
+#   Usage: _preview "Instalar GNOME" "sudo pacman -S gnome" "sudo systemctl enable gdm"
+#
+_preview() {
+  local label="$1"; shift
+  echo
+  echo -e "  ${DIM}┌─${RESET} ${BOLD}${label}${RESET}"
+  for c in "$@"; do
+    echo -e "  ${DIM}│${RESET}  ${DIM_CYAN}\$${RESET}  ${WHITE}${c}${RESET}"
+  done
+  echo -e "  ${DIM}└────────────────────────────────────────${RESET}"
+  echo
+}
+
+# ── Confirmation prompt ───────────────────────────────────────────────────────
+#
+#   Returns 0 if confirmed, 1 if declined.
+#   Usage: _ask "Continuar?" && do_something
+#
+_ask() {
+  local prompt="${1:-Continuar?}"
+  printf "  ${BOLD}%s${RESET} ${DIM}[s/N]${RESET} " "$prompt"
+  local ans
+  read -r ans
+  [[ "${ans,,}" == "s" || "${ans,,}" == "y" ]]
+}
+
+# ── Run with display ──────────────────────────────────────────────────────────
+#
+#   Shows the command, executes it, and reports success or failure.
+#   Usage: _run sudo pacman -S firefox
+#
+_run() {
+  _cmd "$*"
+  if "$@"; then
+    _ok "${DIM}$*${RESET}"
+  else
+    _err "Falhou: $*"
+    return 1
+  fi
+}
 
 # ── Guards ────────────────────────────────────────────────────────────────────
 
