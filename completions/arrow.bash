@@ -1,4 +1,4 @@
-# bash completion for arch(1)
+# bash completion for arrow(1)
 # Source this file or drop it in /usr/share/bash-completion/completions/arrow
 
 _arrow_installed_packages() {
@@ -26,7 +26,7 @@ _arrow() {
   local aur_cmds=(add search upgrade)
 
   case "$prev" in
-    arch)
+    arrow | arw)
       COMPREPLY=($(compgen -W "${commands[*]}" -- "$cur"))
       return
       ;;

@@ -1,5 +1,5 @@
-# fish completion for arch(1)
-# Install to /usr/share/fish/vendor_completions.d/arch.fish
+# fish completion for arrow(1)
+# Install to /usr/share/fish/vendor_completions.d/arrow.fish
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
 
