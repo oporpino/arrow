@@ -1,0 +1,28 @@
+name: Deploy docs to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - "mkdocs.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    container:
+      image: squidfunk/mkdocs-material:latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git (required for gh-deploy inside container)
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Deploy
+        run: mkdocs gh-deploy --force
