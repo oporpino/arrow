@@ -115,12 +115,40 @@ _install() {
   _ok "Installed."
 }
 
+_fix_path() {
+  local bin_dir="${PREFIX}/bin"
+  local export_line="export PATH=\"\$PATH:${bin_dir}\""
+
+  # Detect the right shell config file.
+  local rc_file=""
+  case "${SHELL:-}" in
+    */zsh)  rc_file="${ZDOTDIR:-$HOME}/.zshrc" ;;
+    */fish) rc_file="${XDG_CONFIG_HOME:-$HOME/.config}/fish/config.fish"
+            export_line="fish_add_path ${bin_dir}" ;;
+    *)      rc_file="$HOME/.bashrc" ;;
+  esac
+
+  # Nothing to do if already in PATH.
+  if [[ ":${PATH}:" == *":${bin_dir}:"* ]]; then
+    return 0
+  fi
+
+  # Append if not already present in the rc file.
+  if [[ -n "$rc_file" ]] && ! grep -qF "$bin_dir" "$rc_file" 2>/dev/null; then
+    echo "" >> "$rc_file"
+    echo "# Added by arrow installer" >> "$rc_file"
+    echo "$export_line" >> "$rc_file"
+    _ok "PATH updated in ${rc_file}"
+    _warn "Reload your shell or run: source ${rc_file}"
+  fi
+}
+
 _verify() {
   if command -v arrow &>/dev/null && arrow version &>/dev/null 2>&1; then
     _ok "$(arrow version) is ready."
   else
-    _warn "'arrow' is not in your PATH yet."
-    _warn "Add ${PREFIX}/bin to your PATH:"
+    _fix_path
+    _warn "Restart your shell or run:"
     echo -e "  ${DIM}export PATH=\"\$PATH:${PREFIX}/bin\"${RESET}"
   fi
 }
