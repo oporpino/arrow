@@ -51,6 +51,22 @@ _err()  { echo -e "${RED}✘${RESET}  $*" >&2; }
 _die()  { _err "$*"; exit 1; }
 _sep()  { echo -e "${DIM}────────────────────────────────────${RESET}"; }
 
+# ── Privilege escalation ───────────────────────────────────────────────────────
+# Runs a command as root, trying sudo → doas → plain (if already root).
+# Dies with a helpful message if escalation is not possible.
+_asroot() {
+  if [[ $EUID -eq 0 ]]; then
+    "$@"
+  elif command -v sudo &>/dev/null; then
+    sudo "$@"
+  elif command -v doas &>/dev/null; then
+    doas "$@"
+  else
+    _die "Root privileges required but neither sudo nor doas is available." \
+         "Re-run as root: su -c 'bash <(curl -fsSL ${REPO_URL}/raw/main/install.sh)'"
+  fi
+}
+
 # ── Cleanup ───────────────────────────────────────────────────────────────────
 
 _cleanup() { rm -rf "$WORK_DIR"; }
@@ -77,12 +93,10 @@ _check_deps() {
     _warn "Missing dependencies: ${missing[*]}"
     if command -v pacman &>/dev/null; then
       _info "Installing via pacman…"
-      local _sudo=""
-      [[ $EUID -ne 0 ]] && _sudo="sudo"
       # Kernels without Landlock support (e.g. ARM) need --disable-sandbox.
       local _sandbox=""
       pacman --disable-sandbox --version &>/dev/null && _sandbox="--disable-sandbox"
-      ${_sudo} pacman -S --noconfirm ${_sandbox} "${missing[@]}"
+      _asroot pacman -S --noconfirm ${_sandbox} "${missing[@]}"
     else
       _die "Please install manually: ${missing[*]}"
     fi
@@ -107,11 +121,12 @@ _build() {
 }
 
 _install() {
-  local need_sudo=""
-  [[ $EUID -ne 0 && ! -w "${PREFIX}/bin" ]] && need_sudo="sudo"
-
   _info "Installing to ${BOLD}${PREFIX}${RESET}…"
-  ${need_sudo} make -C "$WORK_DIR/src" install PREFIX="$PREFIX" --silent
+  if [[ $EUID -eq 0 || -w "${PREFIX}/bin" ]]; then
+    make -C "$WORK_DIR/src" install PREFIX="$PREFIX" --silent
+  else
+    _asroot make -C "$WORK_DIR/src" install PREFIX="$PREFIX" --silent
+  fi
   _ok "Installed."
 }
 

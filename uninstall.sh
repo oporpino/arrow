@@ -38,14 +38,29 @@ _err()  { echo -e "${RED}✘${RESET}  $*" >&2; }
 _die()  { _err "$*"; exit 1; }
 _sep()  { echo -e "${DIM}────────────────────────────────────${RESET}"; }
 
+# ── Privilege escalation ───────────────────────────────────────────────────────
+_asroot() {
+  if [[ $EUID -eq 0 ]]; then
+    "$@"
+  elif command -v sudo &>/dev/null; then
+    sudo "$@"
+  elif command -v doas &>/dev/null; then
+    doas "$@"
+  else
+    _die "Root privileges required but neither sudo nor doas is available."
+  fi
+}
+
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
 _remove() {
   local file="$1"
   if [[ -e "$file" || -L "$file" ]]; then
-    local need_sudo=""
-    [[ $EUID -ne 0 && ! -w "$(dirname "$file")" ]] && need_sudo="sudo"
-    ${need_sudo} rm -f "$file"
+    if [[ $EUID -eq 0 || -w "$(dirname "$file")" ]]; then
+      rm -f "$file"
+    else
+      _asroot rm -f "$file"
+    fi
     _ok "Removed ${DIM}${file}${RESET}"
   fi
 }
