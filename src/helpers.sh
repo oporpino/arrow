@@ -73,15 +73,29 @@ _ask() {
 
 # ── Run with display ──────────────────────────────────────────────────────────
 #
-#   Shows the command, executes it, and reports success or failure.
-#   Usage: _run sudo pacman -S firefox
+#   Shows the command (resolving _asroot to sudo/doas/root),
+#   executes it, and reports ✔ or ✘.
+#   Usage: _run _asroot pacman -S firefox
 #
 _run() {
-  _cmd "$*"
+  # Build a display-friendly version of the command:
+  # replace _asroot with the actual escalation tool (or nothing if already root).
+  local display=("$@")
+  if [[ "${display[0]}" == "_asroot" ]]; then
+    if [[ $EUID -eq 0 ]]; then
+      display=("${display[@]:1}")
+    elif command -v sudo &>/dev/null; then
+      display[0]="sudo"
+    elif command -v doas &>/dev/null; then
+      display[0]="doas"
+    fi
+  fi
+
+  _cmd "${display[*]}"
   if "$@"; then
-    _ok "${DIM}$*${RESET}"
+    _ok "Concluído."
   else
-    _err "Falhou: $*"
+    _err "Falhou: ${display[*]}"
     return 1
   fi
 }
