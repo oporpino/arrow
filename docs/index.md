@@ -1,75 +1,83 @@
 ---
-title: arch — an intuitive wrapper for pacman
-description: A friendlier interface to Arch Linux's package manager. Replace cryptic pacman flags with plain English commands.
+title: arrow — Arch Linux for humans
+description: A friendly CLI for Arch Linux. Manage packages, set up your desktop, and configure your system — without memorising pacman flags or wiki pages.
 ---
 
-# arch
+# arrow
 
-**An intuitive wrapper for [pacman](https://wiki.archlinux.org/title/Pacman).**
+**Arch Linux for humans.**
 
-Replace cryptic flags with plain English commands — without sacrificing power.
+arrow makes Arch accessible — whether you're installing packages, setting up a desktop environment, or taking your first steps after a fresh install.
 
 ```bash
-arch add firefox neovim     # install packages
-arch del vlc                # remove + clean orphans automatically
-arch search python          # search repositories
-arch upgrade                # sync databases and upgrade everything
-arch aur add yay            # install from the AUR
+arrow add firefox neovim       # install packages
+arrow del vlc                  # remove + clean orphans
+arrow upgrade                  # full system upgrade
+arrow setup de gnome           # install and configure GNOME
+arrow first-steps              # interactive post-install guide
+arrow doctor                   # check system health
 ```
 
 ---
 
-## Why arch?
+## Why
 
-`pacman` is one of the best package managers in Linux — but its interface shows its age:
+Arch Linux is one of the most powerful and transparent Linux distributions — but it asks a lot from newcomers. The wiki is excellent, but it's a lot to absorb. Flags like `-Syu`, `-Rns`, and `-Qdtq` are hard to remember. Setting up audio, Bluetooth, or a desktop environment still requires cobbling together several wiki pages.
 
-| What you want to do | pacman | arch |
+arrow is a single tool that covers the full journey:
+
+- **Day zero** — guided post-install setup via `first-steps`
+- **Day to day** — plain English package management without memorising pacman flags
+- **As you grow** — `setup` commands for common configurations (desktop environments, audio, printing…)
+- **System health** — `doctor` checks mirrors, orphans, cache, and more
+
+Everything arrow does is a direct, transparent call to `pacman`, `systemctl`, or other standard tools — no hidden state, no magic.
+
+---
+
+## Package management
+
+arrow wraps pacman with memorable commands. Under the hood it's still pacman — you're not giving anything up.
+
+| arrow | pacman | What it does |
 |---|---|---|
-| Install a package | `pacman -S firefox` | `arch add firefox` |
-| Remove + clean deps | `pacman -Rns vlc` | `arch del vlc` |
-| Search repositories | `pacman -Ss python` | `arch search python` |
-| Upgrade everything | `pacman -Syu` | `arch upgrade` |
-| List orphaned packages | `pacman -Qdtq` | `arch orphans` |
-| Remove all orphans | `pacman -Rns $(pacman -Qdtq)` | `arch purge` |
+| `arrow add firefox` | `pacman -S firefox` | Install a package |
+| `arrow del vlc` | `pacman -Rns vlc` | Remove + clean deps |
+| `arrow search python` | `pacman -Ss python` | Search repos |
+| `arrow upgrade` | `pacman -Syu` | Full upgrade |
+| `arrow orphans` | `pacman -Qdtq` | List unused deps |
+| `arrow purge` | `pacman -Rns $(…)` | Remove all orphans |
 
-**arch** adds no hidden state, no extra database, and no magic — every command is a direct, transparent call to `pacman` or an AUR helper under the hood.
+:material-arrow-right: [Full command reference](commands/index.md)
+
+---
+
+## Setup & configuration
+
+*(coming soon)*
+
+`arrow setup` handles the things that send newcomers to the wiki.
+
+```bash
+arrow first-steps              # interactive post-install checklist
+arrow setup de gnome           # install GNOME and enable GDM
+arrow setup de kde             # install KDE Plasma
+arrow setup de hyprland        # install Hyprland (Wayland)
+arrow setup audio              # configure PipeWire
+arrow setup bluetooth          # enable and configure Bluetooth
+arrow setup printer            # CUPS + common drivers
+arrow mirrors                  # refresh mirror list with reflector
+arrow doctor                   # system health check
+```
+
+:material-arrow-right: [See the full roadmap](roadmap.md)
 
 ---
 
 ## Install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/oporpino/arch/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/oporpino/arrow/main/install.sh | bash
 ```
 
 :material-arrow-right: [Full installation guide](getting-started/installation.md)
-
----
-
-## Quick tour
-
-```bash
-# package basics
-arch add git base-devel     # install multiple packages at once
-arch del gimp               # remove gimp and its orphaned deps
-arch search neovim          # search repositories
-
-# system health
-arch upgrade                # full system upgrade
-arch orphans                # see unused packages
-arch purge                  # remove them all
-arch clean                  # trim the package cache
-
-# inspection
-arch info firefox           # package details
-arch files bash             # what files does bash own?
-arch own /usr/bin/git       # which package owns this file?
-arch list | grep py         # filter installed packages
-
-# AUR (requires yay or paru)
-arch aur add visual-studio-code-bin
-arch aur upgrade
-
-# history
-arch history 50             # last 50 pacman operations
-```
