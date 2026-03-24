@@ -37,8 +37,9 @@ _arrow() {
         'orphans:list orphaned packages'
         'clean:clean the package cache'
         'purge:remove all orphaned packages'
-        'self-update:update arrow to the latest version'
-        'selfupdate:alias for self-update'
+        'self:manage arrow itself (update, remove)'
+        'sharpen:update arrow to the latest version'
+        'reforge:alias for sharpen'
         'aur:AUR helper commands'
         'help:show this help'
         'version:print version'
@@ -64,6 +65,14 @@ _arrow() {
           ;;
         clean)
           _values 'option' '--all[wipe the entire package cache]'
+          ;;
+        self)
+          local -a self_cmds
+          self_cmds=(
+            'update:update arrow to the latest version'
+            'remove:uninstall arrow from the system'
+          )
+          _describe -t self-commands 'self subcommand' self_cmds
           ;;
         aur)
           local -a aur_cmds

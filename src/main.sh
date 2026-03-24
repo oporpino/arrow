@@ -16,19 +16,22 @@ main() {
     deps)                   cmd_deps    "$@" ;;
 
     # system
-    update)                       cmd_update       "$@" ;;
-    upgrade | up)                 cmd_upgrade      "$@" ;;
-    clean)                        cmd_clean        "$@" ;;
-    orphans)                      cmd_orphans      "$@" ;;
-    purge)                        cmd_purge        "$@" ;;
-    self-update | selfupdate)     cmd_self_update  "$@" ;;
+    update)            cmd_update   "$@" ;;
+    upgrade | up)      cmd_upgrade  "$@" ;;
+    clean)             cmd_clean    "$@" ;;
+    orphans)           cmd_orphans  "$@" ;;
+    purge)             cmd_purge    "$@" ;;
 
     # query
-    list | ls)              cmd_list    "$@" ;;
-    history | log)          cmd_history "$@" ;;
+    list | ls)         cmd_list     "$@" ;;
+    history | log)     cmd_history  "$@" ;;
 
     # aur
-    aur)                    cmd_aur     "$@" ;;
+    aur)               cmd_aur      "$@" ;;
+
+    # self
+    self)                          cmd_self         "$@" ;;
+    sharpen | reforge)             cmd_self_update  "$@" ;;
 
     # meta
     help | -h | --help)     cmd_help ;;

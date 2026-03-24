@@ -17,7 +17,7 @@ _arrow() {
     info files own deps
     list ls history log
     orphans clean purge
-    self-update selfupdate
+    self sharpen reforge
     aur
     help version
   )
@@ -41,6 +41,10 @@ _arrow() {
       ;;
     aur)
       COMPREPLY=($(compgen -W "${aur_cmds[*]}" -- "$cur"))
+      return
+      ;;
+    self)
+      COMPREPLY=($(compgen -W "update remove" -- "$cur"))
       return
       ;;
     clean)

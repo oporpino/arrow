@@ -21,6 +21,7 @@ SRCS := \
 	src/commands/system.sh \
 	src/commands/query.sh \
 	src/commands/aur.sh \
+	src/commands/self.sh \
 	src/help.sh \
 	src/main.sh
 

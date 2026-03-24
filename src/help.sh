@@ -29,7 +29,11 @@ $(echo -e "${BOLD}SISTEMA${RESET}")
   $(echo -e "${YELLOW}orphans${RESET}")                 Lista pacotes órfãos
   $(echo -e "${YELLOW}purge${RESET}")                   Remove todos os pacotes órfãos
 
-  $(echo -e "${MAGENTA}self-update${RESET}")              Atualiza o arrow para a versão mais recente
+
+$(echo -e "${BOLD}ARROW${RESET}")
+  $(echo -e "${MAGENTA}self update${RESET}")              Atualiza o arrow para a versão mais recente
+  $(echo -e "${MAGENTA}self remove${RESET}")              Desinstala o arrow do sistema
+  $(echo -e "${DIM}sharpen, reforge${RESET}             Aliases para self update${RESET}")
 
 $(echo -e "${BOLD}LISTAGEM${RESET}")
   $(echo -e "${CYAN}list${RESET}")    [filtro]        Lista pacotes instalados
