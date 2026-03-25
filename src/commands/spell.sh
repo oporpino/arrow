@@ -244,37 +244,90 @@ _spell_layer_archcraft_do() {
 
 _spell_layer_archcraft_undo() {
   _section "Remover Archcraft ARM"
-  _warn "Não há procedimento oficial de remoção."
-  _info "Este undo desabilita o SDDM e remove pacotes Archcraft conhecidos."
-  _info "Configurações e temas instalados em /etc e ~ não são removidos."
+  _warn "Não há procedimento oficial de remoção — este undo é best-effort."
   _blank
 
-  _step 1 2 "Desabilitar display manager"
+  _step 1 6 "Desabilitar sddm e restaurar target multi-user"
   _cmd "systemctl disable sddm"
-  _step 2 2 "Remover pacotes Archcraft"
-  _cmd "pacman -Rns archcraft-config archcraft-openbox archcraft-bspwm archcraft-i3wm sddm"
+  _cmd "systemctl set-default multi-user.target"
+  _cmd "systemctl enable systemd-networkd"
 
+  _step 2 6 "Remover pacotes archcraft-*"
+  _cmd "pacman -Rns <archcraft-*>"
+
+  _step 3 6 "Remover repositório archcraft-arm do pacman.conf"
+  _cmd "sed -i '/\\[archcraft-arm\\]/,/^$/d' /etc/pacman.conf"
+
+  _step 4 6 "Remover arquivos instalados manualmente"
+  _cmd "rm -f /usr/local/bin/xflock4"
+  _cmd "rm -f /etc/sudoers.d/01_wheel"
+
+  _step 5 6 "Reverter hook plymouth no mkinitcpio.conf"
+  _cmd "sed -i 's/udev plymouth/udev/' /etc/mkinitcpio.conf && mkinitcpio -P"
+
+  _step 6 6 "Reverter parâmetros do kernel"
+  _cmd "sed -i 's/ quiet splash loglevel=3 udev.log_level=3 vt.global_cursor_default=0//' /boot/cmdline.txt"
+
+  _blank
+  _warn "O que NÃO é revertido: hostname, locale, timezone, usuário criado, configs em /etc/skel e ~/"
   _blank
   _ask "Remover Archcraft?" "${RED}${BOLD}" || { _warn "Cancelado."; return; }
   _blank
 
-  _run _asroot systemctl disable sddm 2>/dev/null || true
+  # Step 1 — services
+  _info "Restaurando serviços…"
+  _asroot systemctl disable sddm 2>/dev/null || true
+  _asroot systemctl set-default multi-user.target 2>/dev/null || true
+  _asroot systemctl enable systemd-networkd 2>/dev/null || true
 
-  # Remove only packages that are actually installed
+  # Step 2 — remove archcraft packages (only those actually installed)
+  _info "Removendo pacotes archcraft-*…"
   local pkgs=()
   local p
-  for p in archcraft-config archcraft-openbox archcraft-bspwm archcraft-i3wm sddm; do
-    pacman -Qq "$p" &>/dev/null && pkgs+=("$p")
+  for p in $(pacman -Qq 2>/dev/null | grep '^archcraft-'); do
+    pkgs+=("$p")
   done
+  # Also remove sddm if installed
+  pacman -Qq sddm &>/dev/null && pkgs+=("sddm")
+  pacman -Qq plymouth &>/dev/null && pkgs+=("plymouth")
 
   if [[ ${#pkgs[@]} -gt 0 ]]; then
-    _run _pacman -Rns "${pkgs[@]}"
+    _run _pacman -Rns "${pkgs[@]}" || true
   else
-    _warn "Nenhum pacote Archcraft encontrado para remover."
+    _warn "Nenhum pacote archcraft encontrado."
+  fi
+
+  # Step 3 — remove repo from pacman.conf
+  _info "Removendo repositório archcraft-arm…"
+  if grep -q '\[archcraft-arm\]' /etc/pacman.conf 2>/dev/null; then
+    _asroot sed -i '/\[archcraft-arm\]/,/^$/d' /etc/pacman.conf
+    _ok "Repositório removido."
+  else
+    _warn "Repositório archcraft-arm não encontrado em pacman.conf."
+  fi
+
+  # Step 4 — remove manually installed files
+  _info "Removendo arquivos instalados…"
+  [[ -f /usr/local/bin/xflock4 ]]   && _asroot rm -f /usr/local/bin/xflock4   && _ok "xflock4 removido."
+  [[ -f /etc/sudoers.d/01_wheel ]]  && _asroot rm -f /etc/sudoers.d/01_wheel  && _ok "sudoers 01_wheel removido."
+
+  # Step 5 — revert mkinitcpio plymouth hook
+  if grep -q 'udev plymouth' /etc/mkinitcpio.conf 2>/dev/null; then
+    _info "Revertendo hook plymouth no mkinitcpio.conf…"
+    _asroot sed -i 's/udev plymouth/udev/' /etc/mkinitcpio.conf
+    _run _asroot mkinitcpio -P || true
+  fi
+
+  # Step 6 — revert boot kernel params
+  if [[ -f /boot/cmdline.txt ]] && grep -q 'quiet splash loglevel=3' /boot/cmdline.txt 2>/dev/null; then
+    _info "Revertendo parâmetros do kernel em /boot/cmdline.txt…"
+    _asroot sed -i 's/ quiet splash loglevel=3 udev.log_level=3 vt.global_cursor_default=0//' /boot/cmdline.txt
+    _ok "Parâmetros revertidos."
   fi
 
   _blank
-  _warn "Remova manualmente configs em ~/.config e /etc/skel se necessário."
+  _ok "Archcraft removido (best-effort)."
+  _warn "Hostname, locale, timezone e usuário criado devem ser revertidos manualmente."
 }
 
 # ── Desktop dispatcher ────────────────────────────────────────────────────────
