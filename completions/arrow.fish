@@ -101,9 +101,11 @@ complete -c arrow -f -n '__arrow_using_subcommand howto' -a user.remove  -d 'Rem
 complete -c arrow -f -n '__arrow_using_subcommand howto' -a user.passwd  -d 'Change user password'
 complete -c arrow -f -n '__arrow_using_subcommand howto' -a list         -d 'List available guides'
 
-# 'formula' / 'setup' sub-commands
+# 'spell' / 'setup' categories
 complete -c arrow -f -n '__arrow_using_subcommand spell' -a desktop -d 'Install/remove a desktop environment'
-complete -c arrow -f -n '__arrow_using_subcommand setup'   -a desktop -d 'Install/remove a desktop environment'
+complete -c arrow -f -n '__arrow_using_subcommand spell' -a layer   -d 'Apply a system layer'
+complete -c arrow -f -n '__arrow_using_subcommand setup' -a desktop -d 'Install/remove a desktop environment'
+complete -c arrow -f -n '__arrow_using_subcommand setup' -a layer   -d 'Apply a system layer'
 
 # 'spell desktop' environments
 complete -c arrow -f -n '__arrow_using_subcommand desktop' -a gnome   -d 'GNOME + gdm'
@@ -117,6 +119,12 @@ complete -c arrow -f -n '__arrow_using_subcommand desktop' -a i3      -d 'i3 X11
 for _de in gnome kde xfce openbox sway i3
     complete -c arrow -f -n "__arrow_using_subcommand $_de" -a undo -d 'Remove this environment'
 end
+
+# 'spell layer' layers
+complete -c arrow -f -n '__arrow_using_subcommand layer' -a archcraft -d 'Archcraft ARM over Arch Linux'
+
+# undo action for each layer
+complete -c arrow -f -n '__arrow_using_subcommand archcraft' -a undo -d 'Remove this layer'
 
 # 'self' sub-commands
 complete -c arrow -f -n '__arrow_using_subcommand self' -a update     -d 'Update arrow to the latest version'

@@ -184,6 +184,99 @@ _spell_desktop_i3_undo() {
   _run _pacman -Rns i3-wm i3status dmenu xterm xorg-server xorg-xinit lightdm lightdm-gtk-greeter
 }
 
+# ── Spell: layer/archcraft ────────────────────────────────────────────────────
+
+_spell_layer_archcraft_do() {
+  _section "Instalar Archcraft ARM"
+
+  _step 1 4 "Detectar versão mais recente"
+  local version
+  version=$(curl -fsSL "https://api.github.com/repos/archcraft-os/archcraft-arm/releases/latest" \
+    2>/dev/null | grep '"tag_name"' | sed 's/.*"tag_name": *"\([^"]*\)".*/\1/')
+  if [[ -z "$version" ]]; then
+    _err "Não foi possível detectar a versão. Informe manualmente:"
+    printf "  Versão (ex: 24.01): " >&2
+    read -r version </dev/tty
+  fi
+  _ok "Versão: ${BOLD}${version}${RESET}"
+
+  _step 2 4 "Baixar archcraft-arm.tar.gz"
+  _cmd "curl -LO https://github.com/archcraft-os/archcraft-arm/releases/download/${version}/archcraft-arm.tar.gz"
+  _cmd "tar -xzvf archcraft-arm.tar.gz"
+
+  _step 3 4 "Configurar hostname, locale, timezone e usuário"
+  _cmd "nano customize.sh"
+
+  _step 4 4 "Executar instalação"
+  _cmd "./install.sh"
+
+  _blank
+  _ask "Continuar?" || { _warn "Cancelado."; return; }
+  _blank
+
+  local workdir="/tmp/archcraft-arm-install"
+  mkdir -p "$workdir"
+
+  _info "Baixando archcraft-arm ${version}…"
+  local url="https://github.com/archcraft-os/archcraft-arm/releases/download/${version}/archcraft-arm.tar.gz"
+  curl -L --progress-bar "$url" -o "$workdir/archcraft-arm.tar.gz" \
+    || { _err "Falha no download."; return 1; }
+
+  _info "Extraindo…"
+  tar -xzf "$workdir/archcraft-arm.tar.gz" -C "$workdir" --strip-components=1 \
+    || { _err "Falha ao extrair."; return 1; }
+
+  _info "Abrindo customize.sh para configuração…"
+  _warn "Edite hostname, locale, timezone e usuário antes de continuar."
+  _blank
+  "${EDITOR:-nano}" "$workdir/customize.sh"
+  _blank
+
+  _ask "Configuração ok? Iniciar instalação?" || { _warn "Cancelado."; return; }
+  _blank
+
+  (cd "$workdir" && bash install.sh) || { _err "Instalação falhou."; return 1; }
+
+  rm -rf "$workdir"
+  _blank
+  _ok "Archcraft ARM instalado. Reinicie para entrar no desktop."
+}
+
+_spell_layer_archcraft_undo() {
+  _section "Remover Archcraft ARM"
+  _warn "Não há procedimento oficial de remoção."
+  _info "Este undo desabilita o SDDM e remove pacotes Archcraft conhecidos."
+  _info "Configurações e temas instalados em /etc e ~ não são removidos."
+  _blank
+
+  _step 1 2 "Desabilitar display manager"
+  _cmd "systemctl disable sddm"
+  _step 2 2 "Remover pacotes Archcraft"
+  _cmd "pacman -Rns archcraft-config archcraft-openbox archcraft-bspwm archcraft-i3wm sddm"
+
+  _blank
+  _ask "Remover Archcraft?" "${RED}${BOLD}" || { _warn "Cancelado."; return; }
+  _blank
+
+  _run _asroot systemctl disable sddm 2>/dev/null || true
+
+  # Remove only packages that are actually installed
+  local pkgs=()
+  local p
+  for p in archcraft-config archcraft-openbox archcraft-bspwm archcraft-i3wm sddm; do
+    pacman -Qq "$p" &>/dev/null && pkgs+=("$p")
+  done
+
+  if [[ ${#pkgs[@]} -gt 0 ]]; then
+    _run _pacman -Rns "${pkgs[@]}"
+  else
+    _warn "Nenhum pacote Archcraft encontrado para remover."
+  fi
+
+  _blank
+  _warn "Remova manualmente configs em ~/.config e /etc/skel se necessário."
+}
+
 # ── Desktop dispatcher ────────────────────────────────────────────────────────
 
 _spell_desktop() {
@@ -223,32 +316,64 @@ _spell_desktop() {
   esac
 }
 
-# ── Spell menu ──────────────────────────────────────────────────────────────
+# ── Layer dispatcher ───────────────────────────────────────────────────────────
+
+_spell_layer() {
+  local name="${1:-}" action="${2:-do}"
+
+  if [[ -z "$name" ]]; then
+    printf "\n  ${BOLD}Escolha uma layer:${RESET}\n\n" >&2
+    printf "    ${CYAN}1${RESET}  archcraft  (Archcraft ARM sobre Arch Linux)\n" >&2
+    printf "\n  Opção [1]: " >&2
+    local choice
+    read -r choice </dev/tty
+    case "${choice:-1}" in
+      1) name="archcraft" ;;
+      *) _die "Opção inválida: '${choice}'" ;;
+    esac
+  fi
+
+  case "$name" in
+    archcraft)
+      "_spell_layer_${name}_${action}"
+      ;;
+    *)
+      _err "Layer desconhecida: '${name}'"
+      printf "\n  Disponíveis: archcraft\n\n"
+      return 1
+      ;;
+  esac
+}
+
+# ── Spell menu ─────────────────────────────────────────────────────────────────
 
 _spell_menu() {
   _section "arrow spell"
   printf "  ${BOLD}O que deseja configurar?${RESET}\n\n"
-  printf "    ${CYAN}1${RESET}  desktop   Ambiente de desktop\n"
+  printf "    ${CYAN}1${RESET}  desktop  Ambiente de desktop\n"
+  printf "    ${CYAN}2${RESET}  layer    Layer sobre o sistema (ex: Archcraft)\n"
   printf "\n  Opção: "
   local choice
   read -r choice </dev/tty
   case "${choice:-}" in
     1 | desktop) _spell_desktop ;;
+    2 | layer)   _spell_layer   ;;
     *) _err "Opção inválida: '${choice}'"; return 1 ;;
   esac
 }
 
 # arrow spell [categoria] [nome] [undo]
-# arrow setup   [categoria] [nome] [undo]   (alias)
+# arrow setup [categoria] [nome] [undo]   (alias)
 cmd_spell() {
   local category="${1:-}"; shift || true
 
   case "$category" in
     desktop) _spell_desktop "${1:-}" "${2:-do}" ;;
+    layer)   _spell_layer   "${1:-}" "${2:-do}" ;;
     "")      _spell_menu ;;
     *)
       _err "Categoria desconhecida: '${category}'"
-      printf "\n  Categorias disponíveis: desktop\n\n"
+      printf "\n  Categorias disponíveis: desktop  layer\n\n"
       return 1
       ;;
   esac

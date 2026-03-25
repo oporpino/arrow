@@ -47,7 +47,7 @@ _arrow() {
       return
       ;;
     spell | setup)
-      COMPREPLY=($(compgen -W "desktop" -- "$cur"))
+      COMPREPLY=($(compgen -W "desktop layer" -- "$cur"))
       return
       ;;
     desktop)
@@ -55,6 +55,14 @@ _arrow() {
       return
       ;;
     gnome | kde | xfce | openbox | sway | i3)
+      COMPREPLY=($(compgen -W "undo" -- "$cur"))
+      return
+      ;;
+    layer)
+      COMPREPLY=($(compgen -W "archcraft" -- "$cur"))
+      return
+      ;;
+    archcraft)
       COMPREPLY=($(compgen -W "undo" -- "$cur"))
       return
       ;;
