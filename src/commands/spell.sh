@@ -99,14 +99,16 @@ _spell_desktop_xfce_undo() {
 
 _spell_desktop_openbox_do() {
   _section "Instalar Openbox"
-  _step 1 2 "Instalar pacotes"
-  _cmd "pacman -Syu openbox lightdm lightdm-gtk-greeter"
-  _step 2 2 "Habilitar display manager"
+  _step 1 3 "Instalar Xorg"
+  _cmd "pacman -Syu xorg-server xorg-xinit"
+  _step 2 3 "Instalar Openbox e display manager"
+  _cmd "pacman -S openbox lightdm lightdm-gtk-greeter"
+  _step 3 3 "Habilitar display manager"
   _cmd "systemctl enable lightdm"
   _blank
   _ask "Instalar Openbox?" || { _warn "Cancelado."; return; }
   _blank
-  _run _pacman -Syu openbox lightdm lightdm-gtk-greeter || return 1
+  _run _pacman -Syu xorg-server xorg-xinit openbox lightdm lightdm-gtk-greeter || return 1
   _run _asroot systemctl enable lightdm || return 1
   _ok "Openbox instalado. Reinicie para entrar no desktop."
 }
@@ -116,12 +118,12 @@ _spell_desktop_openbox_undo() {
   _step 1 2 "Desabilitar display manager"
   _cmd "systemctl disable lightdm"
   _step 2 2 "Remover pacotes"
-  _cmd "pacman -Rns openbox lightdm lightdm-gtk-greeter"
+  _cmd "pacman -Rns openbox lightdm lightdm-gtk-greeter xorg-server xorg-xinit"
   _blank
   _ask "Remover Openbox?" "${RED}${BOLD}" || { _warn "Cancelado."; return; }
   _blank
   _run _asroot systemctl disable lightdm 2>/dev/null || true
-  _run _pacman -Rns openbox lightdm lightdm-gtk-greeter
+  _run _pacman -Rns openbox lightdm lightdm-gtk-greeter xorg-server xorg-xinit
 }
 
 # ── Spell: desktop/sway ────────────────────────────────────────────────────────────────────────────────────────────────────────────
