@@ -14,54 +14,73 @@ cmd_add() {
   done
   [[ $# -eq 0 ]] && _die "Uso: arrow add [--no-upgrade|--no-sync] <pacote> [pacote2 …]"
 
-  # Check each package: already installed or not found in repos.
-  local already=() not_found=() to_install=()
+  # Classify each package: installed / pacman repo / AUR / not found.
+  local already=() to_install=() aur_pkgs=() not_found=()
+  _info "Verificando pacotes…"
+  local pkg
   for pkg in "$@"; do
     if pacman -Qq "$pkg" &>/dev/null; then
       already+=("$pkg")
-    elif ! pacman -Si "$pkg" &>/dev/null 2>&1; then
-      not_found+=("$pkg")
-    else
+    elif pacman -Si "$pkg" &>/dev/null 2>&1; then
       to_install+=("$pkg")
+    elif _aur_exists "$pkg"; then
+      aur_pkgs+=("$pkg")
+    else
+      not_found+=("$pkg")
     fi
   done
 
-  if [[ ${#not_found[@]} -gt 0 ]]; then
-    _err "Pacote(s) não encontrado(s) nos repositórios: ${not_found[*]}"
-    [[ ${#to_install[@]} -eq 0 ]] && return 1
+  [[ ${#already[@]}   -gt 0 ]] && _warn "Já instalado(s): ${already[*]}"
+  [[ ${#aur_pkgs[@]}  -gt 0 ]] && _info "Encontrado(s) no AUR: ${BOLD}${aur_pkgs[*]}${RESET}"
+  [[ ${#not_found[@]} -gt 0 ]] && _err  "Não encontrado(s): ${not_found[*]}"
+
+  if [[ ${#to_install[@]} -eq 0 && ${#aur_pkgs[@]} -eq 0 ]]; then
+    [[ ${#not_found[@]} -gt 0 ]] && return 1
+    _ok "Nada a instalar."
+    return
   fi
 
-  if [[ ${#already[@]} -gt 0 ]]; then
-    _warn "Já instalado(s): ${already[*]}"
-    [[ ${#to_install[@]} -eq 0 ]] && { _ok "Nada a instalar."; return; }
+  # ── Install from pacman repos ────────────────────────────────────────────────
+  if [[ ${#to_install[@]} -gt 0 ]]; then
+    _blank
+    if $upgrade; then
+      _preview "Instalar pacote(s)" \
+        "pacman -Syu  # -S sync  -y atualiza db  -u upgrade" \
+        "pacman -S ${to_install[*]}  # instala o(s) pacote(s)"
+    elif $sync; then
+      _preview "Instalar pacote(s) sem upgrade" \
+        "pacman -Syy  # -S sync  -yy força refresh do db" \
+        "pacman -S ${to_install[*]}  # instala o(s) pacote(s)"
+    else
+      _preview "Instalar pacote(s) sem sincronizar" \
+        "pacman -S ${to_install[*]}  # -S instalar"
+    fi
+
+    _ask "Instalar?" || { _warn "Cancelado."; return; }
+    _blank
+
+    if $upgrade; then
+      _run _pacman -Syu
+      _run _pacman -S "${to_install[@]}"
+    elif $sync; then
+      _run _pacman -Syy
+      _run _pacman -S "${to_install[@]}"
+    else
+      _run _pacman -S "${to_install[@]}"
+    fi
   fi
 
-  set -- "${to_install[@]}"
+  # ── Install from AUR ─────────────────────────────────────────────────────────
+  if [[ ${#aur_pkgs[@]} -gt 0 ]]; then
+    _blank
+    local helper
+    helper=$(_ensure_aur_helper) || return 1
 
-  if $upgrade; then
-    _preview "Instalar pacote(s)" \
-      "pacman -Syu  # -S sync  -y atualiza db  -u upgrade" \
-      "pacman -S $*  # instala o(s) pacote(s)"
-  elif $sync; then
-    _preview "Instalar pacote(s) sem upgrade" \
-      "pacman -Syy  # -S sync  -yy força refresh do db" \
-      "pacman -S $*  # instala o(s) pacote(s)"
-  else
-    _preview "Instalar pacote(s) sem sincronizar" \
-      "pacman -S $*  # -S instalar"
-  fi
-
-  _ask "Instalar?" || { _warn "Cancelado."; return; }
-  _blank
-
-  if $upgrade; then
-    _run _pacman -Syu
-    _run _pacman -S "$@"
-  elif $sync; then
-    _run _pacman -Syy
-    _run _pacman -S "$@"
-  else
-    _run _pacman -S "$@"
+    _preview "Instalar do AUR via ${helper}" \
+      "${helper} -S ${aur_pkgs[*]}  # AUR"
+    _ask "Instalar do AUR?" || { _warn "Cancelado."; return; }
+    _blank
+    _run "$helper" -S --noconfirm "${aur_pkgs[@]}"
   fi
 }
 

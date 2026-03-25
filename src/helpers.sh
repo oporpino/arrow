@@ -182,6 +182,54 @@ _aur_helper() {
   echo ""
 }
 
+# Returns 0 if the package exists in the AUR, 1 otherwise.
+_aur_exists() {
+  local pkg="$1"
+  curl -fsSL "https://aur.archlinux.org/rpc/?v=5&type=info&arg=${pkg}" 2>/dev/null \
+    | grep -q '"resultcount":[1-9]'
+}
+
+# Ensures an AUR helper is available. If none found, asks the user which to install
+# (yay or paru) and bootstraps it via git + makepkg.
+# Prints the helper name on success; returns 1 on failure.
+_ensure_aur_helper() {
+  local helper
+  helper=$(_aur_helper)
+  [[ -n "$helper" ]] && echo "$helper" && return 0
+
+  _blank
+  _warn "Nenhum helper AUR instalado."
+  echo -e "  ${BOLD}Escolha um helper:${RESET}"
+  echo -e "    ${CYAN}1${RESET}  yay   (mais popular, escrito em Go)"
+  echo -e "    ${CYAN}2${RESET}  paru  (mais rápido, escrito em Rust)"
+  printf "\n  Opção [1/2]: "
+  local choice
+  read -r choice
+  case "${choice:-1}" in
+    2) helper="paru" ;;
+    *) helper="yay"  ;;
+  esac
+
+  [[ $EUID -eq 0 ]] && _die "makepkg não pode rodar como root. Execute como usuário normal."
+
+  _info "Instalando dependências de build…"
+  _pacman -S --needed --noconfirm base-devel git 2>/dev/null || true
+
+  local tmp
+  tmp=$(mktemp -d)
+  _info "Clonando ${helper} do AUR…"
+  git clone "https://aur.archlinux.org/${helper}.git" "${tmp}/${helper}" \
+    || { rm -rf "$tmp"; _die "Falha ao clonar ${helper}."; }
+
+  _info "Compilando e instalando ${helper}…"
+  (cd "${tmp}/${helper}" && makepkg -si --noconfirm) \
+    || { rm -rf "$tmp"; _die "Falha ao compilar ${helper}."; }
+
+  rm -rf "$tmp"
+  _ok "${helper} instalado."
+  echo "$helper"
+}
+
 # Detect --disable-sandbox support once (needed on kernels without Landlock, e.g. ARM).
 _PACMAN_SANDBOX=""
 pacman --disable-sandbox --version &>/dev/null && _PACMAN_SANDBOX="--disable-sandbox"
