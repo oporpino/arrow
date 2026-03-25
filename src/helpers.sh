@@ -187,4 +187,15 @@ _PACMAN_SANDBOX=""
 pacman --disable-sandbox --version &>/dev/null && _PACMAN_SANDBOX="--disable-sandbox"
 
 # Runs pacman non-interactively as root with coloured output.
-_pacman() { _asroot pacman --noconfirm --color=always ${_PACMAN_SANDBOX} "$@"; }
+# Temporarily suppresses kernel console messages (audit noise) during execution.
+_pacman() {
+  local _lvl
+  _lvl=$(cut -f1 /proc/sys/kernel/printk 2>/dev/null)
+  _asroot dmesg -n 1 2>/dev/null || true
+
+  _asroot pacman --noconfirm --color=always ${_PACMAN_SANDBOX} "$@"
+  local _ret=$?
+
+  [[ -n "$_lvl" ]] && _asroot dmesg -n "$_lvl" 2>/dev/null || true
+  return $_ret
+}
