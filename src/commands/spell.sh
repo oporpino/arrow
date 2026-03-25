@@ -235,7 +235,7 @@ _spell_layer_archcraft_do() {
   _ask "Configuração ok? Iniciar instalação?" || { _warn "Cancelado."; return; }
   _blank
 
-  (cd "$workdir" && bash install.sh) || { _err "Instalação falhou."; return 1; }
+  (cd "$workdir" && _asroot bash install.sh) || { _err "Instalação falhou."; return 1; }
 
   rm -rf "$workdir"
   _blank
