@@ -87,7 +87,8 @@ _preview() {
 #
 _ask() {
   local prompt="${1:-Continuar?}"
-  printf "  ${BOLD}%s${RESET} ${DIM}[s/N]${RESET} " "$prompt"
+  local color="${2:-${BOLD}}"
+  printf "  ${color}%s${RESET} ${DIM}[s/N]${RESET} " "$prompt"
   local ans
   read -r ans
   [[ "${ans,,}" == "s" || "${ans,,}" == "y" ]]

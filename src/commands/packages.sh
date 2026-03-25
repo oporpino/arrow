@@ -72,12 +72,12 @@ cmd_delete() {
   _warn "Os seguintes pacotes dependem de ${*} e precisam ser removidos junto:"
   local dep
   for dep in $dependents; do
-    echo -e "    ${DIM}•${RESET}  ${dep}"
+    echo -e "    ${YELLOW}•${RESET}  ${YELLOW}${dep}${RESET}"
   done
   _blank
 
   _preview "Remover tudo" "pacman -Rns $* ${dependents}  # -R remover  -n sem backup  -s remove deps órfãs"
-  _ask "Remover tudo?" || { _warn "Cancelado."; return; }
+  _ask "Remover tudo?" "${RED}${BOLD}" || { _warn "Cancelado."; return; }
   _blank
   # shellcheck disable=SC2086
   _run _pacman -Rns "$@" $dependents
