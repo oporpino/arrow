@@ -52,7 +52,10 @@ $(echo -e "${DIM}Exemplos:
   arrow delete vlc
   arrow search python
   arrow upgrade
-  arrow aur add yay${RESET}")
+  arrow aur add yay
+
+Variáveis de ambiente:
+  ARROW_DEBUG=1   Exibe flags internas dos comandos (ex: --noconfirm)${RESET}")
 
 EOF
 }

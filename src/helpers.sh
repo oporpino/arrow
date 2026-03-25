@@ -91,6 +91,17 @@ _run() {
     fi
   fi
 
+  # In normal mode, strip internal flags from display (--noconfirm, --color=always).
+  # ARROW_DEBUG=1 shows the full command as executed.
+  if [[ "${ARROW_DEBUG:-0}" != "1" ]]; then
+    local filtered=()
+    for arg in "${display[@]}"; do
+      [[ "$arg" == "--noconfirm" || "$arg" == "--color=always" ]] && continue
+      filtered+=("$arg")
+    done
+    display=("${filtered[@]}")
+  fi
+
   _cmd "${display[*]}"
   if "$@"; then
     _ok "Concluído."
