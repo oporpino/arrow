@@ -85,17 +85,19 @@ _check_os() {
 
 _check_deps() {
   local missing=()
-  for dep in curl tar make; do
+  for dep in curl tar; do
     command -v "$dep" &>/dev/null || missing+=("$dep")
   done
 
   if [[ ${#missing[@]} -gt 0 ]]; then
     _warn "Missing dependencies: ${missing[*]}"
     if command -v pacman &>/dev/null; then
-      _info "Installing via pacman…"
+      _info "Syncing mirrors…"
       # Kernels without Landlock support (e.g. ARM) need --disable-sandbox.
       local _sandbox=""
       pacman --disable-sandbox --version &>/dev/null && _sandbox="--disable-sandbox"
+      _asroot pacman -Syy --noconfirm ${_sandbox}
+      _info "Installing via pacman…"
       _asroot pacman -S --noconfirm ${_sandbox} "${missing[@]}"
     else
       _die "Please install manually: ${missing[*]}"
@@ -116,16 +118,58 @@ _download() {
 
 _build() {
   _info "Building…"
-  make -C "$WORK_DIR/src" build --silent
+  local src="$WORK_DIR/src"
+  local out="$WORK_DIR/arrow"
+  local version
+  version="$(grep -oP '(?<=VERSION=")[^"]+' "$src/src/version.sh")"
+  local repo
+  repo="$(grep -oP '(?<=REPO=")[^"]+' "$src/src/version.sh")"
+
+  {
+    printf '#!/usr/bin/env bash\n'
+    printf '# arrow v%s\n' "$version"
+    printf '# %s\n' "$repo"
+    printf '# SPDX-License-Identifier: MIT\n\n'
+    for f in \
+      src/version.sh \
+      src/colors.sh \
+      src/helpers.sh \
+      src/commands/packages.sh \
+      src/commands/system.sh \
+      src/commands/query.sh \
+      src/commands/aur.sh \
+      src/commands/self.sh \
+      src/commands/howto.sh \
+      src/help.sh \
+      src/main.sh; do
+      sed '/^[[:space:]]*#/d; /^$/d' "$src/$f"
+      printf '\n'
+    done
+  } > "$out"
+  chmod +x "$out"
   _ok "Build complete."
+}
+
+_do_install() {
+  local src="$WORK_DIR/src"
+  local out="$WORK_DIR/arrow"
+  local bindir="${PREFIX}/bin"
+  local mandir="${PREFIX}/share/man/man1"
+
+  install -Dm755 "$out"                         "${bindir}/arrow"
+  ln -sf arrow                                  "${bindir}/arw"
+  install -Dm644 "$src/man/arrow.1"             "${mandir}/arrow.1"
+  install -Dm644 "$src/completions/arrow.bash"  "/usr/share/bash-completion/completions/arrow"
+  install -Dm644 "$src/completions/_arrow"      "/usr/share/zsh/site-functions/_arrow"
+  install -Dm644 "$src/completions/arrow.fish"  "/usr/share/fish/vendor_completions.d/arrow.fish"
 }
 
 _install() {
   _info "Installing to ${BOLD}${PREFIX}${RESET}…"
   if [[ $EUID -eq 0 || -w "${PREFIX}/bin" ]]; then
-    make -C "$WORK_DIR/src" install PREFIX="$PREFIX" --silent
+    _do_install
   else
-    _asroot make -C "$WORK_DIR/src" install PREFIX="$PREFIX" --silent
+    _asroot bash -c "$(declare -f _do_install); WORK_DIR='$WORK_DIR' PREFIX='$PREFIX' _do_install"
   fi
   _ok "Installed."
 }
