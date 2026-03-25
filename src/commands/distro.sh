@@ -74,7 +74,7 @@ _distro_require_archarm() {
 #   Requirements:
 #     - Arch Linux ARM (aarch64 or armv7)
 #     - ≥ 10GB free on /
-#     - ≥ 300MB free on /boot (Archcraft's own requirement)
+#     - /boot space: if < 300MB free, arrow offers to back up + clear + restore on failure
 #     - Internet connection
 
 _distro_morph_archcraft() {
@@ -84,25 +84,40 @@ _distro_morph_archcraft() {
   _distro_require_archarm || return 1
 
   # Pre-flight: /boot space
-  local boot_avail boot_avail_mb
+  # If space is tight, offer to back up /boot, clear it, and restore on failure.
+  # Even after clearing, a small /boot partition may still be under 300MB —
+  # we let the install attempt proceed and rely on the backup for recovery.
+  local boot_avail boot_avail_mb boot_backup=""
   boot_avail=$(df /boot 2>/dev/null | awk 'NR==2 {print $4}')
   boot_avail_mb=$(( ${boot_avail:-0} / 1024 ))
   if [[ ${boot_avail:-0} -lt 307200 ]]; then
-    _err "/boot space insufficient: ${boot_avail_mb}MB available (minimum: 300MB, required by Archcraft)"
+    _warn "/boot has only ${boot_avail_mb}MB free (Archcraft requires 300MB)."
     _blank
     _info "Current /boot usage:"
     du -h --max-depth=1 /boot 2>/dev/null | sort -rh | while read -r size path; do
       printf "    ${DIM}%s${RESET}  %s\n" "$size" "$path"
     done
     _blank
-    if [[ -f /boot/initramfs-linux-fallback.img ]]; then
-      local boot_fallback_mb
-      boot_fallback_mb=$(du -m /boot/initramfs-linux-fallback.img 2>/dev/null | cut -f1)
-      _warn "initramfs-linux-fallback.img (${boot_fallback_mb}MB) is rarely needed and can be removed."
-    fi
+    _info "arrow can back up /boot to /var/tmp, clear it, run the install,"
+    _info "and restore the backup automatically if anything goes wrong."
+    _warn "Do NOT reboot or lose power while the install is running."
     _blank
-    _warn "Free up space in /boot then run again: arrow distro morph archcraft"
-    return 1
+    _ask "Back up /boot, clear it, and proceed?" "${YELLOW}${BOLD}" \
+      || { _warn "Cancelled."; return; }
+    _blank
+
+    boot_backup="/var/tmp/arrow-boot-backup-$$"
+    _info "Backing up /boot to ${boot_backup}..."
+    _asroot mkdir -p "$boot_backup"
+    _asroot cp -a /boot/. "$boot_backup/" \
+      || { _err "Backup failed."; _asroot rm -rf "$boot_backup"; return 1; }
+    _ok "Backup complete ($(du -sh "$boot_backup" 2>/dev/null | cut -f1))."
+
+    _info "Clearing /boot..."
+    _asroot find /boot -mindepth 1 -delete \
+      || { _err "Failed to clear /boot."; _asroot cp -a "$boot_backup/." /boot/; _asroot rm -rf "$boot_backup"; return 1; }
+    _ok "/boot cleared."
+    _blank
   fi
 
   # Pre-flight: / space
@@ -174,13 +189,27 @@ _distro_morph_archcraft() {
   _blank
 
   # Step 4 — run as root
-  (cd "$workdir" && _asroot bash install.sh) \
-    || { _err "Morph failed."; return 1; }
-
-  rm -rf "$workdir"
-  _blank
-  _ok "Morph complete. Reboot to enter Archcraft."
-  _info "Run: sudo reboot"
+  if (cd "$workdir" && _asroot bash install.sh); then
+    rm -rf "$workdir"
+    if [[ -n "$boot_backup" ]]; then
+      _asroot rm -rf "$boot_backup"
+      _info "Boot backup removed."
+    fi
+    _blank
+    _ok "Morph complete. Reboot to enter Archcraft."
+    _info "Run: sudo reboot"
+  else
+    _err "Morph failed."
+    rm -rf "$workdir"
+    if [[ -n "$boot_backup" ]]; then
+      _blank
+      _warn "Restoring /boot from backup..."
+      _asroot cp -a "$boot_backup/." /boot/ \
+        && { _ok "/boot restored."; _asroot rm -rf "$boot_backup"; } \
+        || _err "Restore failed. Backup is still at: ${boot_backup}"
+    fi
+    return 1
+  fi
 }
 
 # ── Morph list ─────────────────────────────────────────────────────────────────
