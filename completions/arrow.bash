@@ -7,7 +7,14 @@ _arrow_installed_packages() {
 
 _arrow() {
   local cur prev words cword
-  _init_completion || return
+  if declare -f _init_completion &>/dev/null; then
+    _init_completion || return
+  else
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    words=("${COMP_WORDS[@]}")
+    cword=$COMP_CWORD
+  fi
 
   # Top-level commands
   local commands=(
@@ -36,8 +43,7 @@ _arrow() {
       return
       ;;
     own)
-      # complete with file paths
-      _filedir
+      declare -f _filedir &>/dev/null && _filedir || COMPREPLY=($(compgen -f -- "$cur"))
       return
       ;;
     aur)
