@@ -42,6 +42,7 @@ main() {
     # meta
     help | -h | --help)     cmd_help ;;
     version | -v | --version) cmd_version ;;
+    aliases)                cmd_aliases ;;
 
     *)
       _err "Unknown command: '${cmd}'"

@@ -17,43 +17,33 @@ _arrow() {
       local -a cmds
       cmds=(
         'add:install one or more packages'
-        'del:remove packages and orphaned deps'
-        'rm:alias for del'
-        'remove:alias for del'
+        'delete:remove packages and orphaned deps'
         'search:search sync databases'
-        'find:alias for search'
-        's:alias for search'
-        'update:synchronise package databases'
+        'update:sync package databases'
         'upgrade:upgrade all installed packages'
-        'up:alias for upgrade'
         'info:show package details'
         'files:list files owned by a package'
         'own:find the package that owns a file'
         'deps:show dependency tree'
         'list:list installed packages'
-        'ls:alias for list'
         'history:show pacman log entries'
-        'log:alias for history'
         'orphans:list orphaned packages'
         'clean:clean the package cache'
         'purge:remove all orphaned packages'
         'howto:step-by-step guides'
         'spell:guided spells with do/undo'
-        'setup:alias for spell'
         'distro:convert the system to another distro (irreversible)'
         'self:manage arrow itself (update, remove)'
-        'sharpen:update arrow to the latest version'
-        'reforge:alias for sharpen'
-        'reinstall:force reinstall arrow'
         'help:show this help'
         'version:print version'
+        'aliases:list all command aliases'
       )
       _describe -t commands 'arrow command' cmds
       ;;
 
     argument)
       case $words[2] in
-        del | rm | remove | files | info | deps)
+        delete | del | rm | remove | files | info | deps)
           local -a pkgs
           pkgs=(${(f)"$(pacman -Qq 2>/dev/null)"})
           _values 'installed package' $pkgs

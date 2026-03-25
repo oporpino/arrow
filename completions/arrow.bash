@@ -16,17 +16,17 @@ _arrow() {
     cword=$COMP_CWORD
   fi
 
-  # Top-level commands
+  # Top-level commands (no aliases)
   local commands=(
-    add del rm remove
-    search find s
-    update upgrade up
+    add delete
+    search
+    update upgrade
     info files own deps
-    list ls history log
+    list history
     orphans clean purge
-    howto spell setup distro
-    self sharpen reforge reinstall
-    help version
+    howto spell distro
+    self
+    help version aliases
   )
 
   case "$prev" in
@@ -34,7 +34,7 @@ _arrow() {
       COMPREPLY=($(compgen -W "${commands[*]}" -- "$cur"))
       return
       ;;
-    del | rm | remove | files | info | deps)
+    delete | del | rm | remove | files | info | deps)
       COMPREPLY=($(compgen -W "$(_arrow_installed_packages)" -- "$cur"))
       return
       ;;
@@ -55,7 +55,7 @@ _arrow() {
       return
       ;;
     spell | setup)
-      COMPREPLY=($(compgen -W "desktop layer" -- "$cur"))
+      COMPREPLY=($(compgen -W "desktop" -- "$cur"))
       return
       ;;
     desktop)
@@ -66,23 +66,12 @@ _arrow() {
       COMPREPLY=($(compgen -W "undo" -- "$cur"))
       return
       ;;
-    layer)
-      COMPREPLY=($(compgen -W "archcraft" -- "$cur"))
-      return
-      ;;
-    archcraft)
-      COMPREPLY=($(compgen -W "undo" -- "$cur"))
-      return
-      ;;
     self)
       COMPREPLY=($(compgen -W "update reinstall remove" -- "$cur"))
       return
       ;;
     clean)
       COMPREPLY=($(compgen -W "--all" -- "$cur"))
-      return
-      ;;
-    reinstall)
       return
       ;;
     add)

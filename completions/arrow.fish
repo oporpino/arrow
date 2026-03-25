@@ -3,9 +3,10 @@
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
 
+# Includes aliases so fish stops showing top-level completions after an alias is typed.
 function __arrow_no_subcommand
     not __fish_seen_subcommand_from \
-        add del rm remove \
+        add delete del rm remove \
         search find s \
         update upgrade up \
         info files own deps \
@@ -13,7 +14,7 @@ function __arrow_no_subcommand
         orphans clean purge \
         howto spell setup distro \
         self sharpen reforge reinstall \
-        help version
+        help version aliases
 end
 
 function __arrow_using_subcommand
@@ -33,44 +34,34 @@ end
 complete -c arrow -n __arrow_no_subcommand -s h -l help    -d 'Show help and exit'
 complete -c arrow -n __arrow_no_subcommand -s v -l version -d 'Print version and exit'
 
-# ── Top-level commands ────────────────────────────────────────────────────────
+# ── Top-level commands (no aliases) ───────────────────────────────────────────
 
 complete -c arrow -f -n __arrow_no_subcommand -a add     -d 'Install packages'
-complete -c arrow -f -n __arrow_no_subcommand -a del     -d 'Remove packages and orphaned deps'
-complete -c arrow -f -n __arrow_no_subcommand -a rm      -d 'Alias for del'
-complete -c arrow -f -n __arrow_no_subcommand -a remove  -d 'Alias for del'
+complete -c arrow -f -n __arrow_no_subcommand -a delete  -d 'Remove packages and orphaned deps'
 complete -c arrow -f -n __arrow_no_subcommand -a search  -d 'Search repositories'
-complete -c arrow -f -n __arrow_no_subcommand -a find    -d 'Alias for search'
-complete -c arrow -f -n __arrow_no_subcommand -a s       -d 'Alias for search'
 complete -c arrow -f -n __arrow_no_subcommand -a update  -d 'Sync package databases'
 complete -c arrow -f -n __arrow_no_subcommand -a upgrade -d 'Upgrade all packages'
-complete -c arrow -f -n __arrow_no_subcommand -a up      -d 'Alias for upgrade'
 complete -c arrow -f -n __arrow_no_subcommand -a info    -d 'Show package details'
 complete -c arrow -f -n __arrow_no_subcommand -a files   -d 'List files owned by a package'
 complete -c arrow -f -n __arrow_no_subcommand -a own     -d 'Find package that owns a file'
 complete -c arrow -f -n __arrow_no_subcommand -a deps    -d 'Show dependency tree'
 complete -c arrow -f -n __arrow_no_subcommand -a list    -d 'List installed packages'
-complete -c arrow -f -n __arrow_no_subcommand -a ls      -d 'Alias for list'
 complete -c arrow -f -n __arrow_no_subcommand -a history -d 'Show pacman log entries'
-complete -c arrow -f -n __arrow_no_subcommand -a log     -d 'Alias for history'
 complete -c arrow -f -n __arrow_no_subcommand -a orphans -d 'List orphaned packages'
 complete -c arrow -f -n __arrow_no_subcommand -a clean   -d 'Clean package cache'
 complete -c arrow -f -n __arrow_no_subcommand -a purge   -d 'Remove all orphaned packages'
 complete -c arrow -f -n __arrow_no_subcommand -a howto   -d 'Step-by-step guides'
-complete -c arrow -f -n __arrow_no_subcommand -a formula -d 'Guided spells with do/undo'
-complete -c arrow -f -n __arrow_no_subcommand -a setup   -d 'Alias for spell'
+complete -c arrow -f -n __arrow_no_subcommand -a spell   -d 'Guided spells with do/undo'
 complete -c arrow -f -n __arrow_no_subcommand -a distro  -d 'Convert system to another distro (irreversible)'
-complete -c arrow -f -n __arrow_no_subcommand -a self     -d 'Manage arrow itself'
-complete -c arrow -f -n __arrow_no_subcommand -a sharpen   -d 'Update arrow to the latest version'
-complete -c arrow -f -n __arrow_no_subcommand -a reforge   -d 'Alias for sharpen'
-complete -c arrow -f -n __arrow_no_subcommand -a reinstall -d 'Force reinstall arrow'
+complete -c arrow -f -n __arrow_no_subcommand -a self    -d 'Manage arrow itself'
 complete -c arrow -f -n __arrow_no_subcommand -a help    -d 'Show help'
 complete -c arrow -f -n __arrow_no_subcommand -a version -d 'Print version'
+complete -c arrow -f -n __arrow_no_subcommand -a aliases -d 'List all command aliases'
 
 # ── Per-command argument completions ──────────────────────────────────────────
 
-# Commands that accept an installed package name
-for _cmd in del rm remove files info deps
+# Commands that accept an installed package name (canonical + aliases)
+for _cmd in delete del rm remove files info deps
     complete -c arrow -f -n "__arrow_using_subcommand $_cmd" \
         -a '(__arrow_installed_packages)'
 end
@@ -79,7 +70,7 @@ end
 complete -c arrow -f -n '__arrow_using_subcommand add' -a --no-upgrade -d 'Skip system upgrade'
 complete -c arrow -f -n '__arrow_using_subcommand add' -a --no-sync    -d 'Skip db sync'
 
-# Commands that accept a sync-db package name
+# Commands that accept a sync-db package name (canonical + aliases)
 for _cmd in add search find s
     complete -c arrow -f -n "__arrow_using_subcommand $_cmd" \
         -a '(__arrow_sync_packages)'
@@ -130,4 +121,3 @@ complete -c arrow -f -n '__arrow_using_subcommand morph' -a archcraft -d 'Arch L
 complete -c arrow -f -n '__arrow_using_subcommand self' -a update     -d 'Update arrow to the latest version'
 complete -c arrow -f -n '__arrow_using_subcommand self' -a reinstall  -d 'Force reinstall arrow'
 complete -c arrow -f -n '__arrow_using_subcommand self' -a remove     -d 'Uninstall arrow from the system'
-

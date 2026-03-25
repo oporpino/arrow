@@ -4,6 +4,25 @@ cmd_version() {
   echo "arrow v${VERSION}"
 }
 
+cmd_aliases() {
+  echo
+  echo -e "  ${BOLD}Command aliases:${RESET}"
+  _blank
+  echo -e "  ${DIM}alias${RESET}              ${DIM}→  command${RESET}"
+  _sep
+  echo -e "  ${CYAN}arw${RESET}                →  arrow  ${DIM}(binary)${RESET}"
+  _blank
+  echo -e "  ${CYAN}del, rm, remove${RESET}    →  delete"
+  echo -e "  ${CYAN}find, s${RESET}            →  search"
+  echo -e "  ${CYAN}up${RESET}                 →  upgrade"
+  echo -e "  ${CYAN}ls${RESET}                 →  list"
+  echo -e "  ${CYAN}log${RESET}                →  history"
+  echo -e "  ${CYAN}setup${RESET}              →  spell"
+  echo -e "  ${CYAN}sharpen, reforge${RESET}   →  self update"
+  echo -e "  ${CYAN}reinstall${RESET}          →  self reinstall"
+  echo
+}
+
 cmd_help() {
   cat <<EOF
 
@@ -51,6 +70,9 @@ $(echo -e "${BOLD}GUIDES${RESET}")
 $(echo -e "${BOLD}QUERY${RESET}")
   $(echo -e "${CYAN}list${RESET}")    [filter]        List installed packages
   $(echo -e "${CYAN}history${RESET}") [n=20]          Show operation history
+
+$(echo -e "${BOLD}META${RESET}")
+  $(echo -e "${WHITE}aliases${RESET}")                   List all command aliases
 
 $(echo -e "${BOLD}AUR${RESET}")
   $(echo -e "${BLUE}aur add${RESET}")    <pkg>          Install from AUR (yay/paru)
