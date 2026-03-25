@@ -91,7 +91,7 @@ _ask() {
   printf "  ${color}%s${RESET} ${DIM}[y/N]${RESET} " "$prompt"
   local ans
   read -r ans
-  [[ "${ans,,}" == "s" || "${ans,,}" == "y" ]]
+  [[ "${ans,,}" == "y" ]]
 }
 
 # ── Run with display ──────────────────────────────────────────────────────────
