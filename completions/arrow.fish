@@ -53,10 +53,11 @@ complete -c arrow -f -n __arrow_no_subcommand -a purge   -d 'Remove all orphaned
 complete -c arrow -f -n __arrow_no_subcommand -a howto   -d 'Step-by-step guides'
 complete -c arrow -f -n __arrow_no_subcommand -a spell   -d 'Guided spells with do/undo'
 complete -c arrow -f -n __arrow_no_subcommand -a distro  -d 'Convert system to another distro (irreversible)'
-complete -c arrow -f -n __arrow_no_subcommand -a self    -d 'Manage arrow itself'
-complete -c arrow -f -n __arrow_no_subcommand -a help    -d 'Show help'
-complete -c arrow -f -n __arrow_no_subcommand -a version -d 'Print version'
-complete -c arrow -f -n __arrow_no_subcommand -a aliases -d 'List all command aliases'
+complete -c arrow -f -n __arrow_no_subcommand -a sharpen   -d 'Update arrow to the latest version'
+complete -c arrow -f -n __arrow_no_subcommand -a reinstall -d 'Reinstall arrow'
+complete -c arrow -f -n __arrow_no_subcommand -a help      -d 'Show help'
+complete -c arrow -f -n __arrow_no_subcommand -a version   -d 'Print version'
+complete -c arrow -f -n __arrow_no_subcommand -a aliases   -d 'List all command aliases'
 
 # ── Per-command argument completions ──────────────────────────────────────────
 

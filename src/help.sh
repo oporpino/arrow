@@ -18,8 +18,7 @@ cmd_aliases() {
   echo -e "  ${CYAN}ls${RESET}                 →  list"
   echo -e "  ${CYAN}log${RESET}                →  history"
   echo -e "  ${CYAN}setup${RESET}              →  spell"
-  echo -e "  ${CYAN}sharpen, reforge${RESET}   →  self update"
-  echo -e "  ${CYAN}reinstall${RESET}          →  self reinstall"
+  echo -e "  ${CYAN}reforge${RESET}            →  sharpen"
   echo
 }
 
@@ -49,9 +48,9 @@ $(echo -e "${BOLD}SYSTEM${RESET}")
   $(echo -e "${YELLOW}purge${RESET}")                   Remove all orphaned packages
 
 $(echo -e "${BOLD}ARROW${RESET}")
-  $(echo -e "${MAGENTA}self update${RESET}")              Update arrow to the latest version
+  $(echo -e "${MAGENTA}sharpen${RESET}")                  Update arrow to the latest version
+  $(echo -e "${MAGENTA}reinstall${RESET}")                Reinstall arrow
   $(echo -e "${MAGENTA}self remove${RESET}")              Uninstall arrow from the system
-  $(echo -e "${DIM}sharpen, reforge${RESET}             Aliases for self update${RESET}")
 
 $(echo -e "${BOLD}SPELLS${RESET}")
   $(echo -e "${WHITE}spell${RESET}")                     Guided setup menu

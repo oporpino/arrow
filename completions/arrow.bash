@@ -25,7 +25,7 @@ _arrow() {
     list history
     orphans clean purge
     howto spell distro
-    self
+    sharpen reinstall
     help version aliases
   )
 
@@ -68,6 +68,9 @@ _arrow() {
       ;;
     self)
       COMPREPLY=($(compgen -W "update reinstall remove" -- "$cur"))
+      return
+      ;;
+    sharpen | reforge)
       return
       ;;
     clean)
