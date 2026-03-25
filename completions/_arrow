@@ -68,7 +68,7 @@ _arrow() {
           _values 'option' '--all[wipe the entire package cache]'
           ;;
         howto)
-          _values 'guide' 'sudoers[add user to sudoers]' 'list[list available guides]'
+          _values 'guide' 'sudoers[add user to sudoers]' 'add.user[create new user]' 'list[list available guides]'
           ;;
         self)
           local -a self_cmds
@@ -87,8 +87,13 @@ _arrow() {
           )
           _describe -t aur-commands 'aur subcommand' aur_cmds
           ;;
-        add | search | find | s)
-          # Sync database package names (may be slow)
+        add)
+          _values 'option' '--no-upgrade[skip system upgrade]' '--no-sync[skip db sync]'
+          local -a sync_pkgs
+          sync_pkgs=(${(f)"$(pacman -Slq 2>/dev/null)"})
+          _values 'package' $sync_pkgs
+          ;;
+        search | find | s)
           local -a sync_pkgs
           sync_pkgs=(${(f)"$(pacman -Slq 2>/dev/null)"})
           _values 'package' $sync_pkgs
@@ -99,3 +104,5 @@ _arrow() {
 }
 
 _arrow "$@"
+
+compdef _arrow arw

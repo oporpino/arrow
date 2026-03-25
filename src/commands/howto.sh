@@ -55,20 +55,72 @@ _howto_sudoers() {
   _warn "Ou recarregue os grupos: newgrp wheel"
 }
 
-# ── Registry ──────────────────────────────────────────────────────────────────
+# arrow howto add.user
+# Create a new system user with home directory and common groups.
+_howto_add_user() {
+  local target_user="${1:-}"
+  [[ -z "$target_user" ]] && _die "Uso: arrow howto add.user <nome>"
 
-declare -A _HOWTOS=(
-  [sudoers]="Adicionar usuário ao sudoers via grupo wheel"
-  [sudo]="sudoers"   # alias
-)
+  _section "Criar usuário: ${target_user}"
+
+  _step 1 3 "Criar o usuário com diretório home"
+  _cmd "useradd -m -s /bin/bash ${target_user}"
+
+  _step 2 3 "Definir a senha"
+  _cmd "passwd ${target_user}"
+
+  _step 3 3 "Adicionar aos grupos comuns"
+  _cmd "usermod -aG wheel,audio,video,storage,optical ${target_user}"
+
+  _blank
+  _ask "Executar agora?" || { _warn "Cancelado."; return; }
+  _blank
+
+  # Step 1 — create user
+  if id "$target_user" &>/dev/null; then
+    _ok "Usuário '${target_user}' já existe."
+  else
+    _info "Criando usuário '${target_user}'…"
+    _asroot useradd -m -s /bin/bash "$target_user" \
+      && _ok "Usuário criado." \
+      || { _err "Falha ao criar usuário."; return 1; }
+  fi
+
+  # Step 2 — set password (interactive)
+  _info "Defina a senha para '${target_user}':"
+  _asroot passwd "$target_user" \
+    || { _err "Falha ao definir senha."; return 1; }
+
+  # Step 3 — add to groups (skip groups that don't exist)
+  _info "Adicionando '${target_user}' aos grupos…"
+  local groups=()
+  local g
+  for g in wheel audio video storage optical; do
+    getent group "$g" &>/dev/null && groups+=("$g")
+  done
+  if [[ ${#groups[@]} -gt 0 ]]; then
+    local group_list
+    group_list=$(IFS=','; echo "${groups[*]}")
+    _asroot usermod -aG "$group_list" "$target_user" \
+      && _ok "Adicionado aos grupos: ${group_list}." \
+      || { _err "Falha ao adicionar aos grupos."; return 1; }
+  fi
+
+  _blank
+  _ok "Usuário '${target_user}' criado com sucesso."
+  _info "Para acesso sudo, execute: arrow howto sudoers ${target_user}"
+}
+
+# ── Registry ──────────────────────────────────────────────────────────────────
 
 _howto_list() {
   echo
   echo -e "  ${BOLD}Guias disponíveis:${RESET}"
   _blank
-  echo -e "  $(echo -e "${CYAN}sudoers${RESET}")   Adicionar usuário ao sudoers via grupo wheel"
+  echo -e "  ${CYAN}sudoers${RESET}    Adicionar usuário ao sudoers via grupo wheel"
+  echo -e "  ${CYAN}add.user${RESET}   Criar novo usuário com home e grupos comuns"
   _blank
-  echo -e "  ${DIM}Uso: arrow howto <guia> [usuário]${RESET}"
+  echo -e "  ${DIM}Uso: arrow howto <guia> [args]${RESET}"
   echo
 }
 
@@ -78,6 +130,7 @@ cmd_howto() {
 
   case "$guide" in
     sudoers | sudo)  _howto_sudoers "$@" ;;
+    add.user)        _howto_add_user "$@" ;;
     "" | list)       _howto_list ;;
     *)
       _err "Guia desconhecido: '${guide}'"

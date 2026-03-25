@@ -45,7 +45,7 @@ _arrow() {
       return
       ;;
     howto)
-      COMPREPLY=($(compgen -W "sudoers list" -- "$cur"))
+      COMPREPLY=($(compgen -W "sudoers add.user list" -- "$cur"))
       return
       ;;
     self)
@@ -56,8 +56,17 @@ _arrow() {
       COMPREPLY=($(compgen -W "--all" -- "$cur"))
       return
       ;;
-    add | search | find | s)
-      # package names from sync db (may be slow on large repos; skip if empty)
+    add)
+      if [[ "$cur" == -* ]]; then
+        COMPREPLY=($(compgen -W "--no-upgrade --no-sync" -- "$cur"))
+        return
+      fi
+      local sync_pkgs
+      sync_pkgs=$(pacman -Slq 2>/dev/null)
+      [[ -n "$sync_pkgs" ]] && COMPREPLY=($(compgen -W "$sync_pkgs" -- "$cur"))
+      return
+      ;;
+    search | find | s)
       local sync_pkgs
       sync_pkgs=$(pacman -Slq 2>/dev/null)
       [[ -n "$sync_pkgs" ]] && COMPREPLY=($(compgen -W "$sync_pkgs" -- "$cur"))
@@ -83,4 +92,4 @@ _arrow() {
   COMPREPLY=($(compgen -W "${commands[*]}" -- "$cur"))
 }
 
-complete -F _arrow arrow
+complete -F _arrow arrow arw

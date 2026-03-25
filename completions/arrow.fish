@@ -72,11 +72,18 @@ for _cmd in del rm remove files info deps
         -a '(__arrow_installed_packages)'
 end
 
+# 'add' flags
+complete -c arrow -f -n '__arrow_using_subcommand add' -a --no-upgrade -d 'Skip system upgrade'
+complete -c arrow -f -n '__arrow_using_subcommand add' -a --no-sync    -d 'Skip db sync'
+
 # Commands that accept a sync-db package name
 for _cmd in add search find s
     complete -c arrow -f -n "__arrow_using_subcommand $_cmd" \
         -a '(__arrow_sync_packages)'
 end
+
+# 'arw' alias gets the same completions
+complete -c arw -w arrow
 
 # 'own' completes with file paths
 complete -c arrow -F -n '__arrow_using_subcommand own'
@@ -86,8 +93,9 @@ complete -c arrow -f -n '__arrow_using_subcommand clean' \
     -a --all -d 'Wipe the entire package cache'
 
 # 'howto' sub-commands
-complete -c arrow -f -n '__arrow_using_subcommand howto' -a sudoers -d 'Add user to sudoers'
-complete -c arrow -f -n '__arrow_using_subcommand howto' -a list    -d 'List available guides'
+complete -c arrow -f -n '__arrow_using_subcommand howto' -a sudoers  -d 'Add user to sudoers'
+complete -c arrow -f -n '__arrow_using_subcommand howto' -a add.user -d 'Create new user'
+complete -c arrow -f -n '__arrow_using_subcommand howto' -a list     -d 'List available guides'
 
 # 'self' sub-commands
 complete -c arrow -f -n '__arrow_using_subcommand self' -a update -d 'Update arrow to the latest version'
