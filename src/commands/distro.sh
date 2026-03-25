@@ -18,17 +18,31 @@
 
 # ── Guard ──────────────────────────────────────────────────────────────────────
 
-# Ensures this is a plain Arch Linux system.
+# Ensures this is a plain Arch Linux system (x86_64 or ARM).
 # Morphs are not supported on Arch-based distros (Manjaro, EndeavourOS, etc.)
 # because their custom packages and repos will conflict with the morph's
 # assumptions, producing an inconsistent system.
+# Accepted IDs: "arch" (x86_64) and "archarm" (Arch Linux ARM).
 _distro_require_arch() {
   local id
   id=$(grep '^ID=' /etc/os-release 2>/dev/null | cut -d= -f2)
-  if [[ "$id" != "arch" ]]; then
+  if [[ "$id" != "arch" && "$id" != "archarm" ]]; then
     _err "This command requires plain Arch Linux."
     _info "Detected distro: ${BOLD}${id:-unknown}${RESET}"
     _warn "On other distros (Manjaro, EndeavourOS, etc.) the morph may produce an inconsistent system."
+    return 1
+  fi
+}
+
+# Ensures this is specifically Arch Linux ARM.
+# Used by morphs whose installers are ARM-only.
+_distro_require_archarm() {
+  local id
+  id=$(grep '^ID=' /etc/os-release 2>/dev/null | cut -d= -f2)
+  if [[ "$id" != "archarm" ]]; then
+    _err "This morph requires Arch Linux ARM."
+    _info "Detected distro: ${BOLD}${id:-unknown}${RESET}"
+    _warn "The Archcraft ARM installer is ARM-only and will not work on x86_64."
     return 1
   fi
 }
@@ -66,8 +80,8 @@ _distro_require_arch() {
 _distro_morph_archcraft() {
   _section "Morph: Arch Linux ARM → Archcraft ARM"
 
-  # Guard: Arch Linux only
-  _distro_require_arch || return 1
+  # Guard: Arch Linux ARM only (Archcraft ARM installer is ARM-specific)
+  _distro_require_archarm || return 1
 
   # Pre-flight: /boot space
   local boot_avail boot_avail_mb
