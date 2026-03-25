@@ -256,3 +256,18 @@ _pacman() {
   [[ -n "$_lvl" ]] && _asroot dmesg -n "$_lvl" 2>/dev/null || true
   return $_ret
 }
+
+# Check if packages are installed and return separate lists.
+# Usage: _check_installed installed_var not_installed_var pkg1 pkg2 ...
+_check_installed() {
+  local -n _inst_ref="$1" _not_inst_ref="$2"
+  shift 2
+  local pkg
+  for pkg in "$@"; do
+    if pacman -Qq "$pkg" &>/dev/null; then
+      _inst_ref+=("$pkg")
+    else
+      _not_inst_ref+=("$pkg")
+    fi
+  done
+}

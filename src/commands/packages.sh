@@ -15,13 +15,16 @@ cmd_add() {
   [[ $# -eq 0 ]] && _die "Uso: arrow add [--no-upgrade|--no-sync] <pacote> [pacote2 …]"
 
   # Classify each package: installed / pacman repo / AUR / not found.
-  local already=() to_install=() aur_pkgs=() not_found=()
+  local already=() to_install=() aur_pkgs=() not_found=() not_installed=()
   _info "Verificando pacotes…"
+
+  # First check what's already installed
+  _check_installed already not_installed "$@"
+
+  # Then classify non-installed packages
   local pkg
-  for pkg in "$@"; do
-    if pacman -Qq "$pkg" &>/dev/null; then
-      already+=("$pkg")
-    elif pacman -Si "$pkg" &>/dev/null 2>&1; then
+  for pkg in "${not_installed[@]}"; do
+    if pacman -Si "$pkg" &>/dev/null 2>&1; then
       to_install+=("$pkg")
     elif _aur_exists "$pkg"; then
       aur_pkgs+=("$pkg")
@@ -83,14 +86,26 @@ cmd_add() {
 # Aliases: del, rm, remove
 cmd_delete() {
   [[ $# -eq 0 ]] && _die "Uso: arrow delete <pacote> [pacote2 …]"
-  _preview "Remover pacote(s) e dependências órfãs" "pacman -Rns $*  # -R remover  -n sem backup  -s remove deps órfãs"
+
+  # Check which packages are actually installed
+  local installed=() not_installed=()
+  _check_installed installed not_installed "$@"
+
+  [[ ${#not_installed[@]} -gt 0 ]] && _warn "Não instalado(s): ${not_installed[*]}"
+
+  if [[ ${#installed[@]} -eq 0 ]]; then
+    _err "Nenhum pacote instalado para remover."
+    return 1
+  fi
+
+  _preview "Remover pacote(s) e dependências órfãs" "pacman -Rns ${installed[*]}  # -R remover  -n sem backup  -s remove deps órfãs"
   _ask "Remover?" || { _warn "Cancelado."; return; }
   _blank
 
   # First attempt: capture stderr to detect dependent packages.
-  _cmd "pacman -Rns $*"
+  _cmd "pacman -Rns ${installed[*]}"
   local err
-  if err=$(_pacman -Rns "$@" 2>&1); then
+  if err=$(_pacman -Rns "${installed[@]}" 2>&1); then
     _ok "Concluído."
     return
   fi
@@ -106,18 +121,18 @@ cmd_delete() {
   fi
 
   _blank
-  _warn "Os seguintes pacotes dependem de ${*} e precisam ser removidos junto:"
+  _warn "Os seguintes pacotes dependem de ${installed[*]} e precisam ser removidos junto:"
   local dep
   for dep in $dependents; do
     echo -e "    ${YELLOW}•${RESET}  ${YELLOW}${dep}${RESET}"
   done
   _blank
 
-  _preview "Remover tudo" "pacman -Rns $* ${dependents}  # -R remover  -n sem backup  -s remove deps órfãs"
+  _preview "Remover tudo" "pacman -Rns ${installed[*]} ${dependents}  # -R remover  -n sem backup  -s remove deps órfãs"
   _ask "Remover tudo?" "${RED}${BOLD}" || { _warn "Cancelado."; return; }
   _blank
   # shellcheck disable=SC2086
-  _run _pacman -Rns "$@" $dependents
+  _run _pacman -Rns "${installed[@]}" $dependents
 }
 
 # arrow search <term>
