@@ -100,17 +100,24 @@ _check_deps() {
     need_bash_comp=true
   fi
 
-  # Single sync + install pass covers both missing deps and bash-completion.
   if command -v pacman &>/dev/null; then
-    local to_install=("${missing[@]}")
-    $need_bash_comp && to_install+=("bash-completion")
+    local synced=false
 
-    if [[ ${#to_install[@]} -gt 0 ]]; then
-      [[ ${#missing[@]} -gt 0 ]] && _warn "Missing dependencies: ${missing[*]}"
-      $need_bash_comp && _info "Installing bash-completion for tab completion support…"
+    # Install critical deps (curl, tar) — fatal if they fail.
+    if [[ ${#missing[@]} -gt 0 ]]; then
+      _warn "Missing dependencies: ${missing[*]}"
       _info "Syncing package databases…"
       _asroot pacman -Syy --noconfirm ${_sandbox}
-      _asroot pacman -S --noconfirm ${_sandbox} "${to_install[@]}" || true
+      synced=true
+      _asroot pacman -S --noconfirm ${_sandbox} "${missing[@]}"
+    fi
+
+    # Install bash-completion — optional, suppress noisy pacman output on failure.
+    if $need_bash_comp; then
+      _info "Installing bash-completion…"
+      $synced || _asroot pacman -Syy --noconfirm ${_sandbox} &>/dev/null
+      _asroot pacman -S --noconfirm ${_sandbox} bash-completion &>/dev/null \
+        || _warn "bash-completion unavailable on this mirror — tab completion may not work until installed."
     fi
   elif [[ ${#missing[@]} -gt 0 ]]; then
     _die "Please install manually: ${missing[*]}"
@@ -243,13 +250,7 @@ _verify() {
     echo -e "  ${DIM}export PATH=\"\$PATH:${PREFIX}/bin\"${RESET}"
   fi
 
-  # Remind user to reload completions in the current session.
-  local bash_comp_path="/usr/share/bash-completion/completions/arrow"
-  [[ "$PREFIX" != /usr* ]] && bash_comp_path="${PREFIX}/share/bash-completion/completions/arrow"
-  _info "Reload completions in the current session:"
-  echo -e "  ${DIM}bash:  source ${bash_comp_path}${RESET}"
-  echo -e "  ${DIM}zsh:   exec zsh${RESET}"
-  echo -e "  ${DIM}fish:  source /usr/share/fish/vendor_completions.d/arrow.fish${RESET}"
+  _info "Open a new terminal for tab completions to take effect."
 }
 
 # ── Main ──────────────────────────────────────────────────────────────────────
