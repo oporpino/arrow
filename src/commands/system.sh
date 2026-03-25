@@ -12,10 +12,16 @@ cmd_update() {
 # arrow upgrade
 # Synchronise databases and upgrade all packages.
 cmd_upgrade() {
-  _preview "Atualizar o sistema" "pacman -Syu  # -S sync  -y atualiza db  -u upgrade"
+  local helper
+  helper=$(_aur_helper)
+  local preview_cmds=("pacman -Syu  # -S sync  -y atualiza db  -u upgrade")
+  [[ -n "$helper" ]] && preview_cmds+=("${helper} -Syu  # atualiza pacotes AUR")
+
+  _preview "Atualizar o sistema" "${preview_cmds[@]}"
   _ask "Continuar?" || { _warn "Cancelado."; return; }
   _blank
   _run _pacman -Syu
+  [[ -n "$helper" ]] && _run "$helper" -Syu --noconfirm
 }
 
 # arrow clean [--all]

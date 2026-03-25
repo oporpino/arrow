@@ -12,8 +12,8 @@ function __arrow_no_subcommand
         list ls history log \
         orphans clean purge \
         howto \
-        self sharpen reforge \
-        aur help version
+        self sharpen reforge reinstall \
+        help version
 end
 
 function __arrow_using_subcommand
@@ -61,7 +61,6 @@ complete -c arrow -f -n __arrow_no_subcommand -a self     -d 'Manage arrow itsel
 complete -c arrow -f -n __arrow_no_subcommand -a sharpen   -d 'Update arrow to the latest version'
 complete -c arrow -f -n __arrow_no_subcommand -a reforge   -d 'Alias for sharpen'
 complete -c arrow -f -n __arrow_no_subcommand -a reinstall -d 'Force reinstall arrow'
-complete -c arrow -f -n __arrow_no_subcommand -a aur      -d 'AUR helper commands'
 complete -c arrow -f -n __arrow_no_subcommand -a help    -d 'Show help'
 complete -c arrow -f -n __arrow_no_subcommand -a version -d 'Print version'
 
@@ -103,7 +102,3 @@ complete -c arrow -f -n '__arrow_using_subcommand self' -a update     -d 'Update
 complete -c arrow -f -n '__arrow_using_subcommand self' -a reinstall  -d 'Force reinstall arrow'
 complete -c arrow -f -n '__arrow_using_subcommand self' -a remove     -d 'Uninstall arrow from the system'
 
-# 'aur' sub-commands
-complete -c arrow -f -n '__arrow_using_subcommand aur' -a add     -d 'Install from AUR'
-complete -c arrow -f -n '__arrow_using_subcommand aur' -a search  -d 'Search the AUR'
-complete -c arrow -f -n '__arrow_using_subcommand aur' -a upgrade -d 'Upgrade AUR packages'

@@ -183,10 +183,19 @@ _aur_helper() {
 }
 
 # Returns 0 if the package exists in the AUR, 1 otherwise.
+# Uses the installed AUR helper if available (faster); falls back to AUR API.
 _aur_exists() {
   local pkg="$1"
-  curl -fsSL --max-time 5 "https://aur.archlinux.org/rpc/?v=5&type=info&arg=${pkg}" 2>/dev/null \
-    | grep -q '"resultcount":[1-9]'
+  local helper
+  helper=$(_aur_helper)
+  if [[ -n "$helper" ]]; then
+    "$helper" -Si "$pkg" &>/dev/null 2>&1
+  else
+    local result
+    result=$(curl -fsSL --connect-timeout 3 --max-time 5 \
+      "https://aur.archlinux.org/rpc/?v=5&type=info&arg=${pkg}" 2>/dev/null)
+    echo "$result" | grep -q '"resultcount":[1-9]'
+  fi
 }
 
 # Ensures an AUR helper is available. If none found, asks the user which to install

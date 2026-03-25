@@ -26,12 +26,8 @@ _arrow() {
     orphans clean purge
     howto
     self sharpen reforge reinstall
-    aur
     help version
   )
-
-  # AUR sub-commands
-  local aur_cmds=(add search upgrade)
 
   case "$prev" in
     arrow | arw)
@@ -44,10 +40,6 @@ _arrow() {
       ;;
     own)
       declare -f _filedir &>/dev/null && _filedir || COMPREPLY=($(compgen -f -- "$cur"))
-      return
-      ;;
-    aur)
-      COMPREPLY=($(compgen -W "${aur_cmds[*]}" -- "$cur"))
       return
       ;;
     howto)
@@ -82,16 +74,6 @@ _arrow() {
       return
       ;;
   esac
-
-  # Nested: arrow aur <sub>
-  if [[ ${#words[@]} -ge 3 && "${words[1]}" == "aur" ]]; then
-    case "$prev" in
-      add | search)
-        return ;;  # no static completion for AUR names
-    esac
-    COMPREPLY=($(compgen -W "${aur_cmds[*]}" -- "$cur"))
-    return
-  fi
 
   if [[ "$cur" == -* ]]; then
     COMPREPLY=($(compgen -W "--help --version" -- "$cur"))

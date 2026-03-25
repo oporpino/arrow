@@ -42,7 +42,6 @@ _arrow() {
         'sharpen:update arrow to the latest version'
         'reforge:alias for sharpen'
         'reinstall:force reinstall arrow'
-        'aur:AUR helper commands'
         'help:show this help'
         'version:print version'
       )
@@ -79,15 +78,6 @@ _arrow() {
             'remove:uninstall arrow from the system'
           )
           _describe -t self-commands 'self subcommand' self_cmds
-          ;;
-        aur)
-          local -a aur_cmds
-          aur_cmds=(
-            'add:install a package from the AUR'
-            'search:search the AUR'
-            'upgrade:upgrade AUR packages'
-          )
-          _describe -t aur-commands 'aur subcommand' aur_cmds
           ;;
         add)
           _values 'option' '--no-upgrade[skip system upgrade]' '--no-sync[skip db sync]'

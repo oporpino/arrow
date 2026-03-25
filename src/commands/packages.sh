@@ -120,12 +120,20 @@ cmd_delete() {
 }
 
 # arrow search <term>
-# Search package names and descriptions in the sync databases.
+# Search pacman repos, then AUR if a helper is available.
 cmd_search() {
   [[ $# -eq 0 ]] && _die "Uso: arrow search <termo>"
   _info "Buscando por: ${BOLD}$*${RESET}"
   _sep
-  pacman -Ss "$@"
+  pacman -Ss "$@" || true
+  local helper
+  helper=$(_aur_helper)
+  if [[ -n "$helper" ]]; then
+    _blank
+    _info "AUR:"
+    _sep
+    "$helper" -Ss --aur "$@" 2>/dev/null || true
+  fi
 }
 
 # arrow info <pkg>

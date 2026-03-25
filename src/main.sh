@@ -24,9 +24,6 @@ main() {
     list | ls)         cmd_list     "$@" ;;
     history | log)     cmd_history  "$@" ;;
 
-    # aur
-    aur)               cmd_aur      "$@" ;;
-
     # howto
     howto)             cmd_howto    "$@" ;;
 
