@@ -108,7 +108,8 @@ _spell_desktop_openbox_do() {
   _blank
   _ask "Instalar Openbox?" || { _warn "Cancelado."; return; }
   _blank
-  _run _pacman -Syu xorg-server xorg-xinit openbox lightdm lightdm-gtk-greeter || return 1
+  _run _pacman -Syu xorg-server xorg-xinit || return 1
+  _run _pacman -S openbox lightdm lightdm-gtk-greeter || return 1
   _run _asroot systemctl enable lightdm || return 1
   _ok "Openbox instalado. Reinicie para entrar no desktop."
 }
