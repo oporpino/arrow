@@ -44,7 +44,7 @@ main() {
     version | -v | --version) cmd_version ;;
 
     *)
-      _err "Comando desconhecido: '${cmd}'"
+      _err "Unknown command: '${cmd}'"
       cmd_help
       exit 1
       ;;

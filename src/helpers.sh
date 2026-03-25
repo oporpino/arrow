@@ -10,7 +10,7 @@ _blank()   { echo; }
 
 # ── Section header ────────────────────────────────────────────────────────────
 #
-#   ──  Atualizando o sistema  ──────────────────────────────────────────────
+#   ──  Updating the system  ────────────────────────────────────────────────
 #
 _section() {
   local title=" $* "
@@ -25,7 +25,7 @@ _section() {
 
 # ── Step indicator  ──────────────────────────────────────────────────────────
 #
-#   [1/3] Configurando locale
+#   [1/3] Configuring locale
 #
 _step() {
   local n="$1" total="$2"; shift 2
@@ -45,7 +45,7 @@ _cmd() {
 # ── Command block ─────────────────────────────────────────────────────────────
 #
 #   Shows a labelled list of commands before asking for confirmation.
-#   Usage: _preview "Instalar GNOME" "sudo pacman -S gnome" "sudo systemctl enable gdm"
+#   Usage: _preview "Install GNOME" "sudo pacman -S gnome" "sudo systemctl enable gdm"
 #
 _preview() {
   local label="$1"; shift
@@ -83,12 +83,12 @@ _preview() {
 # ── Confirmation prompt ───────────────────────────────────────────────────────
 #
 #   Returns 0 if confirmed, 1 if declined.
-#   Usage: _ask "Continuar?" && do_something
+#   Usage: _ask "Continue?" && do_something
 #
 _ask() {
-  local prompt="${1:-Continuar?}"
+  local prompt="${1:-Continue?}"
   local color="${2:-${BOLD}}"
-  printf "  ${color}%s${RESET} ${DIM}[s/N]${RESET} " "$prompt"
+  printf "  ${color}%s${RESET} ${DIM}[y/N]${RESET} " "$prompt"
   local ans
   read -r ans
   [[ "${ans,,}" == "s" || "${ans,,}" == "y" ]]
@@ -134,9 +134,9 @@ _run() {
 
   _cmd "${display[*]}"
   if "$@"; then
-    _ok "Concluído."
+    _ok "Done."
   else
-    _err "Falhou: ${display[*]}"
+    _err "Failed: ${display[*]}"
     return 1
   fi
 }
@@ -154,20 +154,20 @@ _asroot() {
   elif command -v doas &>/dev/null; then
     doas "$@"
   else
-    _die "Permissão de root necessária, mas sudo/doas não estão instalados." \
-         "Instale sudo: pacman -S sudo   ou execute como root."
+    _die "Root privileges required but sudo/doas are not installed." \
+         "Install sudo: pacman -S sudo   or run as root."
   fi
 }
 
 # ── Guards ────────────────────────────────────────────────────────────────────
 
 _require_not_root() {
-  [[ $EUID -eq 0 ]] && _die "Não execute como root. Use sudo apenas quando necessário."
+  [[ $EUID -eq 0 ]] && _die "Do not run as root. Use sudo only when necessary."
   return 0
 }
 
 _need_pkg() {
-  [[ -z "${1:-}" ]] && _die "Informe o nome do pacote."
+  [[ -z "${1:-}" ]] && _die "Please provide a package name."
   return 0
 }
 
@@ -208,11 +208,11 @@ _ensure_aur_helper() {
   [[ -n "$helper" ]] && return 0
 
   _blank
-  _warn "Nenhum helper AUR instalado."
-  printf "  ${BOLD}Escolha um helper:${RESET}\n" >&2
-  printf "    ${CYAN}1${RESET}  yay   (mais popular, escrito em Go)\n" >&2
-  printf "    ${CYAN}2${RESET}  paru  (mais rápido, escrito em Rust)\n" >&2
-  printf "\n  Opção [1/2]: " >&2
+  _warn "No AUR helper installed."
+  printf "  ${BOLD}Choose a helper:${RESET}\n" >&2
+  printf "    ${CYAN}1${RESET}  yay   (most popular, written in Go)\n" >&2
+  printf "    ${CYAN}2${RESET}  paru  (faster, written in Rust)\n" >&2
+  printf "\n  Option [1/2]: " >&2
   local choice
   read -r choice </dev/tty
   case "${choice:-1}" in
@@ -220,23 +220,23 @@ _ensure_aur_helper() {
     *) helper="yay"  ;;
   esac
 
-  [[ $EUID -eq 0 ]] && _die "makepkg não pode rodar como root. Execute como usuário normal."
+  [[ $EUID -eq 0 ]] && _die "makepkg cannot run as root. Run as a normal user."
 
-  _info "Instalando dependências de build…"
+  _info "Installing build dependencies..."
   _pacman -S --needed base-devel git || true
 
   local tmp
   tmp=$(mktemp -d)
-  _info "Clonando ${helper} do AUR…"
+  _info "Cloning ${helper} from AUR..."
   git clone "https://aur.archlinux.org/${helper}.git" "${tmp}/${helper}" \
-    || { rm -rf "$tmp"; _die "Falha ao clonar ${helper}."; }
+    || { rm -rf "$tmp"; _die "Failed to clone ${helper}."; }
 
-  _info "Compilando e instalando ${helper}…"
+  _info "Building and installing ${helper}..."
   (cd "${tmp}/${helper}" && makepkg -si --noconfirm) \
-    || { rm -rf "$tmp"; _die "Falha ao compilar ${helper}."; }
+    || { rm -rf "$tmp"; _die "Failed to build ${helper}."; }
 
   rm -rf "$tmp"
-  _ok "${helper} instalado."
+  _ok "${helper} installed."
 }
 
 # Detect --disable-sandbox support once (needed on kernels without Landlock, e.g. ARM).

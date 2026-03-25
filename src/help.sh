@@ -10,63 +10,62 @@ cmd_help() {
 $(echo -e "${BOLD}${CYAN}arrow${RESET} ${DIM}v${VERSION}${RESET}") — The missing interface for Arch
 $(echo -e "${DIM}${REPO_URL}${RESET}")
 
-$(echo -e "${BOLD}USO${RESET}")
-  arrow <comando> [argumentos]
+$(echo -e "${BOLD}USAGE${RESET}")
+  arrow <command> [arguments]
 
-$(echo -e "${BOLD}PACOTES${RESET}")
-  $(echo -e "${GREEN}add${RESET}")     <pkg…>         Instala pacote(s)
-  $(echo -e "${RED}delete${RESET}")  <pkg…>         Remove pacote(s) e deps órfãs
-  $(echo -e "${BLUE}search${RESET}")  <termo>        Busca nos repositórios
-  $(echo -e "${CYAN}info${RESET}")    <pkg>          Detalhes de um pacote
-  $(echo -e "${CYAN}files${RESET}")   <pkg>          Arquivos instalados de um pacote
-  $(echo -e "${CYAN}deps${RESET}")    <pkg>          Árvore de dependências
-  $(echo -e "${CYAN}own${RESET}")     <arquivo>      Qual pacote possui este arquivo
+$(echo -e "${BOLD}PACKAGES${RESET}")
+  $(echo -e "${GREEN}add${RESET}")     <pkg…>         Install package(s)
+  $(echo -e "${RED}delete${RESET}")  <pkg…>         Remove package(s) and orphaned deps
+  $(echo -e "${BLUE}search${RESET}")  <term>         Search repositories
+  $(echo -e "${CYAN}info${RESET}")    <pkg>          Show package details
+  $(echo -e "${CYAN}files${RESET}")   <pkg>          List files installed by a package
+  $(echo -e "${CYAN}deps${RESET}")    <pkg>          Show dependency tree
+  $(echo -e "${CYAN}own${RESET}")     <file>         Which package owns this file
 
-$(echo -e "${BOLD}SISTEMA${RESET}")
-  $(echo -e "${GREEN}update${RESET}")                  Sincroniza base de dados
-  $(echo -e "${GREEN}upgrade${RESET}")                 Atualiza todo o sistema
-  $(echo -e "${YELLOW}clean${RESET}")   [--all]         Limpa cache (--all remove tudo)
-  $(echo -e "${YELLOW}orphans${RESET}")                 Lista pacotes órfãos
-  $(echo -e "${YELLOW}purge${RESET}")                   Remove todos os pacotes órfãos
-
+$(echo -e "${BOLD}SYSTEM${RESET}")
+  $(echo -e "${GREEN}update${RESET}")                  Sync package databases
+  $(echo -e "${GREEN}upgrade${RESET}")                 Upgrade all packages
+  $(echo -e "${YELLOW}clean${RESET}")   [--all]         Clean cache (--all removes everything)
+  $(echo -e "${YELLOW}orphans${RESET}")                 List orphaned packages
+  $(echo -e "${YELLOW}purge${RESET}")                   Remove all orphaned packages
 
 $(echo -e "${BOLD}ARROW${RESET}")
-  $(echo -e "${MAGENTA}self update${RESET}")              Atualiza o arrow para a versão mais recente
-  $(echo -e "${MAGENTA}self remove${RESET}")              Desinstala o arrow do sistema
-  $(echo -e "${DIM}sharpen, reforge${RESET}             Aliases para self update${RESET}")
+  $(echo -e "${MAGENTA}self update${RESET}")              Update arrow to the latest version
+  $(echo -e "${MAGENTA}self remove${RESET}")              Uninstall arrow from the system
+  $(echo -e "${DIM}sharpen, reforge${RESET}             Aliases for self update${RESET}")
 
 $(echo -e "${BOLD}SPELLS${RESET}")
-  $(echo -e "${WHITE}spell${RESET}")                     Menu de configuração guiada
-  $(echo -e "${WHITE}spell desktop${RESET}") [de]        Instala ambiente de desktop
-  $(echo -e "${WHITE}spell desktop${RESET}") [de] undo   Remove ambiente de desktop
-  $(echo -e "${DIM}setup é alias para spell${RESET}")
+  $(echo -e "${WHITE}spell${RESET}")                     Guided setup menu
+  $(echo -e "${WHITE}spell desktop${RESET}") [de]        Install a desktop environment
+  $(echo -e "${WHITE}spell desktop${RESET}") [de] undo   Remove a desktop environment
+  $(echo -e "${DIM}setup is an alias for spell${RESET}")
 
 $(echo -e "${BOLD}DISTRO${RESET}")
-  $(echo -e "${RED}distro morph${RESET}") <nome>        Converte o sistema (irreversível)
+  $(echo -e "${RED}distro morph${RESET}") <name>        Convert the system (irreversible)
   $(echo -e "${RED}distro morph archcraft${RESET}")     Arch Linux ARM → Archcraft ARM
-  $(echo -e "${DIM}distro list${RESET}")                Lista morphs disponíveis
+  $(echo -e "${DIM}distro list${RESET}")                List available morphs
 
-$(echo -e "${BOLD}GUIAS${RESET}")
-  $(echo -e "${WHITE}howto${RESET}")   <guia>         Guias passo a passo (ex: sudoers)
+$(echo -e "${BOLD}GUIDES${RESET}")
+  $(echo -e "${WHITE}howto${RESET}")   <guide>         Step-by-step guides (e.g. sudoers)
 
-$(echo -e "${BOLD}LISTAGEM${RESET}")
-  $(echo -e "${CYAN}list${RESET}")    [filtro]        Lista pacotes instalados
-  $(echo -e "${CYAN}history${RESET}") [n=20]          Histórico de operações
+$(echo -e "${BOLD}QUERY${RESET}")
+  $(echo -e "${CYAN}list${RESET}")    [filter]        List installed packages
+  $(echo -e "${CYAN}history${RESET}") [n=20]          Show operation history
 
 $(echo -e "${BOLD}AUR${RESET}")
-  $(echo -e "${BLUE}aur add${RESET}")    <pkg>          Instala do AUR (yay/paru)
-  $(echo -e "${BLUE}aur search${RESET}") <termo>        Busca no AUR
-  $(echo -e "${BLUE}aur upgrade${RESET}")               Atualiza pacotes AUR
+  $(echo -e "${BLUE}aur add${RESET}")    <pkg>          Install from AUR (yay/paru)
+  $(echo -e "${BLUE}aur search${RESET}") <term>         Search the AUR
+  $(echo -e "${BLUE}aur upgrade${RESET}")               Upgrade AUR packages
 
-$(echo -e "${DIM}Exemplos:
+$(echo -e "${DIM}Examples:
   arrow add firefox neovim
   arrow delete vlc
   arrow search python
   arrow upgrade
   arrow aur add yay
 
-Variáveis de ambiente:
-  ARROW_DEBUG=1   Exibe flags internas dos comandos (ex: --noconfirm)${RESET}")
+Environment variables:
+  ARROW_DEBUG=1   Show internal flags (e.g. --noconfirm)${RESET}")
 
 EOF
 }

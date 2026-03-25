@@ -14,7 +14,7 @@ cmd_list() {
 # Show the last n pacman operations from the system log (default: 20).
 cmd_history() {
   local n="${1:-20}"
-  _info "Últimas ${BOLD}${n}${RESET} operações:"
+  _info "Last ${BOLD}${n}${RESET} operations:"
   _sep
   grep -E "installed|removed|upgraded" /var/log/pacman.log | tail -n "$n"
 }

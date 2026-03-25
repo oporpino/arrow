@@ -13,25 +13,25 @@ cmd_self_update() {
 
   _need_pkg curl
 
-  _info "Verificando versão remota…"
+  _info "Checking remote version..."
   local remote
   remote=$(_remote_version)
 
   if [[ -z "$remote" ]]; then
-    _warn "Não foi possível verificar a versão remota. Continuando mesmo assim."
+    _warn "Could not check remote version. Proceeding anyway."
   elif [[ "$remote" == "$VERSION" ]]; then
-    _ok "arrow ${VERSION} já é a versão mais recente."
+    _ok "arrow ${VERSION} is already the latest version."
     return
   else
-    _info "Nova versão disponível: ${BOLD}${remote}${RESET}  (atual: ${DIM}${VERSION}${RESET})"
+    _info "New version available: ${BOLD}${remote}${RESET}  (current: ${DIM}${VERSION}${RESET})"
   fi
 
   _blank
-  _preview "Atualizar o arrow" "curl -fsSL ${install_url} | bash"
-  _ask "Atualizar?" || { _warn "Cancelado."; return; }
+  _preview "Update arrow" "curl -fsSL ${install_url} | bash"
+  _ask "Update?" || { _warn "Cancelled."; return; }
 
   _blank
-  _info "Baixando e executando o installer…"
+  _info "Downloading and running installer..."
   bash <(curl -fsSL "$install_url")
 }
 
@@ -42,11 +42,11 @@ cmd_self_reinstall() {
 
   _need_pkg curl
 
-  _preview "Reinstalar o arrow" "curl -fsSL ${install_url} | bash"
-  _ask "Reinstalar arrow ${VERSION}?" || { _warn "Cancelado."; return; }
+  _preview "Reinstall arrow" "curl -fsSL ${install_url} | bash"
+  _ask "Reinstall arrow ${VERSION}?" || { _warn "Cancelled."; return; }
 
   _blank
-  _info "Baixando e executando o installer…"
+  _info "Downloading and running installer..."
   bash <(curl -fsSL "$install_url")
 }
 
@@ -57,14 +57,14 @@ cmd_self_remove() {
 
   _need_pkg curl
 
-  _preview "Desinstalar o arrow" \
+  _preview "Uninstall arrow" \
     "curl -fsSL ${uninstall_url} | bash"
 
-  _ask "Remover o arrow do sistema?" \
-    || { _warn "Cancelado."; return; }
+  _ask "Remove arrow from the system?" \
+    || { _warn "Cancelled."; return; }
 
   _blank
-  _info "Baixando e executando o uninstaller…"
+  _info "Downloading and running uninstaller..."
   bash <(curl -fsSL "$uninstall_url")
 }
 
@@ -76,12 +76,12 @@ cmd_self() {
     reinstall) cmd_self_reinstall "$@" ;;
     remove)    cmd_self_remove    "$@" ;;
     "")
-      _err "Uso: arrow self <update|reinstall|remove>"
+      _err "Usage: arrow self <update|reinstall|remove>"
       exit 1
       ;;
     *)
-      _err "Subcomando desconhecido: 'self ${sub}'"
-      _err "Uso: arrow self <update|reinstall|remove>"
+      _err "Unknown subcommand: 'self ${sub}'"
+      _err "Usage: arrow self <update|reinstall|remove>"
       exit 1
       ;;
   esac

@@ -185,6 +185,8 @@ _do_install() {
     fish_comp="${PREFIX}/share/fish/vendor_completions.d/arrow.fish"
   fi
 
+  # Remove existing completions before installing to guarantee overwrite.
+  rm -f "$bash_comp" "$zsh_comp" "$fish_comp" 2>/dev/null || true
   install -Dm644 "$src/completions/arrow.bash" "$bash_comp"
   install -Dm644 "$src/completions/_arrow"     "$zsh_comp"
   install -Dm644 "$src/completions/arrow.fish" "$fish_comp"
@@ -237,13 +239,13 @@ _verify() {
     echo -e "  ${DIM}export PATH=\"\$PATH:${PREFIX}/bin\"${RESET}"
   fi
 
-  # Remind user to activate bash completion in the current session.
-  if [[ "${SHELL:-}" == */bash ]]; then
-    local comp="/usr/share/bash-completion/completions/arrow"
-    [[ "$PREFIX" != /usr* ]] && comp="${PREFIX}/share/bash-completion/completions/arrow"
-    _info "To enable tab completion now:"
-    echo -e "  ${DIM}source ${comp}${RESET}"
-  fi
+  # Remind user to reload completions in the current session.
+  local bash_comp_path="/usr/share/bash-completion/completions/arrow"
+  [[ "$PREFIX" != /usr* ]] && bash_comp_path="${PREFIX}/share/bash-completion/completions/arrow"
+  _info "Reload completions in the current session:"
+  echo -e "  ${DIM}bash:  source ${bash_comp_path}${RESET}"
+  echo -e "  ${DIM}zsh:   exec zsh${RESET}"
+  echo -e "  ${DIM}fish:  source /usr/share/fish/vendor_completions.d/arrow.fish${RESET}"
 }
 
 # ── Main ──────────────────────────────────────────────────────────────────────

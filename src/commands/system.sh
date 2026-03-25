@@ -3,8 +3,8 @@
 # arrow update
 # Synchronise the package databases.
 cmd_update() {
-  _preview "Sincronizar base de dados" "pacman -Sy  # -S sync  -y atualiza db"
-  _ask "Continuar?" || { _warn "Cancelado."; return; }
+  _preview "Sync package databases" "pacman -Sy  # -S sync  -y refresh db"
+  _ask "Continue?" || { _warn "Cancelled."; return; }
   _blank
   _run _pacman -Sy
 }
@@ -14,11 +14,11 @@ cmd_update() {
 cmd_upgrade() {
   local helper
   helper=$(_aur_helper)
-  local preview_cmds=("pacman -Syu  # -S sync  -y atualiza db  -u upgrade")
-  [[ -n "$helper" ]] && preview_cmds+=("${helper} -Syu  # atualiza pacotes AUR")
+  local preview_cmds=("pacman -Syu  # -S sync  -y refresh db  -u upgrade")
+  [[ -n "$helper" ]] && preview_cmds+=("${helper} -Syu  # upgrade AUR packages")
 
-  _preview "Atualizar o sistema" "${preview_cmds[@]}"
-  _ask "Continuar?" || { _warn "Cancelado."; return; }
+  _preview "Upgrade the system" "${preview_cmds[@]}"
+  _ask "Continue?" || { _warn "Cancelled."; return; }
   _blank
   _run _pacman -Syu
   [[ -n "$helper" ]] && _run "$helper" -Syu --noconfirm
@@ -29,11 +29,11 @@ cmd_upgrade() {
 # With --all, wipe the entire cache.
 cmd_clean() {
   if [[ "${1:-}" == "--all" ]]; then
-    _preview "Limpar TODO o cache de pacotes" "pacman -Scc  # -S cache  -cc apaga tudo"
-    _ask "Isso removerá todos os pacotes em cache. Continuar?" || { _warn "Cancelado."; return; }
+    _preview "Wipe the entire package cache" "pacman -Scc  # -S cache  -cc remove everything"
+    _ask "This will remove all cached packages. Continue?" || { _warn "Cancelled."; return; }
   else
-    _preview "Limpar versões antigas do cache" "pacman -Sc  # -S cache  -c remove versões antigas"
-    _ask "Continuar?" || { _warn "Cancelado."; return; }
+    _preview "Remove old versions from cache" "pacman -Sc  # -S cache  -c remove old versions"
+    _ask "Continue?" || { _warn "Cancelled."; return; }
   fi
   _blank
   if [[ "${1:-}" == "--all" ]]; then
@@ -49,15 +49,15 @@ cmd_orphans() {
   local pkgs
   pkgs=$(pacman -Qdtq 2>/dev/null || true)
   if [[ -z "$pkgs" ]]; then
-    _ok "Nenhum pacote órfão encontrado."
+    _ok "No orphaned packages found."
   else
-    _warn "Pacotes órfãos (não mais necessários):"
+    _warn "Orphaned packages (no longer required):"
     _blank
     while IFS= read -r pkg; do
       echo -e "    ${DIM}•${RESET}  ${pkg}"
     done <<< "$pkgs"
     _blank
-    _info "Execute ${BOLD}arrow purge${RESET} para removê-los."
+    _info "Run ${BOLD}arrow purge${RESET} to remove them."
   fi
 }
 
@@ -67,15 +67,15 @@ cmd_purge() {
   local pkgs
   pkgs=$(pacman -Qdtq 2>/dev/null || true)
   if [[ -z "$pkgs" ]]; then
-    _ok "Nenhum pacote órfão para remover."
+    _ok "No orphaned packages to remove."
     return
   fi
 
   local pkg_list
   pkg_list=$(echo "$pkgs" | tr '\n' ' ')
 
-  _preview "Remover pacotes órfãos" "pacman -Rns ${pkg_list}  # -R remover  -n sem backup  -s remove deps órfãs"
-  _ask "Remover?" || { _warn "Cancelado."; return; }
+  _preview "Remove orphaned packages" "pacman -Rns ${pkg_list}  # -R remove  -n no backup  -s remove orphaned deps"
+  _ask "Remove?" || { _warn "Cancelled."; return; }
   _blank
   # shellcheck disable=SC2086
   _run _pacman -Rns $pkgs

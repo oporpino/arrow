@@ -7,92 +7,92 @@
 _howto_sudoers() {
   local target_user="${1:-$USER}"
 
-  _section "Como adicionar ${target_user} ao sudoers"
+  _section "How to add ${target_user} to sudoers"
 
-  _step 1 3 "Instalar o sudo"
+  _step 1 3 "Install sudo"
   _cmd "pacman -S sudo"
 
-  _step 2 3 "Adicionar ${target_user} ao grupo wheel"
+  _step 2 3 "Add ${target_user} to the wheel group"
   _cmd "usermod -aG wheel ${target_user}"
 
-  _step 3 3 "Habilitar o grupo wheel no /etc/sudoers"
+  _step 3 3 "Enable the wheel group in /etc/sudoers"
   _cmd "sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers"
 
   _blank
-  _ask "Executar agora?" || { _warn "Cancelado."; return; }
+  _ask "Run now?" || { _warn "Cancelled."; return; }
   _blank
 
   # Step 1 — install sudo if missing
   if ! command -v sudo &>/dev/null; then
-    _info "Instalando sudo…"
+    _info "Installing sudo..."
     local _sandbox=""
     pacman --disable-sandbox --version &>/dev/null && _sandbox="--disable-sandbox"
     _asroot pacman -S --noconfirm ${_sandbox} sudo \
-      && _ok "sudo instalado." \
-      || { _err "Falha ao instalar sudo."; return 1; }
+      && _ok "sudo installed." \
+      || { _err "Failed to install sudo."; return 1; }
   else
-    _ok "sudo já instalado."
+    _ok "sudo already installed."
   fi
 
   # Step 2 — add to wheel group
-  _info "Adicionando ${target_user} ao grupo wheel…"
+  _info "Adding ${target_user} to the wheel group..."
   _asroot usermod -aG wheel "$target_user" \
-    && _ok "${target_user} adicionado ao wheel." \
-    || { _err "Falha ao adicionar ao wheel."; return 1; }
+    && _ok "${target_user} added to wheel." \
+    || { _err "Failed to add to wheel."; return 1; }
 
   # Step 3 — uncomment wheel in sudoers
-  _info "Habilitando wheel em /etc/sudoers…"
+  _info "Enabling wheel in /etc/sudoers..."
   if grep -q '^%wheel ALL=(ALL:ALL) ALL' /etc/sudoers 2>/dev/null; then
-    _ok "Wheel já habilitado em /etc/sudoers."
+    _ok "Wheel already enabled in /etc/sudoers."
   else
     _asroot sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers \
-      && _ok "Wheel habilitado." \
-      || { _err "Falha ao editar /etc/sudoers."; return 1; }
+      && _ok "Wheel enabled." \
+      || { _err "Failed to edit /etc/sudoers."; return 1; }
   fi
 
   _blank
-  _ok "Pronto! Faça logout e login novamente para aplicar."
-  _warn "Ou recarregue os grupos: newgrp wheel"
+  _ok "Done! Log out and back in to apply."
+  _warn "Or reload groups now: newgrp wheel"
 }
 
 # arrow howto add.user
 # Create a new system user with home directory and common groups.
 _howto_add_user() {
   local target_user="${1:-}"
-  [[ -z "$target_user" ]] && _die "Uso: arrow howto add.user <nome>"
+  [[ -z "$target_user" ]] && _die "Usage: arrow howto user.add <name>"
 
-  _section "Criar usuário: ${target_user}"
+  _section "Create user: ${target_user}"
 
-  _step 1 3 "Criar o usuário com diretório home"
+  _step 1 3 "Create the user with a home directory"
   _cmd "useradd -m -s /bin/bash ${target_user}"
 
-  _step 2 3 "Definir a senha"
+  _step 2 3 "Set the password"
   _cmd "passwd ${target_user}"
 
-  _step 3 3 "Adicionar aos grupos comuns"
+  _step 3 3 "Add to common groups"
   _cmd "usermod -aG wheel,audio,video,storage,optical ${target_user}"
 
   _blank
-  _ask "Executar agora?" || { _warn "Cancelado."; return; }
+  _ask "Run now?" || { _warn "Cancelled."; return; }
   _blank
 
   # Step 1 — create user
   if id "$target_user" &>/dev/null; then
-    _ok "Usuário '${target_user}' já existe."
+    _ok "User '${target_user}' already exists."
   else
-    _info "Criando usuário '${target_user}'…"
+    _info "Creating user '${target_user}'..."
     _asroot useradd -m -s /bin/bash "$target_user" \
-      && _ok "Usuário criado." \
-      || { _err "Falha ao criar usuário."; return 1; }
+      && _ok "User created." \
+      || { _err "Failed to create user."; return 1; }
   fi
 
   # Step 2 — set password (interactive)
-  _info "Defina a senha para '${target_user}':"
+  _info "Set a password for '${target_user}':"
   _asroot passwd "$target_user" \
-    || { _err "Falha ao definir senha."; return 1; }
+    || { _err "Failed to set password."; return 1; }
 
   # Step 3 — add to groups (skip groups that don't exist)
-  _info "Adicionando '${target_user}' aos grupos…"
+  _info "Adding '${target_user}' to groups..."
   local groups=()
   local g
   for g in wheel audio video storage optical; do
@@ -102,42 +102,42 @@ _howto_add_user() {
     local group_list
     group_list=$(IFS=','; echo "${groups[*]}")
     _asroot usermod -aG "$group_list" "$target_user" \
-      && _ok "Adicionado aos grupos: ${group_list}." \
-      || { _err "Falha ao adicionar aos grupos."; return 1; }
+      && _ok "Added to groups: ${group_list}." \
+      || { _err "Failed to add to groups."; return 1; }
   fi
 
   _blank
-  _ok "Usuário '${target_user}' criado com sucesso."
-  _info "Para acesso sudo, execute: arrow howto user.sudoers ${target_user}"
+  _ok "User '${target_user}' created successfully."
+  _info "For sudo access, run: arrow howto user.sudoers ${target_user}"
 }
 
 # arrow howto user.remove
 # Remove a user and optionally their home directory.
 _howto_remove_user() {
   local target_user="${1:-}"
-  [[ -z "$target_user" ]] && _die "Uso: arrow howto user.remove <nome>"
+  [[ -z "$target_user" ]] && _die "Usage: arrow howto user.remove <name>"
 
-  _section "Remover usuário: ${target_user}"
+  _section "Remove user: ${target_user}"
 
-  _step 1 2 "Remover o usuário e o diretório home"
+  _step 1 2 "Remove the user and their home directory"
   _cmd "userdel -r ${target_user}"
 
-  _step 2 2 "Remover arquivos residuais (opcional)"
+  _step 2 2 "Remove leftover files (optional)"
   _cmd "find / -user ${target_user} -delete 2>/dev/null"
 
   _blank
-  _ask "Remover usuário '${target_user}'?" "${RED}${BOLD}" || { _warn "Cancelado."; return; }
+  _ask "Remove user '${target_user}'?" "${RED}${BOLD}" || { _warn "Cancelled."; return; }
   _blank
 
   if ! id "$target_user" &>/dev/null; then
-    _err "Usuário '${target_user}' não existe."
+    _err "User '${target_user}' does not exist."
     return 1
   fi
 
-  _info "Removendo usuário '${target_user}'…"
+  _info "Removing user '${target_user}'..."
   _asroot userdel -r "$target_user" \
-    && _ok "Usuário '${target_user}' removido." \
-    || { _err "Falha ao remover usuário."; return 1; }
+    && _ok "User '${target_user}' removed." \
+    || { _err "Failed to remove user."; return 1; }
 }
 
 # arrow howto user.passwd
@@ -145,33 +145,33 @@ _howto_remove_user() {
 _howto_passwd() {
   local target_user="${1:-$USER}"
 
-  _section "Alterar senha: ${target_user}"
+  _section "Change password: ${target_user}"
 
-  _step 1 1 "Definir nova senha"
+  _step 1 1 "Set new password"
   _cmd "passwd ${target_user}"
 
   _blank
-  _ask "Continuar?" || { _warn "Cancelado."; return; }
+  _ask "Continue?" || { _warn "Cancelled."; return; }
   _blank
 
   _asroot passwd "$target_user" \
-    || { _err "Falha ao alterar senha."; return 1; }
+    || { _err "Failed to change password."; return 1; }
 
-  _ok "Senha de '${target_user}' alterada com sucesso."
+  _ok "Password for '${target_user}' changed successfully."
 }
 
 # ── Registry ──────────────────────────────────────────────────────────────────
 
 _howto_list() {
   echo
-  echo -e "  ${BOLD}Guias disponíveis:${RESET}"
+  echo -e "  ${BOLD}Available guides:${RESET}"
   _blank
-  echo -e "  ${CYAN}user.add${RESET}      Criar novo usuário com home e grupos comuns"
-  echo -e "  ${CYAN}user.sudoers${RESET}  Adicionar usuário ao sudoers via grupo wheel"
-  echo -e "  ${CYAN}user.remove${RESET}   Remover usuário do sistema"
-  echo -e "  ${CYAN}user.passwd${RESET}   Alterar senha de um usuário"
+  echo -e "  ${CYAN}user.add${RESET}      Create a new user with home directory and common groups"
+  echo -e "  ${CYAN}user.sudoers${RESET}  Add a user to sudoers via the wheel group"
+  echo -e "  ${CYAN}user.remove${RESET}   Remove a user from the system"
+  echo -e "  ${CYAN}user.passwd${RESET}   Change a user's password"
   _blank
-  echo -e "  ${DIM}Uso: arrow howto <guia> [args]${RESET}"
+  echo -e "  ${DIM}Usage: arrow howto <guide> [args]${RESET}"
   echo
 }
 
@@ -186,7 +186,7 @@ cmd_howto() {
     user.passwd)                   _howto_passwd     "$@" ;;
     "" | list)       _howto_list ;;
     *)
-      _err "Guia desconhecido: '${guide}'"
+      _err "Unknown guide: '${guide}'"
       _howto_list
       exit 1
       ;;

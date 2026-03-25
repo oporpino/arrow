@@ -8,15 +8,15 @@ cmd_add() {
     case "$1" in
       --no-upgrade) upgrade=false ;;
       --no-sync)    sync=false; upgrade=false ;;
-      *) _die "Opção desconhecida: $1" ;;
+      *) _die "Unknown option: $1" ;;
     esac
     shift
   done
-  [[ $# -eq 0 ]] && _die "Uso: arrow add [--no-upgrade|--no-sync] <pacote> [pacote2 …]"
+  [[ $# -eq 0 ]] && _die "Usage: arrow add [--no-upgrade|--no-sync] <package> [package2 …]"
 
   # Classify each package: installed / pacman repo / AUR / not found.
   local already=() to_install=() aur_pkgs=() not_found=() not_installed=()
-  _info "Verificando pacotes…"
+  _info "Checking packages..."
 
   # First check what's already installed
   _check_installed already not_installed "$@"
@@ -33,13 +33,13 @@ cmd_add() {
     fi
   done
 
-  [[ ${#already[@]}   -gt 0 ]] && _warn "Já instalado(s): ${already[*]}"
-  [[ ${#aur_pkgs[@]}  -gt 0 ]] && _info "Encontrado(s) no AUR: ${BOLD}${aur_pkgs[*]}${RESET}"
-  [[ ${#not_found[@]} -gt 0 ]] && _err  "Não encontrado(s): ${not_found[*]}"
+  [[ ${#already[@]}   -gt 0 ]] && _warn "Already installed: ${already[*]}"
+  [[ ${#aur_pkgs[@]}  -gt 0 ]] && _info "Found in AUR: ${BOLD}${aur_pkgs[*]}${RESET}"
+  [[ ${#not_found[@]} -gt 0 ]] && _err  "Not found: ${not_found[*]}"
 
   if [[ ${#to_install[@]} -eq 0 && ${#aur_pkgs[@]} -eq 0 ]]; then
     [[ ${#not_found[@]} -gt 0 ]] && return 1
-    _ok "Nada a instalar."
+    _ok "Nothing to install."
     return
   fi
 
@@ -54,19 +54,19 @@ cmd_add() {
   local preview_cmds=()
   if [[ ${#to_install[@]} -gt 0 ]]; then
     if $upgrade; then
-      preview_cmds+=("pacman -Syu  # -S sync  -y atualiza db  -u upgrade")
+      preview_cmds+=("pacman -Syu  # -S sync  -y refresh db  -u upgrade")
     elif $sync; then
-      preview_cmds+=("pacman -Syy  # -S sync  -yy força refresh do db")
+      preview_cmds+=("pacman -Syy  # -S sync  -yy force db refresh")
     fi
-    preview_cmds+=("pacman -S ${to_install[*]}  # instala pacote(s) dos repos")
+    preview_cmds+=("pacman -S ${to_install[*]}  # install package(s) from repos")
   fi
   if [[ ${#aur_pkgs[@]} -gt 0 ]]; then
     preview_cmds+=("${helper} -S ${aur_pkgs[*]}  # AUR")
   fi
 
   _blank
-  _preview "Instalar pacote(s)" "${preview_cmds[@]}"
-  _ask "Instalar?" || { _warn "Cancelado."; return; }
+  _preview "Install package(s)" "${preview_cmds[@]}"
+  _ask "Install?" || { _warn "Cancelled."; return; }
   _blank
 
   # ── Execute ──────────────────────────────────────────────────────────────────
@@ -85,28 +85,28 @@ cmd_add() {
 # Remove packages together with any now-orphaned dependencies.
 # Aliases: del, rm, remove
 cmd_delete() {
-  [[ $# -eq 0 ]] && _die "Uso: arrow delete <pacote> [pacote2 …]"
+  [[ $# -eq 0 ]] && _die "Usage: arrow delete <package> [package2 …]"
 
   # Check which packages are actually installed
   local installed=() not_installed=()
   _check_installed installed not_installed "$@"
 
-  [[ ${#not_installed[@]} -gt 0 ]] && _warn "Não instalado(s): ${not_installed[*]}"
+  [[ ${#not_installed[@]} -gt 0 ]] && _warn "Not installed: ${not_installed[*]}"
 
   if [[ ${#installed[@]} -eq 0 ]]; then
-    _err "Nenhum pacote instalado para remover."
+    _err "No installed packages to remove."
     return 1
   fi
 
-  _preview "Remover pacote(s) e dependências órfãs" "pacman -Rns ${installed[*]}  # -R remover  -n sem backup  -s remove deps órfãs"
-  _ask "Remover?" || { _warn "Cancelado."; return; }
+  _preview "Remove package(s) and orphaned deps" "pacman -Rns ${installed[*]}  # -R remove  -n no backup  -s remove orphaned deps"
+  _ask "Remove?" || { _warn "Cancelled."; return; }
   _blank
 
   # First attempt: capture stderr to detect dependent packages.
   _cmd "pacman -Rns ${installed[*]}"
   local err
   if err=$(_pacman -Rns "${installed[@]}" 2>&1); then
-    _ok "Concluído."
+    _ok "Done."
     return
   fi
 
@@ -116,20 +116,20 @@ cmd_delete() {
 
   if [[ -z "$dependents" ]]; then
     [[ "${ARROW_DEBUG:-0}" == "1" ]] && printf '%s\n' "$err" >&2
-    _err "Falhou."
+    _err "Failed."
     return 1
   fi
 
   _blank
-  _warn "Os seguintes pacotes dependem de ${installed[*]} e precisam ser removidos junto:"
+  _warn "The following packages depend on ${installed[*]} and must be removed too:"
   local dep
   for dep in $dependents; do
     echo -e "    ${YELLOW}•${RESET}  ${YELLOW}${dep}${RESET}"
   done
   _blank
 
-  _preview "Remover tudo" "pacman -Rns ${installed[*]} ${dependents}  # -R remover  -n sem backup  -s remove deps órfãs"
-  _ask "Remover tudo?" "${RED}${BOLD}" || { _warn "Cancelado."; return; }
+  _preview "Remove all" "pacman -Rns ${installed[*]} ${dependents}  # -R remove  -n no backup  -s remove orphaned deps"
+  _ask "Remove all?" "${RED}${BOLD}" || { _warn "Cancelled."; return; }
   _blank
   # shellcheck disable=SC2086
   _run _pacman -Rns "${installed[@]}" $dependents
@@ -138,8 +138,8 @@ cmd_delete() {
 # arrow search <term>
 # Search pacman repos, then AUR if a helper is available.
 cmd_search() {
-  [[ $# -eq 0 ]] && _die "Uso: arrow search <termo>"
-  _info "Buscando por: ${BOLD}$*${RESET}"
+  [[ $# -eq 0 ]] && _die "Usage: arrow search <term>"
+  _info "Searching for: ${BOLD}$*${RESET}"
   _sep
   pacman -Ss "$@" || true
   local helper
@@ -181,7 +181,7 @@ cmd_deps() {
   if command -v pactree &>/dev/null; then
     pactree "$1"
   else
-    _warn "pactree não encontrado. Instale com: arrow add pacman-contrib"
+    _warn "pactree not found. Install with: arrow add pacman-contrib"
     pacman -Si "$1" | grep "Depends On"
   fi
 }
