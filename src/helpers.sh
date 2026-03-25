@@ -100,25 +100,32 @@ _ask() {
 #   Usage: _run _asroot pacman -S firefox
 #
 _run() {
-  # Build a display-friendly version of the command:
-  # replace _asroot with the actual escalation tool (or nothing if already root).
   local display=("$@")
-  if [[ "${display[0]}" == "_asroot" ]]; then
-    if [[ $EUID -eq 0 ]]; then
-      display=("${display[@]:1}")
-    elif command -v sudo &>/dev/null; then
-      display[0]="sudo"
-    elif command -v doas &>/dev/null; then
-      display[0]="doas"
-    fi
+
+  # Resolve _asroot or _pacman to a user-friendly prefix for display.
+  local _prefix=""
+  if [[ $EUID -ne 0 ]]; then
+    command -v sudo &>/dev/null && _prefix="sudo"
+    command -v doas &>/dev/null && _prefix="doas"
   fi
 
-  # In normal mode, strip internal flags from display (--noconfirm, --color=always).
+  case "${display[0]}" in
+    _asroot)
+      if [[ -n "$_prefix" ]]; then display[0]="$_prefix"
+      else display=("${display[@]:1}"); fi
+      ;;
+    _pacman)
+      if [[ -n "$_prefix" ]]; then display=("$_prefix" "pacman" "${display[@]:1}")
+      else display=("pacman" "${display[@]:1}"); fi
+      ;;
+  esac
+
+  # In normal mode, strip internal flags from display.
   # ARROW_DEBUG=1 shows the full command as executed.
   if [[ "${ARROW_DEBUG:-0}" != "1" ]]; then
     local filtered=()
     for arg in "${display[@]}"; do
-      [[ "$arg" == "--noconfirm" || "$arg" == "--color=always" ]] && continue
+      [[ "$arg" == "--noconfirm" || "$arg" == "--color=always" || "$arg" == "--disable-sandbox" ]] && continue
       filtered+=("$arg")
     done
     display=("${filtered[@]}")
