@@ -193,8 +193,8 @@ _spell_layer_archcraft_do() {
   local boot_avail
   boot_avail=$(df /boot 2>/dev/null | awk 'NR==2 {print $4}')
   local boot_avail_mb=$(( ${boot_avail:-0} / 1024 ))
-  if [[ ${boot_avail:-0} -lt 307200 ]]; then
-    _err "Espaço insuficiente em /boot: ${boot_avail_mb}MB disponíveis (mínimo: 300MB)"
+  if [[ ${boot_avail:-0} -lt 51200 ]]; then
+    _err "Espaço insuficiente em /boot: ${boot_avail_mb}MB disponíveis (mínimo: 50MB)"
     _blank
     _info "O Archcraft faz upgrade completo do sistema, incluindo o kernel."
     _info "Libere espaço em /boot antes de continuar."
