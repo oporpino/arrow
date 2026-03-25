@@ -189,6 +189,31 @@ _spell_desktop_i3_undo() {
 _spell_layer_archcraft_do() {
   _section "Instalar Archcraft ARM"
 
+  # ── Pre-flight: check /boot free space (needs ~300M for kernel upgrade) ───────
+  local boot_avail
+  boot_avail=$(df /boot 2>/dev/null | awk 'NR==2 {print $4}')
+  local boot_avail_mb=$(( ${boot_avail:-0} / 1024 ))
+  if [[ ${boot_avail:-0} -lt 307200 ]]; then
+    _warn "Espaço insuficiente em /boot: ${boot_avail_mb}MB disponíveis (mínimo: 300MB)"
+    _blank
+    _info "O Archcraft faz upgrade do sistema incluindo o kernel."
+    _info "Para liberar espaço, remova o initramfs de fallback (raramente usado):"
+    _blank
+    _cmd "sudo rm /boot/initramfs-linux-fallback.img"
+    _blank
+    local boot_fallback_mb=0
+    if [[ -f /boot/initramfs-linux-fallback.img ]]; then
+      boot_fallback_mb=$(du -m /boot/initramfs-linux-fallback.img 2>/dev/null | cut -f1)
+      _info "Isso liberaria ~${boot_fallback_mb}MB."
+    fi
+    _blank
+    _ask "Remover initramfs-fallback agora e continuar?" || { _warn "Cancelado. Libere espaço em /boot e tente novamente."; return 1; }
+    _asroot rm -f /boot/initramfs-linux-fallback.img \
+      && _ok "initramfs-fallback removido." \
+      || { _err "Falha ao remover. Tente manualmente: sudo rm /boot/initramfs-linux-fallback.img"; return 1; }
+    _blank
+  fi
+
   _step 1 4 "Detectar versão mais recente"
   local version
   version=$(curl -fsSL "https://api.github.com/repos/archcraft-os/archcraft-arm/releases/latest" \
