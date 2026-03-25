@@ -68,7 +68,7 @@ _arrow() {
           _values 'option' '--all[wipe the entire package cache]'
           ;;
         howto)
-          _values 'guide' 'user.add[create new user]' 'user.sudoers[add user to sudoers]' 'list[list available guides]'
+          _values 'guide' 'user.add[create new user]' 'user.sudoers[add user to sudoers]' 'user.remove[remove user from system]' 'user.passwd[change user password]' 'list[list available guides]'
           ;;
         self)
           local -a self_cmds

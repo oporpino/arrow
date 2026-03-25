@@ -111,6 +111,55 @@ _howto_add_user() {
   _info "Para acesso sudo, execute: arrow howto user.sudoers ${target_user}"
 }
 
+# arrow howto user.remove
+# Remove a user and optionally their home directory.
+_howto_remove_user() {
+  local target_user="${1:-}"
+  [[ -z "$target_user" ]] && _die "Uso: arrow howto user.remove <nome>"
+
+  _section "Remover usuário: ${target_user}"
+
+  _step 1 2 "Remover o usuário e o diretório home"
+  _cmd "userdel -r ${target_user}"
+
+  _step 2 2 "Remover arquivos residuais (opcional)"
+  _cmd "find / -user ${target_user} -delete 2>/dev/null"
+
+  _blank
+  _ask "Remover usuário '${target_user}'?" "${RED}${BOLD}" || { _warn "Cancelado."; return; }
+  _blank
+
+  if ! id "$target_user" &>/dev/null; then
+    _err "Usuário '${target_user}' não existe."
+    return 1
+  fi
+
+  _info "Removendo usuário '${target_user}'…"
+  _asroot userdel -r "$target_user" \
+    && _ok "Usuário '${target_user}' removido." \
+    || { _err "Falha ao remover usuário."; return 1; }
+}
+
+# arrow howto user.passwd
+# Change a user's password.
+_howto_passwd() {
+  local target_user="${1:-$USER}"
+
+  _section "Alterar senha: ${target_user}"
+
+  _step 1 1 "Definir nova senha"
+  _cmd "passwd ${target_user}"
+
+  _blank
+  _ask "Continuar?" || { _warn "Cancelado."; return; }
+  _blank
+
+  _asroot passwd "$target_user" \
+    || { _err "Falha ao alterar senha."; return 1; }
+
+  _ok "Senha de '${target_user}' alterada com sucesso."
+}
+
 # ── Registry ──────────────────────────────────────────────────────────────────
 
 _howto_list() {
@@ -119,6 +168,8 @@ _howto_list() {
   _blank
   echo -e "  ${CYAN}user.add${RESET}      Criar novo usuário com home e grupos comuns"
   echo -e "  ${CYAN}user.sudoers${RESET}  Adicionar usuário ao sudoers via grupo wheel"
+  echo -e "  ${CYAN}user.remove${RESET}   Remover usuário do sistema"
+  echo -e "  ${CYAN}user.passwd${RESET}   Alterar senha de um usuário"
   _blank
   echo -e "  ${DIM}Uso: arrow howto <guia> [args]${RESET}"
   echo
@@ -129,8 +180,10 @@ cmd_howto() {
   local guide="${1:-}"; shift || true
 
   case "$guide" in
-    sudoers | sudo | user.sudoers) _howto_sudoers "$@" ;;
-    user.add)                      _howto_add_user "$@" ;;
+    sudoers | sudo | user.sudoers) _howto_sudoers    "$@" ;;
+    user.add)                      _howto_add_user   "$@" ;;
+    user.remove)                   _howto_remove_user "$@" ;;
+    user.passwd)                   _howto_passwd     "$@" ;;
     "" | list)       _howto_list ;;
     *)
       _err "Guia desconhecido: '${guide}'"
