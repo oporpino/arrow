@@ -103,6 +103,17 @@ _check_deps() {
       _die "Please install manually: ${missing[*]}"
     fi
   fi
+
+  # Ensure bash-completion is installed so tab completion works out of the box.
+  if [[ "${SHELL:-}" == */bash ]] && ! command -v bash &>/dev/null; then
+    : # non-bash shell, skip
+  elif command -v pacman &>/dev/null \
+    && ! pacman -Qq bash-completion &>/dev/null 2>&1; then
+    _info "Installing bash-completion for tab completion support…"
+    local _sandbox=""
+    pacman --disable-sandbox --version &>/dev/null && _sandbox="--disable-sandbox"
+    _asroot pacman -S --noconfirm ${_sandbox} bash-completion || true
+  fi
 }
 
 # ── Install steps ─────────────────────────────────────────────────────────────
@@ -156,12 +167,26 @@ _do_install() {
   local bindir="${PREFIX}/bin"
   local mandir="${PREFIX}/share/man/man1"
 
-  install -Dm755 "$out"                         "${bindir}/arrow"
-  ln -sf arrow                                  "${bindir}/arw"
-  install -Dm644 "$src/man/arrow.1"             "${mandir}/arrow.1"
-  install -Dm644 "$src/completions/arrow.bash"  "/usr/share/bash-completion/completions/arrow"
-  install -Dm644 "$src/completions/_arrow"      "/usr/share/zsh/site-functions/_arrow"
-  install -Dm644 "$src/completions/arrow.fish"  "/usr/share/fish/vendor_completions.d/arrow.fish"
+  install -Dm755 "$out"      "${bindir}/arrow"
+  ln -sf arrow               "${bindir}/arw"
+  install -Dm644 "$src/man/arrow.1" "${mandir}/arrow.1"
+
+  # Shell completions — use system-wide paths when installing to /usr/local or /usr,
+  # otherwise fall back to PREFIX-relative paths.
+  local bash_comp zsh_comp fish_comp
+  if [[ "$PREFIX" == /usr* ]]; then
+    bash_comp="/usr/share/bash-completion/completions/arrow"
+    zsh_comp="/usr/share/zsh/site-functions/_arrow"
+    fish_comp="/usr/share/fish/vendor_completions.d/arrow.fish"
+  else
+    bash_comp="${PREFIX}/share/bash-completion/completions/arrow"
+    zsh_comp="${PREFIX}/share/zsh/site-functions/_arrow"
+    fish_comp="${PREFIX}/share/fish/vendor_completions.d/arrow.fish"
+  fi
+
+  install -Dm644 "$src/completions/arrow.bash" "$bash_comp"
+  install -Dm644 "$src/completions/_arrow"     "$zsh_comp"
+  install -Dm644 "$src/completions/arrow.fish" "$fish_comp"
 }
 
 _install() {
@@ -209,6 +234,14 @@ _verify() {
     _fix_path
     _warn "Restart your shell or run:"
     echo -e "  ${DIM}export PATH=\"\$PATH:${PREFIX}/bin\"${RESET}"
+  fi
+
+  # Remind user to activate bash completion in the current session.
+  if [[ "${SHELL:-}" == */bash ]]; then
+    local comp="/usr/share/bash-completion/completions/arrow"
+    [[ "$PREFIX" != /usr* ]] && comp="${PREFIX}/share/bash-completion/completions/arrow"
+    _info "To enable tab completion now:"
+    echo -e "  ${DIM}source ${comp}${RESET}"
   fi
 }
 
