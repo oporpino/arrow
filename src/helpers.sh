@@ -185,7 +185,7 @@ _aur_helper() {
 # Returns 0 if the package exists in the AUR, 1 otherwise.
 _aur_exists() {
   local pkg="$1"
-  curl -fsSL "https://aur.archlinux.org/rpc/?v=5&type=info&arg=${pkg}" 2>/dev/null \
+  curl -fsSL --max-time 5 "https://aur.archlinux.org/rpc/?v=5&type=info&arg=${pkg}" 2>/dev/null \
     | grep -q '"resultcount":[1-9]'
 }
 
