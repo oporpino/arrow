@@ -19,8 +19,8 @@ _spell_desktop_gnome_do() {
   _blank
   _ask "Instalar GNOME?" || { _warn "Cancelado."; return; }
   _blank
-  _run _pacman -Syu gnome gdm
-  _run _asroot systemctl enable gdm
+  _run _pacman -Syu gnome gdm || return 1
+  _run _asroot systemctl enable gdm || return 1
   _ok "GNOME instalado. Reinicie para entrar no desktop."
 }
 
@@ -48,8 +48,8 @@ _spell_desktop_kde_do() {
   _blank
   _ask "Instalar KDE Plasma?" || { _warn "Cancelado."; return; }
   _blank
-  _run _pacman -Syu plasma sddm
-  _run _asroot systemctl enable sddm
+  _run _pacman -Syu plasma sddm || return 1
+  _run _asroot systemctl enable sddm || return 1
   _ok "KDE Plasma instalado. Reinicie para entrar no desktop."
 }
 
@@ -77,8 +77,8 @@ _spell_desktop_xfce_do() {
   _blank
   _ask "Instalar XFCE?" || { _warn "Cancelado."; return; }
   _blank
-  _run _pacman -Syu xfce4 xfce4-goodies lightdm lightdm-gtk-greeter
-  _run _asroot systemctl enable lightdm
+  _run _pacman -Syu xfce4 xfce4-goodies lightdm lightdm-gtk-greeter || return 1
+  _run _asroot systemctl enable lightdm || return 1
   _ok "XFCE instalado. Reinicie para entrar no desktop."
 }
 
@@ -100,14 +100,14 @@ _spell_desktop_xfce_undo() {
 _spell_desktop_openbox_do() {
   _section "Instalar Openbox"
   _step 1 2 "Instalar pacotes"
-  _cmd "pacman -Syu openbox obconf lxappearance lightdm lightdm-gtk-greeter"
+  _cmd "pacman -Syu openbox lightdm lightdm-gtk-greeter"
   _step 2 2 "Habilitar display manager"
   _cmd "systemctl enable lightdm"
   _blank
   _ask "Instalar Openbox?" || { _warn "Cancelado."; return; }
   _blank
-  _run _pacman -Syu openbox obconf lxappearance lightdm lightdm-gtk-greeter
-  _run _asroot systemctl enable lightdm
+  _run _pacman -Syu openbox lightdm lightdm-gtk-greeter || return 1
+  _run _asroot systemctl enable lightdm || return 1
   _ok "Openbox instalado. Reinicie para entrar no desktop."
 }
 
@@ -116,12 +116,12 @@ _spell_desktop_openbox_undo() {
   _step 1 2 "Desabilitar display manager"
   _cmd "systemctl disable lightdm"
   _step 2 2 "Remover pacotes"
-  _cmd "pacman -Rns openbox obconf lxappearance lightdm lightdm-gtk-greeter"
+  _cmd "pacman -Rns openbox lightdm lightdm-gtk-greeter"
   _blank
   _ask "Remover Openbox?" "${RED}${BOLD}" || { _warn "Cancelado."; return; }
   _blank
   _run _asroot systemctl disable lightdm 2>/dev/null || true
-  _run _pacman -Rns openbox obconf lxappearance lightdm lightdm-gtk-greeter
+  _run _pacman -Rns openbox lightdm lightdm-gtk-greeter
 }
 
 # ── Spell: desktop/sway ────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -135,7 +135,7 @@ _spell_desktop_sway_do() {
   _blank
   _ask "Instalar Sway?" || { _warn "Cancelado."; return; }
   _blank
-  _run _pacman -Syu sway waybar wofi foot xdg-desktop-portal-wlr
+  _run _pacman -Syu sway waybar wofi foot xdg-desktop-portal-wlr || return 1
   _blank
   _ok "Sway instalado."
   _info "Adicione 'exec sway' ao ~/.bash_profile para iniciar automaticamente."
@@ -163,8 +163,8 @@ _spell_desktop_i3_do() {
   _blank
   _ask "Instalar i3?" || { _warn "Cancelado."; return; }
   _blank
-  _run _pacman -Syu i3-wm i3status dmenu xterm xorg-server xorg-xinit lightdm lightdm-gtk-greeter
-  _run _asroot systemctl enable lightdm
+  _run _pacman -Syu i3-wm i3status dmenu xterm xorg-server xorg-xinit lightdm lightdm-gtk-greeter || return 1
+  _run _asroot systemctl enable lightdm || return 1
   _ok "i3 instalado. Reinicie para entrar no desktop."
 }
 
