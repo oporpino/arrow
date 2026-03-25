@@ -186,8 +186,11 @@ _do_install() {
   fi
 
   # Remove existing completions before installing to guarantee overwrite.
-  rm -f "$bash_comp" "$zsh_comp" "$fish_comp" 2>/dev/null || true
+  local arw_bash_comp
+  arw_bash_comp="$(dirname "$bash_comp")/arw"
+  rm -f "$bash_comp" "$arw_bash_comp" "$zsh_comp" "$fish_comp" 2>/dev/null || true
   install -Dm644 "$src/completions/arrow.bash" "$bash_comp"
+  ln -sf arrow "$arw_bash_comp"
   install -Dm644 "$src/completions/_arrow"     "$zsh_comp"
   install -Dm644 "$src/completions/arrow.fish" "$fish_comp"
 }

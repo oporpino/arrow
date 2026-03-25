@@ -60,6 +60,7 @@ install: build
 	ln -sf arrow                              $(DESTDIR)$(BINDIR)/arw
 	install -Dm644 man/arrow.1                $(DESTDIR)$(MANDIR)/arrow.1
 	install -Dm644 completions/arrow.bash     $(DESTDIR)$(BASH_COMP)/arrow
+	ln -sf arrow                              $(DESTDIR)$(BASH_COMP)/arw
 	install -Dm644 completions/_arrow         $(DESTDIR)$(ZSH_COMP)/_arrow
 	install -Dm644 completions/arrow.fish     $(DESTDIR)$(FISH_COMP)/arrow.fish
 	@printf '  Installed arrow (+ arw alias) to %s\n' "$(DESTDIR)$(BINDIR)"
@@ -70,6 +71,7 @@ uninstall:
 	rm -f $(DESTDIR)$(BINDIR)/arw
 	rm -f $(DESTDIR)$(MANDIR)/arrow.1
 	rm -f $(DESTDIR)$(BASH_COMP)/arrow
+	rm -f $(DESTDIR)$(BASH_COMP)/arw
 	rm -f $(DESTDIR)$(ZSH_COMP)/_arrow
 	rm -f $(DESTDIR)$(FISH_COMP)/arrow.fish
 	@printf '  Uninstalled arrow\n'
