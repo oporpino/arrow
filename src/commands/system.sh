@@ -6,18 +6,18 @@ cmd_update() {
   _preview "Sync package databases" "pacman -Sy  # -S sync  -y refresh db"
   _ask "Continue?" || { _warn "Cancelled."; return; }
   _blank
-  _run _pacman -Sy
+  _run _pkg -Sy
 }
 
 # arrow upgrade
 # Synchronise databases and upgrade all packages.
 # Uses the AUR helper when available — it handles both official and AUR packages.
 cmd_upgrade() {
-  local cmd="${_PACMAN_AUR_HELPER:-pacman}"
+  local cmd="${_PKG_HELPER:-pacman}"
   _preview "Upgrade the system" "${cmd} -Syu  # -S sync  -y refresh db  -u upgrade"
   _ask "Continue?" || { _warn "Cancelled."; return; }
   _blank
-  _run _pacman -Syu
+  _run _pkg -Syu
 }
 
 # arrow clean [--all]
@@ -33,9 +33,9 @@ cmd_clean() {
   fi
   _blank
   if [[ "${1:-}" == "--all" ]]; then
-    _run _pacman -Scc
+    _run _pkg -Scc
   else
-    _run _pacman -Sc
+    _run _pkg -Sc
   fi
 }
 
@@ -74,5 +74,5 @@ cmd_purge() {
   _ask "Remove?" || { _warn "Cancelled."; return; }
   _blank
   # shellcheck disable=SC2086
-  _run _pacman -Rns $pkgs
+  _run _pkg -Rns $pkgs
 }

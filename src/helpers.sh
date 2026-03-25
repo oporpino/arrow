@@ -103,7 +103,7 @@ _ask() {
 _run() {
   local display=("$@")
 
-  # Resolve _asroot or _pacman to a user-friendly prefix for display.
+  # Resolve _asroot or _pkg to a user-friendly prefix for display.
   local _prefix=""
   if [[ $EUID -ne 0 ]]; then
     command -v sudo &>/dev/null && _prefix="sudo"
@@ -115,9 +115,9 @@ _run() {
       if [[ -n "$_prefix" ]]; then display[0]="$_prefix"
       else display=("${display[@]:1}"); fi
       ;;
-    _pacman)
-      if [[ -n "$_PACMAN_AUR_HELPER" && $EUID -ne 0 ]]; then
-        display=("$_PACMAN_AUR_HELPER" "${display[@]:1}")
+    _pkg)
+      if [[ -n "$_PKG_HELPER" && $EUID -ne 0 ]]; then
+        display=("$_PKG_HELPER" "${display[@]:1}")
       elif [[ -n "$_prefix" ]]; then
         display=("$_prefix" "pacman" "${display[@]:1}")
       else
@@ -228,7 +228,7 @@ _ensure_aur_helper() {
   [[ $EUID -eq 0 ]] && _die "makepkg cannot run as root. Run as a normal user."
 
   _info "Installing build dependencies..."
-  _pacman -S --needed base-devel git || true
+  _pkg -S --needed base-devel git || true
 
   local tmp
   tmp=$(mktemp -d)
@@ -245,27 +245,27 @@ _ensure_aur_helper() {
 }
 
 # Detect --disable-sandbox support once (needed on kernels without Landlock, e.g. ARM).
-_PACMAN_SANDBOX=""
-pacman --disable-sandbox --version &>/dev/null && _PACMAN_SANDBOX="--disable-sandbox"
+_PKG_SANDBOX=""
+pacman --disable-sandbox --version &>/dev/null && _PKG_SANDBOX="--disable-sandbox"
 
 # Cache the AUR helper at startup (empty string if none installed).
 # AUR helpers (yay, paru) are drop-in replacements for pacman and also handle
 # AUR packages. When one is available and we're not root, prefer it over pacman.
 # They cannot run as root — they manage their own privilege escalation internally.
-_PACMAN_AUR_HELPER=""
-_PACMAN_AUR_HELPER=$(_aur_helper)
+_PKG_HELPER=""
+_PKG_HELPER=$(_aur_helper)
 
 # Runs package operations non-interactively with coloured output.
 # Uses the AUR helper when available (and not root), otherwise falls back to
 # pacman as root. Kernel console noise is suppressed during pacman calls.
-_pacman() {
-  if [[ -n "$_PACMAN_AUR_HELPER" && $EUID -ne 0 ]]; then
-    "$_PACMAN_AUR_HELPER" --noconfirm --color=always "$@"
+_pkg() {
+  if [[ -n "$_PKG_HELPER" && $EUID -ne 0 ]]; then
+    "$_PKG_HELPER" --noconfirm --color=always "$@"
   else
     local _lvl
     _lvl=$(cut -f1 /proc/sys/kernel/printk 2>/dev/null)
     _asroot dmesg -n 1 2>/dev/null || true
-    _asroot pacman --noconfirm --color=always ${_PACMAN_SANDBOX} "$@"
+    _asroot pacman --noconfirm --color=always ${_PKG_SANDBOX} "$@"
     local _ret=$?
     [[ -n "$_lvl" ]] && _asroot dmesg -n "$_lvl" 2>/dev/null || true
     return $_ret
