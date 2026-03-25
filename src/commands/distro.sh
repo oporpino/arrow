@@ -204,9 +204,12 @@ _distro_morph_archcraft() {
     if [[ -n "$boot_backup" ]]; then
       _blank
       _warn "Restoring /boot from backup..."
-      _asroot cp -a "$boot_backup/." /boot/ \
-        && { _ok "/boot restored."; _asroot rm -rf "$boot_backup"; } \
-        || _err "Restore failed. Backup is still at: ${boot_backup}"
+      if _asroot cp -a "$boot_backup/." /boot/; then
+        _ok "/boot restored."
+        _asroot rm -rf "$boot_backup"
+      else
+        _err "Restore failed. Backup is still at: ${boot_backup}"
+      fi
     fi
     return 1
   fi
