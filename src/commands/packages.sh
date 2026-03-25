@@ -43,7 +43,8 @@ cmd_add() {
   # Resolve AUR helper upfront (may prompt user to choose yay/paru).
   local helper=""
   if [[ ${#aur_pkgs[@]} -gt 0 ]]; then
-    helper=$(_ensure_aur_helper) || return 1
+    _ensure_aur_helper || return 1
+    helper=$(_aur_helper)
   fi
 
   # ── Build unified preview with all commands ──────────────────────────────────

@@ -200,20 +200,21 @@ _aur_exists() {
 
 # Ensures an AUR helper is available. If none found, asks the user which to install
 # (yay or paru) and bootstraps it via git + makepkg.
-# Prints the helper name on success; returns 1 on failure.
+# All output goes to stderr so this can be called without subshell capture.
+# Returns 0 on success, 1 on failure.
 _ensure_aur_helper() {
   local helper
   helper=$(_aur_helper)
-  [[ -n "$helper" ]] && echo "$helper" && return 0
+  [[ -n "$helper" ]] && return 0
 
   _blank
   _warn "Nenhum helper AUR instalado."
-  echo -e "  ${BOLD}Escolha um helper:${RESET}"
-  echo -e "    ${CYAN}1${RESET}  yay   (mais popular, escrito em Go)"
-  echo -e "    ${CYAN}2${RESET}  paru  (mais rápido, escrito em Rust)"
-  printf "\n  Opção [1/2]: "
+  printf "  ${BOLD}Escolha um helper:${RESET}\n" >&2
+  printf "    ${CYAN}1${RESET}  yay   (mais popular, escrito em Go)\n" >&2
+  printf "    ${CYAN}2${RESET}  paru  (mais rápido, escrito em Rust)\n" >&2
+  printf "\n  Opção [1/2]: " >&2
   local choice
-  read -r choice
+  read -r choice </dev/tty
   case "${choice:-1}" in
     2) helper="paru" ;;
     *) helper="yay"  ;;
@@ -222,7 +223,7 @@ _ensure_aur_helper() {
   [[ $EUID -eq 0 ]] && _die "makepkg não pode rodar como root. Execute como usuário normal."
 
   _info "Instalando dependências de build…"
-  _pacman -S --needed --noconfirm base-devel git 2>/dev/null || true
+  _pacman -S --needed base-devel git || true
 
   local tmp
   tmp=$(mktemp -d)
@@ -236,7 +237,6 @@ _ensure_aur_helper() {
 
   rm -rf "$tmp"
   _ok "${helper} instalado."
-  echo "$helper"
 }
 
 # Detect --disable-sandbox support once (needed on kernels without Landlock, e.g. ARM).
