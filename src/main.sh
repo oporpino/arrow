@@ -27,6 +27,9 @@ main() {
     # howto
     howto)             cmd_howto    "$@" ;;
 
+    # setup
+    setup)             cmd_setup    "$@" ;;
+
     # self
     self)                          cmd_self          "$@" ;;
     sharpen | reforge)             cmd_self_update   "$@" ;;

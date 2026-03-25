@@ -24,7 +24,7 @@ _arrow() {
     info files own deps
     list ls history log
     orphans clean purge
-    howto
+    howto setup
     self sharpen reforge reinstall
     help version
   )
@@ -44,6 +44,14 @@ _arrow() {
       ;;
     howto)
       COMPREPLY=($(compgen -W "user.add user.sudoers user.remove user.passwd list" -- "$cur"))
+      return
+      ;;
+    setup)
+      COMPREPLY=($(compgen -W "desktop" -- "$cur"))
+      return
+      ;;
+    desktop)
+      COMPREPLY=($(compgen -W "gnome kde xfce sway i3" -- "$cur"))
       return
       ;;
     self)
