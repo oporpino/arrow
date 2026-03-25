@@ -41,6 +41,11 @@ $(echo -e "${BOLD}SPELLS${RESET}")
   $(echo -e "${WHITE}spell desktop${RESET}") [de] undo   Remove ambiente de desktop
   $(echo -e "${DIM}setup é alias para spell${RESET}")
 
+$(echo -e "${BOLD}DISTRO${RESET}")
+  $(echo -e "${RED}distro morph${RESET}") <nome>        Converte o sistema (irreversível)
+  $(echo -e "${RED}distro morph archcraft${RESET}")     Arch Linux ARM → Archcraft ARM
+  $(echo -e "${DIM}distro list${RESET}")                Lista morphs disponíveis
+
 $(echo -e "${BOLD}GUIAS${RESET}")
   $(echo -e "${WHITE}howto${RESET}")   <guia>         Guias passo a passo (ex: sudoers)
 

@@ -24,7 +24,7 @@ _arrow() {
     info files own deps
     list ls history log
     orphans clean purge
-    howto spell setup
+    howto spell setup distro
     self sharpen reforge reinstall
     help version
   )
@@ -44,6 +44,14 @@ _arrow() {
       ;;
     howto)
       COMPREPLY=($(compgen -W "user.add user.sudoers user.remove user.passwd list" -- "$cur"))
+      return
+      ;;
+    distro)
+      COMPREPLY=($(compgen -W "morph list" -- "$cur"))
+      return
+      ;;
+    morph)
+      COMPREPLY=($(compgen -W "archcraft" -- "$cur"))
       return
       ;;
     spell | setup)

@@ -23,6 +23,7 @@ SRCS := \
 	src/commands/self.sh \
 	src/commands/howto.sh \
 	src/commands/spell.sh \
+	src/commands/distro.sh \
 	src/help.sh \
 	src/main.sh
 

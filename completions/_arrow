@@ -40,6 +40,7 @@ _arrow() {
         'howto:step-by-step guides'
         'spell:guided spells with do/undo'
         'setup:alias for spell'
+        'distro:convert the system to another distro (irreversible)'
         'self:manage arrow itself (update, remove)'
         'sharpen:update arrow to the latest version'
         'reforge:alias for sharpen'
@@ -73,19 +74,19 @@ _arrow() {
           _values 'guide' 'user.add[create new user]' 'user.sudoers[add user to sudoers]' 'user.remove[remove user from system]' 'user.passwd[change user password]' 'list[list available guides]'
           ;;
         spell | setup)
-          _values 'category' 'desktop[install a desktop environment]' 'layer[apply a system layer]'
+          _values 'category' 'desktop[install a desktop environment]'
+          ;;
+        distro)
+          _values 'subcommand' 'morph[convert this system to another distro]' 'list[list available morphs]'
+          ;;
+        morph)
+          _values 'name' 'archcraft[Arch Linux ARM → Archcraft ARM]'
           ;;
         desktop)
           _values 'environment' 'gnome[GNOME + gdm]' 'kde[KDE Plasma + sddm]' 'xfce[XFCE + lightdm]' 'openbox[Openbox + lightdm]' 'sway[Sway Wayland tiling]' 'i3[i3 X11 tiling]'
           ;;
         gnome | kde | xfce | openbox | sway | i3)
           _values 'action' 'undo[remove this environment]'
-          ;;
-        layer)
-          _values 'layer' 'archcraft[Archcraft ARM over Arch Linux]'
-          ;;
-        archcraft)
-          _values 'action' 'undo[remove this layer]'
           ;;
         self)
           local -a self_cmds

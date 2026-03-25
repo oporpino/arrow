@@ -11,7 +11,7 @@ function __arrow_no_subcommand
         info files own deps \
         list ls history log \
         orphans clean purge \
-        howto spell setup \
+        howto spell setup distro \
         self sharpen reforge reinstall \
         help version
 end
@@ -59,6 +59,7 @@ complete -c arrow -f -n __arrow_no_subcommand -a purge   -d 'Remove all orphaned
 complete -c arrow -f -n __arrow_no_subcommand -a howto   -d 'Step-by-step guides'
 complete -c arrow -f -n __arrow_no_subcommand -a formula -d 'Guided spells with do/undo'
 complete -c arrow -f -n __arrow_no_subcommand -a setup   -d 'Alias for spell'
+complete -c arrow -f -n __arrow_no_subcommand -a distro  -d 'Convert system to another distro (irreversible)'
 complete -c arrow -f -n __arrow_no_subcommand -a self     -d 'Manage arrow itself'
 complete -c arrow -f -n __arrow_no_subcommand -a sharpen   -d 'Update arrow to the latest version'
 complete -c arrow -f -n __arrow_no_subcommand -a reforge   -d 'Alias for sharpen'
@@ -103,9 +104,7 @@ complete -c arrow -f -n '__arrow_using_subcommand howto' -a list         -d 'Lis
 
 # 'spell' / 'setup' categories
 complete -c arrow -f -n '__arrow_using_subcommand spell' -a desktop -d 'Install/remove a desktop environment'
-complete -c arrow -f -n '__arrow_using_subcommand spell' -a layer   -d 'Apply a system layer'
 complete -c arrow -f -n '__arrow_using_subcommand setup' -a desktop -d 'Install/remove a desktop environment'
-complete -c arrow -f -n '__arrow_using_subcommand setup' -a layer   -d 'Apply a system layer'
 
 # 'spell desktop' environments
 complete -c arrow -f -n '__arrow_using_subcommand desktop' -a gnome   -d 'GNOME + gdm'
@@ -120,11 +119,12 @@ for _de in gnome kde xfce openbox sway i3
     complete -c arrow -f -n "__arrow_using_subcommand $_de" -a undo -d 'Remove this environment'
 end
 
-# 'spell layer' layers
-complete -c arrow -f -n '__arrow_using_subcommand layer' -a archcraft -d 'Archcraft ARM over Arch Linux'
+# 'distro' subcommands
+complete -c arrow -f -n '__arrow_using_subcommand distro' -a morph -d 'Convert system to another distro (irreversible)'
+complete -c arrow -f -n '__arrow_using_subcommand distro' -a list  -d 'List available morphs'
 
-# undo action for each layer
-complete -c arrow -f -n '__arrow_using_subcommand archcraft' -a undo -d 'Remove this layer'
+# 'distro morph' names
+complete -c arrow -f -n '__arrow_using_subcommand morph' -a archcraft -d 'Arch Linux ARM → Archcraft ARM'
 
 # 'self' sub-commands
 complete -c arrow -f -n '__arrow_using_subcommand self' -a update     -d 'Update arrow to the latest version'

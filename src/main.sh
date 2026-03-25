@@ -31,6 +31,9 @@ main() {
     spell)             cmd_spell    "$@" ;;
     setup)             cmd_setup    "$@" ;;
 
+    # distro
+    distro)            cmd_distro   "$@" ;;
+
     # self
     self)                          cmd_self          "$@" ;;
     sharpen | reforge)             cmd_self_update   "$@" ;;

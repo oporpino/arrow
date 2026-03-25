@@ -184,177 +184,6 @@ _spell_desktop_i3_undo() {
   _run _pacman -Rns i3-wm i3status dmenu xterm xorg-server xorg-xinit lightdm lightdm-gtk-greeter
 }
 
-# ── Spell: layer/archcraft ────────────────────────────────────────────────────
-
-_spell_layer_archcraft_do() {
-  _section "Instalar Archcraft ARM"
-
-  # ── Pre-flight: check /boot free space (needs ~300M for kernel upgrade) ───────
-  local boot_avail
-  boot_avail=$(df /boot 2>/dev/null | awk 'NR==2 {print $4}')
-  local boot_avail_mb=$(( ${boot_avail:-0} / 1024 ))
-  if [[ ${boot_avail:-0} -lt 307200 ]]; then
-    _err "Espaço insuficiente em /boot: ${boot_avail_mb}MB disponíveis (mínimo: 300MB, exigido pelo Archcraft)"
-    _blank
-    _info "O Archcraft faz upgrade completo do sistema, incluindo o kernel."
-    _info "Libere espaço em /boot antes de continuar."
-    _blank
-    _info "Uso atual de /boot:"
-    du -h --max-depth=1 /boot 2>/dev/null | sort -rh | while read -r size path; do
-      printf "    ${DIM}%s${RESET}  %s\n" "$size" "$path"
-    done
-    _blank
-    if [[ -f /boot/initramfs-linux-fallback.img ]]; then
-      local boot_fallback_mb
-      boot_fallback_mb=$(du -m /boot/initramfs-linux-fallback.img 2>/dev/null | cut -f1)
-      _warn "initramfs-linux-fallback.img (${boot_fallback_mb}MB) raramente é necessário e pode ser removido."
-    fi
-    _blank
-    _warn "Após liberar espaço, execute novamente: arrow spell layer archcraft"
-    return 1
-  fi
-
-  _step 1 4 "Detectar versão mais recente"
-  local version
-  version=$(curl -fsSL "https://api.github.com/repos/archcraft-os/archcraft-arm/releases/latest" \
-    2>/dev/null | grep '"tag_name"' | sed 's/.*"tag_name": *"\([^"]*\)".*/\1/')
-  if [[ -z "$version" ]]; then
-    _err "Não foi possível detectar a versão. Informe manualmente:"
-    printf "  Versão (ex: 24.01): " >&2
-    read -r version </dev/tty
-  fi
-  _ok "Versão: ${BOLD}${version}${RESET}"
-
-  _step 2 4 "Baixar archcraft-arm.tar.gz"
-  _cmd "curl -LO https://github.com/archcraft-os/archcraft-arm/releases/download/${version}/archcraft-arm.tar.gz"
-  _cmd "tar -xzvf archcraft-arm.tar.gz"
-
-  _step 3 4 "Configurar hostname, locale, timezone e usuário"
-  _cmd "nano customize.sh"
-
-  _step 4 4 "Executar instalação"
-  _cmd "./install.sh"
-
-  _blank
-  _ask "Continuar?" || { _warn "Cancelado."; return; }
-  _blank
-
-  local workdir="/tmp/archcraft-arm-install"
-  mkdir -p "$workdir"
-
-  _info "Baixando archcraft-arm ${version}…"
-  local url="https://github.com/archcraft-os/archcraft-arm/releases/download/${version}/archcraft-arm.tar.gz"
-  curl -L --progress-bar "$url" -o "$workdir/archcraft-arm.tar.gz" \
-    || { _err "Falha no download."; return 1; }
-
-  _info "Extraindo…"
-  tar -xzf "$workdir/archcraft-arm.tar.gz" -C "$workdir" --strip-components=1 \
-    || { _err "Falha ao extrair."; return 1; }
-
-  _info "Abrindo customize.sh para configuração…"
-  _warn "Edite hostname, locale, timezone e usuário antes de continuar."
-  _blank
-  "${EDITOR:-nano}" "$workdir/customize.sh"
-  _blank
-
-  _ask "Configuração ok? Iniciar instalação?" || { _warn "Cancelado."; return; }
-  _blank
-
-  (cd "$workdir" && _asroot bash install.sh) || { _err "Instalação falhou."; return 1; }
-
-  rm -rf "$workdir"
-  _blank
-  _ok "Archcraft ARM instalado. Reinicie para entrar no desktop."
-}
-
-_spell_layer_archcraft_undo() {
-  _section "Remover Archcraft ARM"
-  _warn "Não há procedimento oficial de remoção — este undo é best-effort."
-  _blank
-
-  _step 1 6 "Desabilitar sddm e restaurar target multi-user"
-  _cmd "systemctl disable sddm"
-  _cmd "systemctl set-default multi-user.target"
-  _cmd "systemctl enable systemd-networkd"
-
-  _step 2 6 "Remover pacotes archcraft-*"
-  _cmd "pacman -Rns <archcraft-*>"
-
-  _step 3 6 "Remover repositório archcraft-arm do pacman.conf"
-  _cmd "sed -i '/\\[archcraft-arm\\]/,/^$/d' /etc/pacman.conf"
-
-  _step 4 6 "Remover arquivos instalados manualmente"
-  _cmd "rm -f /usr/local/bin/xflock4"
-  _cmd "rm -f /etc/sudoers.d/01_wheel"
-
-  _step 5 6 "Reverter hook plymouth no mkinitcpio.conf"
-  _cmd "sed -i 's/udev plymouth/udev/' /etc/mkinitcpio.conf && mkinitcpio -P"
-
-  _step 6 6 "Reverter parâmetros do kernel"
-  _cmd "sed -i 's/ quiet splash loglevel=3 udev.log_level=3 vt.global_cursor_default=0//' /boot/cmdline.txt"
-
-  _blank
-  _warn "O que NÃO é revertido: hostname, locale, timezone, usuário criado, configs em /etc/skel e ~/"
-  _blank
-  _ask "Remover Archcraft?" "${RED}${BOLD}" || { _warn "Cancelado."; return; }
-  _blank
-
-  # Step 1 — services
-  _info "Restaurando serviços…"
-  _asroot systemctl disable sddm 2>/dev/null || true
-  _asroot systemctl set-default multi-user.target 2>/dev/null || true
-  _asroot systemctl enable systemd-networkd 2>/dev/null || true
-
-  # Step 2 — remove archcraft packages (only those actually installed)
-  _info "Removendo pacotes archcraft-*…"
-  local pkgs=()
-  local p
-  for p in $(pacman -Qq 2>/dev/null | grep '^archcraft-'); do
-    pkgs+=("$p")
-  done
-  # Also remove sddm if installed
-  pacman -Qq sddm &>/dev/null && pkgs+=("sddm")
-  pacman -Qq plymouth &>/dev/null && pkgs+=("plymouth")
-
-  if [[ ${#pkgs[@]} -gt 0 ]]; then
-    _run _pacman -Rns "${pkgs[@]}" || true
-  else
-    _warn "Nenhum pacote archcraft encontrado."
-  fi
-
-  # Step 3 — remove repo from pacman.conf
-  _info "Removendo repositório archcraft-arm…"
-  if grep -q '\[archcraft-arm\]' /etc/pacman.conf 2>/dev/null; then
-    _asroot sed -i '/\[archcraft-arm\]/,/^$/d' /etc/pacman.conf
-    _ok "Repositório removido."
-  else
-    _warn "Repositório archcraft-arm não encontrado em pacman.conf."
-  fi
-
-  # Step 4 — remove manually installed files
-  _info "Removendo arquivos instalados…"
-  [[ -f /usr/local/bin/xflock4 ]]   && _asroot rm -f /usr/local/bin/xflock4   && _ok "xflock4 removido."
-  [[ -f /etc/sudoers.d/01_wheel ]]  && _asroot rm -f /etc/sudoers.d/01_wheel  && _ok "sudoers 01_wheel removido."
-
-  # Step 5 — revert mkinitcpio plymouth hook
-  if grep -q 'udev plymouth' /etc/mkinitcpio.conf 2>/dev/null; then
-    _info "Revertendo hook plymouth no mkinitcpio.conf…"
-    _asroot sed -i 's/udev plymouth/udev/' /etc/mkinitcpio.conf
-    _run _asroot mkinitcpio -P || true
-  fi
-
-  # Step 6 — revert boot kernel params
-  if [[ -f /boot/cmdline.txt ]] && grep -q 'quiet splash loglevel=3' /boot/cmdline.txt 2>/dev/null; then
-    _info "Revertendo parâmetros do kernel em /boot/cmdline.txt…"
-    _asroot sed -i 's/ quiet splash loglevel=3 udev.log_level=3 vt.global_cursor_default=0//' /boot/cmdline.txt
-    _ok "Parâmetros revertidos."
-  fi
-
-  _blank
-  _ok "Archcraft removido (best-effort)."
-  _warn "Hostname, locale, timezone e usuário criado devem ser revertidos manualmente."
-}
-
 # ── Desktop dispatcher ────────────────────────────────────────────────────────
 
 _spell_desktop() {
@@ -394,48 +223,17 @@ _spell_desktop() {
   esac
 }
 
-# ── Layer dispatcher ───────────────────────────────────────────────────────────
-
-_spell_layer() {
-  local name="${1:-}" action="${2:-do}"
-
-  if [[ -z "$name" ]]; then
-    printf "\n  ${BOLD}Escolha uma layer:${RESET}\n\n" >&2
-    printf "    ${CYAN}1${RESET}  archcraft  (Archcraft ARM sobre Arch Linux)\n" >&2
-    printf "\n  Opção [1]: " >&2
-    local choice
-    read -r choice </dev/tty
-    case "${choice:-1}" in
-      1) name="archcraft" ;;
-      *) _die "Opção inválida: '${choice}'" ;;
-    esac
-  fi
-
-  case "$name" in
-    archcraft)
-      "_spell_layer_${name}_${action}"
-      ;;
-    *)
-      _err "Layer desconhecida: '${name}'"
-      printf "\n  Disponíveis: archcraft\n\n"
-      return 1
-      ;;
-  esac
-}
-
 # ── Spell menu ─────────────────────────────────────────────────────────────────
 
 _spell_menu() {
   _section "arrow spell"
   printf "  ${BOLD}O que deseja configurar?${RESET}\n\n"
   printf "    ${CYAN}1${RESET}  desktop  Ambiente de desktop\n"
-  printf "    ${CYAN}2${RESET}  layer    Layer sobre o sistema (ex: Archcraft)\n"
   printf "\n  Opção: "
   local choice
   read -r choice </dev/tty
   case "${choice:-}" in
     1 | desktop) _spell_desktop ;;
-    2 | layer)   _spell_layer   ;;
     *) _err "Opção inválida: '${choice}'"; return 1 ;;
   esac
 }
@@ -447,11 +245,10 @@ cmd_spell() {
 
   case "$category" in
     desktop) _spell_desktop "${1:-}" "${2:-do}" ;;
-    layer)   _spell_layer   "${1:-}" "${2:-do}" ;;
     "")      _spell_menu ;;
     *)
       _err "Categoria desconhecida: '${category}'"
-      printf "\n  Categorias disponíveis: desktop  layer\n\n"
+      printf "\n  Categorias disponíveis: desktop\n\n"
       return 1
       ;;
   esac
