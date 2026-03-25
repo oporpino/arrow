@@ -84,35 +84,36 @@ _check_os() {
 }
 
 _check_deps() {
+  # Kernels without Landlock support (e.g. ARM) need --disable-sandbox.
+  local _sandbox=""
+  pacman --disable-sandbox --version &>/dev/null && _sandbox="--disable-sandbox"
+
   local missing=()
   for dep in curl tar; do
     command -v "$dep" &>/dev/null || missing+=("$dep")
   done
 
-  if [[ ${#missing[@]} -gt 0 ]]; then
-    _warn "Missing dependencies: ${missing[*]}"
-    if command -v pacman &>/dev/null; then
-      _info "Syncing mirrors…"
-      # Kernels without Landlock support (e.g. ARM) need --disable-sandbox.
-      local _sandbox=""
-      pacman --disable-sandbox --version &>/dev/null && _sandbox="--disable-sandbox"
-      _asroot pacman -Syy --noconfirm ${_sandbox}
-      _info "Installing via pacman…"
-      _asroot pacman -S --noconfirm ${_sandbox} "${missing[@]}"
-    else
-      _die "Please install manually: ${missing[*]}"
-    fi
+  # Collect bash-completion as a needed package too (if on bash and not installed).
+  local need_bash_comp=false
+  if command -v pacman &>/dev/null \
+    && ! pacman -Qq bash-completion &>/dev/null 2>&1; then
+    need_bash_comp=true
   fi
 
-  # Ensure bash-completion is installed so tab completion works out of the box.
-  if [[ "${SHELL:-}" == */bash ]] && ! command -v bash &>/dev/null; then
-    : # non-bash shell, skip
-  elif command -v pacman &>/dev/null \
-    && ! pacman -Qq bash-completion &>/dev/null 2>&1; then
-    _info "Installing bash-completion for tab completion support…"
-    local _sandbox=""
-    pacman --disable-sandbox --version &>/dev/null && _sandbox="--disable-sandbox"
-    _asroot pacman -S --noconfirm ${_sandbox} bash-completion || true
+  # Single sync + install pass covers both missing deps and bash-completion.
+  if command -v pacman &>/dev/null; then
+    local to_install=("${missing[@]}")
+    $need_bash_comp && to_install+=("bash-completion")
+
+    if [[ ${#to_install[@]} -gt 0 ]]; then
+      [[ ${#missing[@]} -gt 0 ]] && _warn "Missing dependencies: ${missing[*]}"
+      $need_bash_comp && _info "Installing bash-completion for tab completion support…"
+      _info "Syncing package databases…"
+      _asroot pacman -Syy --noconfirm ${_sandbox}
+      _asroot pacman -S --noconfirm ${_sandbox} "${to_install[@]}" || true
+    fi
+  elif [[ ${#missing[@]} -gt 0 ]]; then
+    _die "Please install manually: ${missing[*]}"
   fi
 }
 
