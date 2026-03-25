@@ -4,9 +4,10 @@
 # Install one or more packages from the official repositories.
 cmd_add() {
   [[ $# -eq 0 ]] && _die "Uso: arrow add <pacote> [pacote2 …]"
-  _preview "Instalar pacote(s)" "pacman -S $*"
+  _preview "Instalar pacote(s)" "pacman -Syy" "pacman -S $*"
   _ask "Instalar?" || { _warn "Cancelado."; return; }
   _blank
+  _run _asroot pacman --noconfirm --color=always -Syy || true
   _run _asroot pacman --noconfirm --color=always -S "$@"
 }
 
