@@ -3,11 +3,42 @@
 # arrow add <pkg> [pkg2 …]
 # Install one or more packages from the official repositories.
 cmd_add() {
-  [[ $# -eq 0 ]] && _die "Uso: arrow add <pacote> [pacote2 …]"
-  _preview "Instalar pacote(s)" "pacman -Syu $*"
+  local upgrade=true sync=true
+  while [[ "${1:-}" == --* ]]; do
+    case "$1" in
+      --no-upgrade) upgrade=false ;;
+      --no-sync)    sync=false; upgrade=false ;;
+      *) _die "Opção desconhecida: $1" ;;
+    esac
+    shift
+  done
+  [[ $# -eq 0 ]] && _die "Uso: arrow add [--no-upgrade|--no-sync] <pacote> [pacote2 …]"
+
+  if $upgrade; then
+    _preview "Instalar pacote(s)" \
+      "pacman -Syu  # -S sync  -y atualiza db  -u upgrade" \
+      "pacman -S $*  # instala o(s) pacote(s)"
+  elif $sync; then
+    _preview "Instalar pacote(s) sem upgrade" \
+      "pacman -Syy  # -S sync  -yy força refresh do db" \
+      "pacman -S $*  # instala o(s) pacote(s)"
+  else
+    _preview "Instalar pacote(s) sem sincronizar" \
+      "pacman -S $*  # -S instalar"
+  fi
+
   _ask "Instalar?" || { _warn "Cancelado."; return; }
   _blank
-  _run _asroot pacman --noconfirm --color=always -Syu "$@"
+
+  if $upgrade; then
+    _run _asroot pacman --noconfirm --color=always -Syu
+    _run _asroot pacman --noconfirm --color=always -S "$@"
+  elif $sync; then
+    _run _asroot pacman --noconfirm --color=always -Syy
+    _run _asroot pacman --noconfirm --color=always -S "$@"
+  else
+    _run _asroot pacman --noconfirm --color=always -S "$@"
+  fi
 }
 
 # arrow delete <pkg> [pkg2 …]
@@ -15,7 +46,7 @@ cmd_add() {
 # Aliases: del, rm, remove
 cmd_delete() {
   [[ $# -eq 0 ]] && _die "Uso: arrow delete <pacote> [pacote2 …]"
-  _preview "Remover pacote(s) e dependências órfãs" "pacman -Rns $*"
+  _preview "Remover pacote(s) e dependências órfãs" "pacman -Rns $*  # -R remover  -n sem backup  -s remove deps órfãs"
   _ask "Remover?" || { _warn "Cancelado."; return; }
   _blank
   _run _asroot pacman --noconfirm --color=always -Rns "$@"

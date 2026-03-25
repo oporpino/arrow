@@ -52,7 +52,14 @@ _preview() {
   echo
   echo -e "  ${DIM}┌─${RESET} ${BOLD}${label}${RESET}"
   for c in "$@"; do
-    echo -e "  ${DIM}│${RESET}  ${DIM_CYAN}\$${RESET}  ${WHITE}${c}${RESET}"
+    # Split on "  #" to separate command from inline annotation.
+    local cmd_part="${c%%  #*}"
+    if [[ "$cmd_part" != "$c" ]]; then
+      local note_part="${c#*  #}"
+      echo -e "  ${DIM}│${RESET}  ${DIM_CYAN}\$${RESET}  ${WHITE}${cmd_part}${RESET}  ${DIM_WHITE}# ${note_part}${RESET}"
+    else
+      echo -e "  ${DIM}│${RESET}  ${DIM_CYAN}\$${RESET}  ${WHITE}${c}${RESET}"
+    fi
   done
   echo -e "  ${DIM}└────────────────────────────────────────${RESET}"
   echo
