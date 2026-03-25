@@ -19,7 +19,7 @@ _spell_desktop_gnome_do() {
   _blank
   _ask "Install GNOME?" || { _warn "Cancelled."; return; }
   _blank
-  _run _pacman -Syu gnome gdm || return 1
+  _run _pkg -Syu gnome gdm || return 1
   _run _asroot systemctl enable gdm || return 1
   _ok "GNOME installed. Reboot to enter the desktop."
 }
@@ -34,7 +34,7 @@ _spell_desktop_gnome_undo() {
   _ask "Remove GNOME?" "${RED}${BOLD}" || { _warn "Cancelled."; return; }
   _blank
   _run _asroot systemctl disable gdm 2>/dev/null || true
-  _run _pacman -Rns gnome gdm
+  _run _pkg -Rns gnome gdm
 }
 
 # ── Spell: desktop/kde ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -48,7 +48,7 @@ _spell_desktop_kde_do() {
   _blank
   _ask "Install KDE Plasma?" || { _warn "Cancelled."; return; }
   _blank
-  _run _pacman -Syu plasma sddm || return 1
+  _run _pkg -Syu plasma sddm || return 1
   _run _asroot systemctl enable sddm || return 1
   _ok "KDE Plasma installed. Reboot to enter the desktop."
 }
@@ -63,7 +63,7 @@ _spell_desktop_kde_undo() {
   _ask "Remove KDE Plasma?" "${RED}${BOLD}" || { _warn "Cancelled."; return; }
   _blank
   _run _asroot systemctl disable sddm 2>/dev/null || true
-  _run _pacman -Rns plasma sddm
+  _run _pkg -Rns plasma sddm
 }
 
 # ── Spell: desktop/xfce ────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -77,7 +77,7 @@ _spell_desktop_xfce_do() {
   _blank
   _ask "Install XFCE?" || { _warn "Cancelled."; return; }
   _blank
-  _run _pacman -Syu xfce4 xfce4-goodies lightdm lightdm-gtk-greeter || return 1
+  _run _pkg -Syu xfce4 xfce4-goodies lightdm lightdm-gtk-greeter || return 1
   _run _asroot systemctl enable lightdm || return 1
   _ok "XFCE installed. Reboot to enter the desktop."
 }
@@ -92,7 +92,7 @@ _spell_desktop_xfce_undo() {
   _ask "Remove XFCE?" "${RED}${BOLD}" || { _warn "Cancelled."; return; }
   _blank
   _run _asroot systemctl disable lightdm 2>/dev/null || true
-  _run _pacman -Rns xfce4 xfce4-goodies lightdm lightdm-gtk-greeter
+  _run _pkg -Rns xfce4 xfce4-goodies lightdm lightdm-gtk-greeter
 }
 
 # ── Spell: desktop/openbox ─────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -108,8 +108,8 @@ _spell_desktop_openbox_do() {
   _blank
   _ask "Install Openbox?" || { _warn "Cancelled."; return; }
   _blank
-  _run _pacman -Syu xorg-server xorg-xinit || return 1
-  _run _pacman -S openbox lightdm lightdm-gtk-greeter || return 1
+  _run _pkg -Syu xorg-server xorg-xinit || return 1
+  _run _pkg -S openbox lightdm lightdm-gtk-greeter || return 1
   _run _asroot systemctl enable lightdm || return 1
   _ok "Openbox installed. Reboot to enter the desktop."
 }
@@ -124,7 +124,7 @@ _spell_desktop_openbox_undo() {
   _ask "Remove Openbox?" "${RED}${BOLD}" || { _warn "Cancelled."; return; }
   _blank
   _run _asroot systemctl disable lightdm 2>/dev/null || true
-  _run _pacman -Rns openbox lightdm lightdm-gtk-greeter xorg-server xorg-xinit
+  _run _pkg -Rns openbox lightdm lightdm-gtk-greeter xorg-server xorg-xinit
 }
 
 # ── Spell: desktop/sway ────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -138,7 +138,7 @@ _spell_desktop_sway_do() {
   _blank
   _ask "Install Sway?" || { _warn "Cancelled."; return; }
   _blank
-  _run _pacman -Syu sway waybar wofi foot xdg-desktop-portal-wlr || return 1
+  _run _pkg -Syu sway waybar wofi foot xdg-desktop-portal-wlr || return 1
   _blank
   _ok "Sway installed."
   _info "Add 'exec sway' to ~/.bash_profile to start automatically."
@@ -152,7 +152,7 @@ _spell_desktop_sway_undo() {
   _blank
   _ask "Remove Sway?" "${RED}${BOLD}" || { _warn "Cancelled."; return; }
   _blank
-  _run _pacman -Rns sway waybar wofi foot xdg-desktop-portal-wlr
+  _run _pkg -Rns sway waybar wofi foot xdg-desktop-portal-wlr
 }
 
 # ── Spell: desktop/i3 ──────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -166,7 +166,7 @@ _spell_desktop_i3_do() {
   _blank
   _ask "Install i3?" || { _warn "Cancelled."; return; }
   _blank
-  _run _pacman -Syu i3-wm i3status dmenu xterm xorg-server xorg-xinit lightdm lightdm-gtk-greeter || return 1
+  _run _pkg -Syu i3-wm i3status dmenu xterm xorg-server xorg-xinit lightdm lightdm-gtk-greeter || return 1
   _run _asroot systemctl enable lightdm || return 1
   _ok "i3 installed. Reboot to enter the desktop."
 }
@@ -181,7 +181,7 @@ _spell_desktop_i3_undo() {
   _ask "Remove i3?" "${RED}${BOLD}" || { _warn "Cancelled."; return; }
   _blank
   _run _asroot systemctl disable lightdm 2>/dev/null || true
-  _run _pacman -Rns i3-wm i3status dmenu xterm xorg-server xorg-xinit lightdm lightdm-gtk-greeter
+  _run _pkg -Rns i3-wm i3status dmenu xterm xorg-server xorg-xinit lightdm lightdm-gtk-greeter
 }
 
 # ── Desktop dispatcher ────────────────────────────────────────────────────────

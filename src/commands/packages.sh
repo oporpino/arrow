@@ -71,9 +71,9 @@ cmd_add() {
 
   # ── Execute ──────────────────────────────────────────────────────────────────
   if [[ ${#to_install[@]} -gt 0 ]]; then
-    $upgrade && _run _pacman -Syu
-    $sync && ! $upgrade && _run _pacman -Syy
-    _run _pacman -S "${to_install[@]}"
+    $upgrade && _run _pkg -Syu
+    $sync && ! $upgrade && _run _pkg -Syy
+    _run _pkg -S "${to_install[@]}"
   fi
 
   if [[ ${#aur_pkgs[@]} -gt 0 ]]; then
@@ -105,7 +105,7 @@ cmd_delete() {
   # First attempt: capture stderr to detect dependent packages.
   _cmd "pacman -Rns ${installed[*]}"
   local err
-  if err=$(_pacman -Rns "${installed[@]}" 2>&1); then
+  if err=$(_pkg -Rns "${installed[@]}" 2>&1); then
     _ok "Done."
     return
   fi
@@ -132,7 +132,7 @@ cmd_delete() {
   _ask "Remove all?" "${RED}${BOLD}" || { _warn "Cancelled."; return; }
   _blank
   # shellcheck disable=SC2086
-  _run _pacman -Rns "${installed[@]}" $dependents
+  _run _pkg -Rns "${installed[@]}" $dependents
 }
 
 # arrow search <term>
