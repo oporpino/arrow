@@ -49,7 +49,38 @@ cmd_delete() {
   _preview "Remover pacote(s) e dependências órfãs" "pacman -Rns $*  # -R remover  -n sem backup  -s remove deps órfãs"
   _ask "Remover?" || { _warn "Cancelado."; return; }
   _blank
-  _run _pacman -Rns "$@"
+
+  # First attempt: capture stderr to detect dependent packages.
+  _cmd "pacman -Rns $*"
+  local err
+  if err=$(_pacman -Rns "$@" 2>&1); then
+    _ok "Concluído."
+    return
+  fi
+
+  # Parse packages that block the removal.
+  local dependents
+  dependents=$(printf '%s\n' "$err" | grep "required by" | sed 's/.*required by //' | sort -u | tr '\n' ' ' | sed 's/[[:space:]]*$//')
+
+  if [[ -z "$dependents" ]]; then
+    [[ "${ARROW_DEBUG:-0}" == "1" ]] && printf '%s\n' "$err" >&2
+    _err "Falhou."
+    return 1
+  fi
+
+  _blank
+  _warn "Os seguintes pacotes dependem de ${*} e precisam ser removidos junto:"
+  local dep
+  for dep in $dependents; do
+    echo -e "    ${DIM}•${RESET}  ${dep}"
+  done
+  _blank
+
+  _preview "Remover tudo" "pacman -Rns $* ${dependents}  # -R remover  -n sem backup  -s remove deps órfãs"
+  _ask "Remover tudo?" || { _warn "Cancelado."; return; }
+  _blank
+  # shellcheck disable=SC2086
+  _run _pacman -Rns "$@" $dependents
 }
 
 # arrow search <term>
