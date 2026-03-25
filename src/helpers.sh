@@ -116,8 +116,13 @@ _run() {
       else display=("${display[@]:1}"); fi
       ;;
     _pacman)
-      if [[ -n "$_prefix" ]]; then display=("$_prefix" "pacman" "${display[@]:1}")
-      else display=("pacman" "${display[@]:1}"); fi
+      if [[ -n "$_PACMAN_AUR_HELPER" && $EUID -ne 0 ]]; then
+        display=("$_PACMAN_AUR_HELPER" "${display[@]:1}")
+      elif [[ -n "$_prefix" ]]; then
+        display=("$_prefix" "pacman" "${display[@]:1}")
+      else
+        display=("pacman" "${display[@]:1}")
+      fi
       ;;
   esac
 
@@ -243,18 +248,28 @@ _ensure_aur_helper() {
 _PACMAN_SANDBOX=""
 pacman --disable-sandbox --version &>/dev/null && _PACMAN_SANDBOX="--disable-sandbox"
 
-# Runs pacman non-interactively as root with coloured output.
-# Temporarily suppresses kernel console messages (audit noise) during execution.
+# Cache the AUR helper at startup (empty string if none installed).
+# AUR helpers (yay, paru) are drop-in replacements for pacman and also handle
+# AUR packages. When one is available and we're not root, prefer it over pacman.
+# They cannot run as root — they manage their own privilege escalation internally.
+_PACMAN_AUR_HELPER=""
+_PACMAN_AUR_HELPER=$(_aur_helper)
+
+# Runs package operations non-interactively with coloured output.
+# Uses the AUR helper when available (and not root), otherwise falls back to
+# pacman as root. Kernel console noise is suppressed during pacman calls.
 _pacman() {
-  local _lvl
-  _lvl=$(cut -f1 /proc/sys/kernel/printk 2>/dev/null)
-  _asroot dmesg -n 1 2>/dev/null || true
-
-  _asroot pacman --noconfirm --color=always ${_PACMAN_SANDBOX} "$@"
-  local _ret=$?
-
-  [[ -n "$_lvl" ]] && _asroot dmesg -n "$_lvl" 2>/dev/null || true
-  return $_ret
+  if [[ -n "$_PACMAN_AUR_HELPER" && $EUID -ne 0 ]]; then
+    "$_PACMAN_AUR_HELPER" --noconfirm --color=always "$@"
+  else
+    local _lvl
+    _lvl=$(cut -f1 /proc/sys/kernel/printk 2>/dev/null)
+    _asroot dmesg -n 1 2>/dev/null || true
+    _asroot pacman --noconfirm --color=always ${_PACMAN_SANDBOX} "$@"
+    local _ret=$?
+    [[ -n "$_lvl" ]] && _asroot dmesg -n "$_lvl" 2>/dev/null || true
+    return $_ret
+  fi
 }
 
 # Check if packages are installed and return separate lists.

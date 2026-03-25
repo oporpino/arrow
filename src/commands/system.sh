@@ -11,17 +11,13 @@ cmd_update() {
 
 # arrow upgrade
 # Synchronise databases and upgrade all packages.
+# Uses the AUR helper when available — it handles both official and AUR packages.
 cmd_upgrade() {
-  local helper
-  helper=$(_aur_helper)
-  local preview_cmds=("pacman -Syu  # -S sync  -y refresh db  -u upgrade")
-  [[ -n "$helper" ]] && preview_cmds+=("${helper} -Syu  # upgrade AUR packages")
-
-  _preview "Upgrade the system" "${preview_cmds[@]}"
+  local cmd="${_PACMAN_AUR_HELPER:-pacman}"
+  _preview "Upgrade the system" "${cmd} -Syu  # -S sync  -y refresh db  -u upgrade"
   _ask "Continue?" || { _warn "Cancelled."; return; }
   _blank
   _run _pacman -Syu
-  [[ -n "$helper" ]] && _run "$helper" -Syu --noconfirm
 }
 
 # arrow clean [--all]
