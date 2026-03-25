@@ -31,13 +31,13 @@ cmd_add() {
   _blank
 
   if $upgrade; then
-    _run _asroot pacman --noconfirm --color=always -Syu
-    _run _asroot pacman --noconfirm --color=always -S "$@"
+    _run _pacman -Syu
+    _run _pacman -S "$@"
   elif $sync; then
-    _run _asroot pacman --noconfirm --color=always -Syy
-    _run _asroot pacman --noconfirm --color=always -S "$@"
+    _run _pacman -Syy
+    _run _pacman -S "$@"
   else
-    _run _asroot pacman --noconfirm --color=always -S "$@"
+    _run _pacman -S "$@"
   fi
 }
 
@@ -49,7 +49,7 @@ cmd_delete() {
   _preview "Remover pacote(s) e dependências órfãs" "pacman -Rns $*  # -R remover  -n sem backup  -s remove deps órfãs"
   _ask "Remover?" || { _warn "Cancelado."; return; }
   _blank
-  _run _asroot pacman --noconfirm --color=always -Rns "$@"
+  _run _pacman -Rns "$@"
 }
 
 # arrow search <term>

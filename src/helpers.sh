@@ -174,5 +174,9 @@ _aur_helper() {
   echo ""
 }
 
+# Detect --disable-sandbox support once (needed on kernels without Landlock, e.g. ARM).
+_PACMAN_SANDBOX=""
+pacman --disable-sandbox --version &>/dev/null && _PACMAN_SANDBOX="--disable-sandbox"
+
 # Runs pacman non-interactively as root with coloured output.
-_pacman() { _asroot pacman --noconfirm --color=always "$@"; }
+_pacman() { _asroot pacman --noconfirm --color=always ${_PACMAN_SANDBOX} "$@"; }
