@@ -148,9 +148,9 @@ _build() {
       src/commands/packages.sh \
       src/commands/system.sh \
       src/commands/query.sh \
-      src/commands/aur.sh \
       src/commands/self.sh \
       src/commands/howto.sh \
+      src/commands/setup.sh \
       src/help.sh \
       src/main.sh; do
       sed '/^[[:space:]]*#/d; /^$/d' "$src/$f"
