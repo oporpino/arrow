@@ -93,9 +93,9 @@ complete -c arrow -f -n '__arrow_using_subcommand clean' \
     -a --all -d 'Wipe the entire package cache'
 
 # 'howto' sub-commands
-complete -c arrow -f -n '__arrow_using_subcommand howto' -a sudoers  -d 'Add user to sudoers'
-complete -c arrow -f -n '__arrow_using_subcommand howto' -a add.user -d 'Create new user'
-complete -c arrow -f -n '__arrow_using_subcommand howto' -a list     -d 'List available guides'
+complete -c arrow -f -n '__arrow_using_subcommand howto' -a user.add     -d 'Create new user'
+complete -c arrow -f -n '__arrow_using_subcommand howto' -a user.sudoers -d 'Add user to sudoers'
+complete -c arrow -f -n '__arrow_using_subcommand howto' -a list         -d 'List available guides'
 
 # 'self' sub-commands
 complete -c arrow -f -n '__arrow_using_subcommand self' -a update -d 'Update arrow to the latest version'

@@ -51,7 +51,7 @@ _arrow() {
       return
       ;;
     howto)
-      COMPREPLY=($(compgen -W "sudoers add.user list" -- "$cur"))
+      COMPREPLY=($(compgen -W "user.add user.sudoers list" -- "$cur"))
       return
       ;;
     self)

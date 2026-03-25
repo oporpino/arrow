@@ -108,7 +108,7 @@ _howto_add_user() {
 
   _blank
   _ok "Usuário '${target_user}' criado com sucesso."
-  _info "Para acesso sudo, execute: arrow howto sudoers ${target_user}"
+  _info "Para acesso sudo, execute: arrow howto user.sudoers ${target_user}"
 }
 
 # ── Registry ──────────────────────────────────────────────────────────────────
@@ -117,8 +117,8 @@ _howto_list() {
   echo
   echo -e "  ${BOLD}Guias disponíveis:${RESET}"
   _blank
-  echo -e "  ${CYAN}sudoers${RESET}    Adicionar usuário ao sudoers via grupo wheel"
-  echo -e "  ${CYAN}add.user${RESET}   Criar novo usuário com home e grupos comuns"
+  echo -e "  ${CYAN}user.add${RESET}      Criar novo usuário com home e grupos comuns"
+  echo -e "  ${CYAN}user.sudoers${RESET}  Adicionar usuário ao sudoers via grupo wheel"
   _blank
   echo -e "  ${DIM}Uso: arrow howto <guia> [args]${RESET}"
   echo
@@ -129,8 +129,8 @@ cmd_howto() {
   local guide="${1:-}"; shift || true
 
   case "$guide" in
-    sudoers | sudo)  _howto_sudoers "$@" ;;
-    add.user)        _howto_add_user "$@" ;;
+    sudoers | sudo | user.sudoers) _howto_sudoers "$@" ;;
+    user.add)                      _howto_add_user "$@" ;;
     "" | list)       _howto_list ;;
     *)
       _err "Guia desconhecido: '${guide}'"
