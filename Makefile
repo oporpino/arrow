@@ -22,7 +22,7 @@ SRCS := \
 	src/commands/query.sh \
 	src/commands/self.sh \
 	src/commands/howto.sh \
-	src/commands/setup.sh \
+	src/commands/spell.sh \
 	src/help.sh \
 	src/main.sh
 
