@@ -27,8 +27,8 @@ main() {
     # howto
     howto)             cmd_howto    "$@" ;;
 
-    # formula / setup
-    formula)           cmd_formula  "$@" ;;
+    # spell / setup
+    spell)             cmd_spell    "$@" ;;
     setup)             cmd_setup    "$@" ;;
 
     # self

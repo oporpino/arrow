@@ -24,7 +24,7 @@ _arrow() {
     info files own deps
     list ls history log
     orphans clean purge
-    howto formula setup
+    howto spell setup
     self sharpen reforge reinstall
     help version
   )
@@ -46,7 +46,7 @@ _arrow() {
       COMPREPLY=($(compgen -W "user.add user.sudoers user.remove user.passwd list" -- "$cur"))
       return
       ;;
-    formula | setup)
+    spell | setup)
       COMPREPLY=($(compgen -W "desktop" -- "$cur"))
       return
       ;;

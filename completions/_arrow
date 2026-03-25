@@ -38,8 +38,8 @@ _arrow() {
         'clean:clean the package cache'
         'purge:remove all orphaned packages'
         'howto:step-by-step guides'
-        'formula:guided formulas with do/undo'
-        'setup:alias for formula'
+        'spell:guided spells with do/undo'
+        'setup:alias for spell'
         'self:manage arrow itself (update, remove)'
         'sharpen:update arrow to the latest version'
         'reforge:alias for sharpen'
@@ -72,7 +72,7 @@ _arrow() {
         howto)
           _values 'guide' 'user.add[create new user]' 'user.sudoers[add user to sudoers]' 'user.remove[remove user from system]' 'user.passwd[change user password]' 'list[list available guides]'
           ;;
-        formula | setup)
+        spell | setup)
           _values 'category' 'desktop[install a desktop environment]'
           ;;
         desktop)

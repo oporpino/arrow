@@ -11,7 +11,7 @@ function __arrow_no_subcommand
         info files own deps \
         list ls history log \
         orphans clean purge \
-        howto formula setup \
+        howto spell setup \
         self sharpen reforge reinstall \
         help version
 end
@@ -57,8 +57,8 @@ complete -c arrow -f -n __arrow_no_subcommand -a orphans -d 'List orphaned packa
 complete -c arrow -f -n __arrow_no_subcommand -a clean   -d 'Clean package cache'
 complete -c arrow -f -n __arrow_no_subcommand -a purge   -d 'Remove all orphaned packages'
 complete -c arrow -f -n __arrow_no_subcommand -a howto   -d 'Step-by-step guides'
-complete -c arrow -f -n __arrow_no_subcommand -a formula -d 'Guided formulas with do/undo'
-complete -c arrow -f -n __arrow_no_subcommand -a setup   -d 'Alias for formula'
+complete -c arrow -f -n __arrow_no_subcommand -a formula -d 'Guided spells with do/undo'
+complete -c arrow -f -n __arrow_no_subcommand -a setup   -d 'Alias for spell'
 complete -c arrow -f -n __arrow_no_subcommand -a self     -d 'Manage arrow itself'
 complete -c arrow -f -n __arrow_no_subcommand -a sharpen   -d 'Update arrow to the latest version'
 complete -c arrow -f -n __arrow_no_subcommand -a reforge   -d 'Alias for sharpen'
@@ -102,10 +102,10 @@ complete -c arrow -f -n '__arrow_using_subcommand howto' -a user.passwd  -d 'Cha
 complete -c arrow -f -n '__arrow_using_subcommand howto' -a list         -d 'List available guides'
 
 # 'formula' / 'setup' sub-commands
-complete -c arrow -f -n '__arrow_using_subcommand formula' -a desktop -d 'Install/remove a desktop environment'
+complete -c arrow -f -n '__arrow_using_subcommand spell' -a desktop -d 'Install/remove a desktop environment'
 complete -c arrow -f -n '__arrow_using_subcommand setup'   -a desktop -d 'Install/remove a desktop environment'
 
-# 'formula desktop' environments
+# 'spell desktop' environments
 complete -c arrow -f -n '__arrow_using_subcommand desktop' -a gnome   -d 'GNOME + gdm'
 complete -c arrow -f -n '__arrow_using_subcommand desktop' -a kde     -d 'KDE Plasma + sddm'
 complete -c arrow -f -n '__arrow_using_subcommand desktop' -a xfce    -d 'XFCE + lightdm'

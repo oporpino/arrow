@@ -35,11 +35,11 @@ $(echo -e "${BOLD}ARROW${RESET}")
   $(echo -e "${MAGENTA}self remove${RESET}")              Desinstala o arrow do sistema
   $(echo -e "${DIM}sharpen, reforge${RESET}             Aliases para self update${RESET}")
 
-$(echo -e "${BOLD}FÓRMULAS${RESET}")
-  $(echo -e "${WHITE}formula${RESET}")                   Menu de configuração guiada
-  $(echo -e "${WHITE}formula desktop${RESET}") [de]      Instala ambiente de desktop
-  $(echo -e "${WHITE}formula desktop${RESET}") [de] undo Remove ambiente de desktop
-  $(echo -e "${DIM}setup é alias para formula${RESET}")
+$(echo -e "${BOLD}SPELLS${RESET}")
+  $(echo -e "${WHITE}spell${RESET}")                     Menu de configuração guiada
+  $(echo -e "${WHITE}spell desktop${RESET}") [de]        Instala ambiente de desktop
+  $(echo -e "${WHITE}spell desktop${RESET}") [de] undo   Remove ambiente de desktop
+  $(echo -e "${DIM}setup é alias para spell${RESET}")
 
 $(echo -e "${BOLD}GUIAS${RESET}")
   $(echo -e "${WHITE}howto${RESET}")   <guia>         Guias passo a passo (ex: sudoers)

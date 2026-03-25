@@ -1,16 +1,16 @@
-# ── Formulas — guided sequences with do/undo ──────────────────────────────────
+# ── Spells — guided sequences with do/undo ────────────────────────────────────
 #
-#   Each formula exposes two functions:
-#     _formula_<name>_do   — install / configure
-#     _formula_<name>_undo — remove / revert  (mirror of do)
+#   Each spell exposes two functions:
+#     _spell_<name>_do   — install / configure
+#     _spell_<name>_undo — remove / revert  (mirror of do)
 #
 #   Usage:
-#     arrow formula desktop gnome        # do (default)
-#     arrow formula desktop gnome undo   # undo
+#     arrow spell desktop gnome        # do (default)
+#     arrow spell desktop gnome undo   # undo
 
-# ── Formula: desktop/gnome ────────────────────────────────────────────────────
+# ── Spell: desktop/gnome ──────────────────────────────────────────────────────
 
-_formula_desktop_gnome_do() {
+_spell_desktop_gnome_do() {
   _section "Instalar GNOME"
   _step 1 2 "Instalar pacotes"
   _cmd "pacman -Syu gnome gdm"
@@ -24,7 +24,7 @@ _formula_desktop_gnome_do() {
   _ok "GNOME instalado. Reinicie para entrar no desktop."
 }
 
-_formula_desktop_gnome_undo() {
+_spell_desktop_gnome_undo() {
   _section "Remover GNOME"
   _step 1 2 "Desabilitar display manager"
   _cmd "systemctl disable gdm"
@@ -37,9 +37,9 @@ _formula_desktop_gnome_undo() {
   _run _pacman -Rns gnome gdm
 }
 
-# ── Formula: desktop/kde ──────────────────────────────────────────────────────
+# ── Spell: desktop/kde ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
-_formula_desktop_kde_do() {
+_spell_desktop_kde_do() {
   _section "Instalar KDE Plasma"
   _step 1 2 "Instalar pacotes"
   _cmd "pacman -Syu plasma sddm"
@@ -53,7 +53,7 @@ _formula_desktop_kde_do() {
   _ok "KDE Plasma instalado. Reinicie para entrar no desktop."
 }
 
-_formula_desktop_kde_undo() {
+_spell_desktop_kde_undo() {
   _section "Remover KDE Plasma"
   _step 1 2 "Desabilitar display manager"
   _cmd "systemctl disable sddm"
@@ -66,9 +66,9 @@ _formula_desktop_kde_undo() {
   _run _pacman -Rns plasma sddm
 }
 
-# ── Formula: desktop/xfce ─────────────────────────────────────────────────────
+# ── Spell: desktop/xfce ────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
-_formula_desktop_xfce_do() {
+_spell_desktop_xfce_do() {
   _section "Instalar XFCE"
   _step 1 2 "Instalar pacotes"
   _cmd "pacman -Syu xfce4 xfce4-goodies lightdm lightdm-gtk-greeter"
@@ -82,7 +82,7 @@ _formula_desktop_xfce_do() {
   _ok "XFCE instalado. Reinicie para entrar no desktop."
 }
 
-_formula_desktop_xfce_undo() {
+_spell_desktop_xfce_undo() {
   _section "Remover XFCE"
   _step 1 2 "Desabilitar display manager"
   _cmd "systemctl disable lightdm"
@@ -95,9 +95,9 @@ _formula_desktop_xfce_undo() {
   _run _pacman -Rns xfce4 xfce4-goodies lightdm lightdm-gtk-greeter
 }
 
-# ── Formula: desktop/openbox ──────────────────────────────────────────────────
+# ── Spell: desktop/openbox ─────────────────────────────────────────────────────────────────────────────────────────────────────────
 
-_formula_desktop_openbox_do() {
+_spell_desktop_openbox_do() {
   _section "Instalar Openbox"
   _step 1 2 "Instalar pacotes"
   _cmd "pacman -Syu openbox obconf lxappearance lightdm lightdm-gtk-greeter"
@@ -111,7 +111,7 @@ _formula_desktop_openbox_do() {
   _ok "Openbox instalado. Reinicie para entrar no desktop."
 }
 
-_formula_desktop_openbox_undo() {
+_spell_desktop_openbox_undo() {
   _section "Remover Openbox"
   _step 1 2 "Desabilitar display manager"
   _cmd "systemctl disable lightdm"
@@ -124,9 +124,9 @@ _formula_desktop_openbox_undo() {
   _run _pacman -Rns openbox obconf lxappearance lightdm lightdm-gtk-greeter
 }
 
-# ── Formula: desktop/sway ─────────────────────────────────────────────────────
+# ── Spell: desktop/sway ────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
-_formula_desktop_sway_do() {
+_spell_desktop_sway_do() {
   _section "Instalar Sway"
   _step 1 2 "Instalar pacotes"
   _cmd "pacman -Syu sway waybar wofi foot xdg-desktop-portal-wlr"
@@ -142,7 +142,7 @@ _formula_desktop_sway_do() {
   _warn "Wayland não requer display manager."
 }
 
-_formula_desktop_sway_undo() {
+_spell_desktop_sway_undo() {
   _section "Remover Sway"
   _step 1 1 "Remover pacotes"
   _cmd "pacman -Rns sway waybar wofi foot xdg-desktop-portal-wlr"
@@ -152,9 +152,9 @@ _formula_desktop_sway_undo() {
   _run _pacman -Rns sway waybar wofi foot xdg-desktop-portal-wlr
 }
 
-# ── Formula: desktop/i3 ───────────────────────────────────────────────────────
+# ── Spell: desktop/i3 ──────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
-_formula_desktop_i3_do() {
+_spell_desktop_i3_do() {
   _section "Instalar i3"
   _step 1 2 "Instalar pacotes"
   _cmd "pacman -Syu i3-wm i3status dmenu xterm xorg-server xorg-xinit lightdm lightdm-gtk-greeter"
@@ -168,7 +168,7 @@ _formula_desktop_i3_do() {
   _ok "i3 instalado. Reinicie para entrar no desktop."
 }
 
-_formula_desktop_i3_undo() {
+_spell_desktop_i3_undo() {
   _section "Remover i3"
   _step 1 2 "Desabilitar display manager"
   _cmd "systemctl disable lightdm"
@@ -183,7 +183,7 @@ _formula_desktop_i3_undo() {
 
 # ── Desktop dispatcher ────────────────────────────────────────────────────────
 
-_formula_desktop() {
+_spell_desktop() {
   local de="${1:-}" action="${2:-do}"
 
   if [[ -z "$de" ]]; then
@@ -210,7 +210,7 @@ _formula_desktop() {
 
   case "$de" in
     gnome | kde | xfce | openbox | sway | i3)
-      "_formula_desktop_${de}_${action}"
+      "_spell_desktop_${de}_${action}"
       ;;
     *)
       _err "Ambiente desconhecido: '${de}'"
@@ -220,29 +220,29 @@ _formula_desktop() {
   esac
 }
 
-# ── Formula menu ──────────────────────────────────────────────────────────────
+# ── Spell menu ──────────────────────────────────────────────────────────────
 
-_formula_menu() {
-  _section "arrow formula"
+_spell_menu() {
+  _section "arrow spell"
   printf "  ${BOLD}O que deseja configurar?${RESET}\n\n"
   printf "    ${CYAN}1${RESET}  desktop   Ambiente de desktop\n"
   printf "\n  Opção: "
   local choice
   read -r choice </dev/tty
   case "${choice:-}" in
-    1 | desktop) _formula_desktop ;;
+    1 | desktop) _spell_desktop ;;
     *) _err "Opção inválida: '${choice}'"; return 1 ;;
   esac
 }
 
-# arrow formula [categoria] [nome] [undo]
+# arrow spell [categoria] [nome] [undo]
 # arrow setup   [categoria] [nome] [undo]   (alias)
-cmd_formula() {
+cmd_spell() {
   local category="${1:-}"; shift || true
 
   case "$category" in
-    desktop) _formula_desktop "${1:-}" "${2:-do}" ;;
-    "")      _formula_menu ;;
+    desktop) _spell_desktop "${1:-}" "${2:-do}" ;;
+    "")      _spell_menu ;;
     *)
       _err "Categoria desconhecida: '${category}'"
       printf "\n  Categorias disponíveis: desktop\n\n"
@@ -251,4 +251,4 @@ cmd_formula() {
   esac
 }
 
-cmd_setup() { cmd_formula "$@"; }
+cmd_setup() { cmd_spell "$@"; }
