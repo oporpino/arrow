@@ -47,6 +47,24 @@ _distro_require_archarm() {
   fi
 }
 
+# ── Boot restore helper ────────────────────────────────────────────────────────
+#
+#   Restores /boot from a backup directory created by the morph pre-flight.
+#   No-op if no backup path is given (backup was never created).
+#
+_distro_restore_boot() {
+  local backup="${1:-}"
+  [[ -z "$backup" ]] && return 0
+  _blank
+  _warn "Restoring /boot from backup..."
+  if _asroot cp -a "$backup/." /boot/; then
+    _ok "/boot restored."
+    _asroot rm -rf "$backup"
+  else
+    _err "Restore failed. Backup is still at: ${backup}"
+  fi
+}
+
 # ── Morph: archcraft ───────────────────────────────────────────────────────────
 #
 #   Converts Arch Linux ARM into Archcraft ARM by running the official
@@ -83,6 +101,15 @@ _distro_morph_archcraft() {
   # Guard: Arch Linux ARM only (Archcraft ARM installer is ARM-specific)
   _distro_require_archarm || return 1
 
+  # Pre-flight: / space (check before touching /boot)
+  local root_avail root_avail_gb
+  root_avail=$(df / 2>/dev/null | awk 'NR==2 {print $4}')
+  root_avail_gb=$(( ${root_avail:-0} / 1024 / 1024 ))
+  if [[ ${root_avail:-0} -lt 10485760 ]]; then
+    _err "/ space insufficient: ${root_avail_gb}GB available (minimum: 10GB, required by Archcraft)"
+    return 1
+  fi
+
   # Pre-flight: /boot space
   # If space is tight, offer to back up /boot, clear it, and restore on failure.
   # Even after clearing, a small /boot partition may still be under 300MB —
@@ -118,15 +145,6 @@ _distro_morph_archcraft() {
       || { _err "Failed to clear /boot."; _asroot cp -a "$boot_backup/." /boot/; _asroot rm -rf "$boot_backup"; return 1; }
     _ok "/boot cleared."
     _blank
-  fi
-
-  # Pre-flight: / space
-  local root_avail root_avail_gb
-  root_avail=$(df / 2>/dev/null | awk 'NR==2 {print $4}')
-  root_avail_gb=$(( ${root_avail:-0} / 1024 / 1024 ))
-  if [[ ${root_avail:-0} -lt 10485760 ]]; then
-    _err "/ space insufficient: ${root_avail_gb}GB available (minimum: 10GB, required by Archcraft)"
-    return 1
   fi
 
   # Show what will happen
@@ -166,10 +184,10 @@ _distro_morph_archcraft() {
   _info "Downloading archcraft-arm ${version}..."
   local url="https://github.com/archcraft-os/archcraft-arm/releases/download/${version}/archcraft-arm.tar.gz"
   curl -L --progress-bar "$url" -o "$workdir/archcraft-arm.tar.gz" \
-    || { _err "Download failed."; rm -rf "$workdir"; return 1; }
+    || { _err "Download failed."; rm -rf "$workdir"; _distro_restore_boot "$boot_backup"; return 1; }
   _info "Extracting..."
   tar -xzf "$workdir/archcraft-arm.tar.gz" -C "$workdir" --strip-components=1 \
-    || { _err "Extraction failed."; rm -rf "$workdir"; return 1; }
+    || { _err "Extraction failed."; rm -rf "$workdir"; _distro_restore_boot "$boot_backup"; return 1; }
 
   # Step 3 — configure
   _blank
@@ -185,7 +203,7 @@ _distro_morph_archcraft() {
   _blank
 
   _ask "Configuration looks good? Start the morph?" "${RED}${BOLD}" \
-    || { _warn "Cancelled."; rm -rf "$workdir"; return; }
+    || { _warn "Cancelled."; rm -rf "$workdir"; _distro_restore_boot "$boot_backup"; return; }
   _blank
 
   # Step 4 — run as root
@@ -201,16 +219,7 @@ _distro_morph_archcraft() {
   else
     _err "Morph failed."
     rm -rf "$workdir"
-    if [[ -n "$boot_backup" ]]; then
-      _blank
-      _warn "Restoring /boot from backup..."
-      if _asroot cp -a "$boot_backup/." /boot/; then
-        _ok "/boot restored."
-        _asroot rm -rf "$boot_backup"
-      else
-        _err "Restore failed. Backup is still at: ${boot_backup}"
-      fi
-    fi
+    _distro_restore_boot "$boot_backup"
     return 1
   fi
 }
