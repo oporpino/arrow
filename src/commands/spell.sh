@@ -199,12 +199,15 @@ _spell_layer_archcraft_do() {
     _info "O Archcraft faz upgrade completo do sistema, incluindo o kernel."
     _info "Libere espaço em /boot antes de continuar."
     _blank
+    _info "Uso atual de /boot:"
+    du -h --max-depth=1 /boot 2>/dev/null | sort -rh | while read -r size path; do
+      printf "    ${DIM}%s${RESET}  %s\n" "$size" "$path"
+    done
+    _blank
     if [[ -f /boot/initramfs-linux-fallback.img ]]; then
       local boot_fallback_mb
       boot_fallback_mb=$(du -m /boot/initramfs-linux-fallback.img 2>/dev/null | cut -f1)
-      _warn "O initramfs de fallback ocupa ~${boot_fallback_mb}MB e raramente é necessário."
-      _info "Para removê-lo:"
-      _cmd "sudo rm /boot/initramfs-linux-fallback.img"
+      _warn "initramfs-linux-fallback.img (${boot_fallback_mb}MB) raramente é necessário e pode ser removido."
     fi
     _blank
     _warn "Após liberar espaço, execute novamente: arrow spell layer archcraft"
