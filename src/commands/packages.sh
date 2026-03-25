@@ -14,6 +14,30 @@ cmd_add() {
   done
   [[ $# -eq 0 ]] && _die "Uso: arrow add [--no-upgrade|--no-sync] <pacote> [pacote2 …]"
 
+  # Check each package: already installed or not found in repos.
+  local already=() not_found=() to_install=()
+  for pkg in "$@"; do
+    if pacman -Qq "$pkg" &>/dev/null; then
+      already+=("$pkg")
+    elif ! pacman -Si "$pkg" &>/dev/null 2>&1; then
+      not_found+=("$pkg")
+    else
+      to_install+=("$pkg")
+    fi
+  done
+
+  if [[ ${#not_found[@]} -gt 0 ]]; then
+    _err "Pacote(s) não encontrado(s) nos repositórios: ${not_found[*]}"
+    [[ ${#to_install[@]} -eq 0 ]] && return 1
+  fi
+
+  if [[ ${#already[@]} -gt 0 ]]; then
+    _warn "Já instalado(s): ${already[*]}"
+    [[ ${#to_install[@]} -eq 0 ]] && { _ok "Nada a instalar."; return; }
+  fi
+
+  set -- "${to_install[@]}"
+
   if $upgrade; then
     _preview "Instalar pacote(s)" \
       "pacman -Syu  # -S sync  -y atualiza db  -u upgrade" \

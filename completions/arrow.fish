@@ -98,8 +98,9 @@ complete -c arrow -f -n '__arrow_using_subcommand howto' -a user.sudoers -d 'Add
 complete -c arrow -f -n '__arrow_using_subcommand howto' -a list         -d 'List available guides'
 
 # 'self' sub-commands
-complete -c arrow -f -n '__arrow_using_subcommand self' -a update -d 'Update arrow to the latest version'
-complete -c arrow -f -n '__arrow_using_subcommand self' -a remove -d 'Uninstall arrow from the system'
+complete -c arrow -f -n '__arrow_using_subcommand self' -a update     -d 'Update arrow to the latest version'
+complete -c arrow -f -n '__arrow_using_subcommand self' -a reinstall  -d 'Force reinstall arrow'
+complete -c arrow -f -n '__arrow_using_subcommand self' -a remove     -d 'Uninstall arrow from the system'
 
 # 'aur' sub-commands
 complete -c arrow -f -n '__arrow_using_subcommand aur' -a add     -d 'Install from AUR'

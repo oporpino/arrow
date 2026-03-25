@@ -74,6 +74,7 @@ _arrow() {
           local -a self_cmds
           self_cmds=(
             'update:update arrow to the latest version'
+            'reinstall:force reinstall arrow'
             'remove:uninstall arrow from the system'
           )
           _describe -t self-commands 'self subcommand' self_cmds

@@ -55,11 +55,14 @@ _arrow() {
       return
       ;;
     self)
-      COMPREPLY=($(compgen -W "update remove" -- "$cur"))
+      COMPREPLY=($(compgen -W "update reinstall remove" -- "$cur"))
       return
       ;;
     clean)
       COMPREPLY=($(compgen -W "--all" -- "$cur"))
+      return
+      ;;
+    reinstall)
       return
       ;;
     add)

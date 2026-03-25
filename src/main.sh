@@ -31,8 +31,9 @@ main() {
     howto)             cmd_howto    "$@" ;;
 
     # self
-    self)                          cmd_self         "$@" ;;
-    sharpen | reforge)             cmd_self_update  "$@" ;;
+    self)                          cmd_self          "$@" ;;
+    sharpen | reforge)             cmd_self_update   "$@" ;;
+    reinstall)                     cmd_self_reinstall "$@" ;;
 
     # meta
     help | -h | --help)     cmd_help ;;
