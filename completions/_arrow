@@ -38,7 +38,8 @@ _arrow() {
         'clean:clean the package cache'
         'purge:remove all orphaned packages'
         'howto:step-by-step guides'
-        'setup:guided system configuration'
+        'formula:guided formulas with do/undo'
+        'setup:alias for formula'
         'self:manage arrow itself (update, remove)'
         'sharpen:update arrow to the latest version'
         'reforge:alias for sharpen'
@@ -71,11 +72,14 @@ _arrow() {
         howto)
           _values 'guide' 'user.add[create new user]' 'user.sudoers[add user to sudoers]' 'user.remove[remove user from system]' 'user.passwd[change user password]' 'list[list available guides]'
           ;;
-        setup)
+        formula | setup)
           _values 'category' 'desktop[install a desktop environment]'
           ;;
         desktop)
-          _values 'environment' 'gnome[GNOME + gdm]' 'kde[KDE Plasma + sddm]' 'xfce[XFCE + lightdm]' 'sway[Sway Wayland tiling]' 'i3[i3 X11 tiling]'
+          _values 'environment' 'gnome[GNOME + gdm]' 'kde[KDE Plasma + sddm]' 'xfce[XFCE + lightdm]' 'openbox[Openbox + lightdm]' 'sway[Sway Wayland tiling]' 'i3[i3 X11 tiling]'
+          ;;
+        gnome | kde | xfce | openbox | sway | i3)
+          _values 'action' 'undo[remove this environment]'
           ;;
         self)
           local -a self_cmds

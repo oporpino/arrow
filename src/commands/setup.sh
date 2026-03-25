@@ -1,122 +1,248 @@
-# ── Setup — guided system configuration ───────────────────────────────────────
+# ── Formulas — guided sequences with do/undo ──────────────────────────────────
+#
+#   Each formula exposes two functions:
+#     _formula_<name>_do   — install / configure
+#     _formula_<name>_undo — remove / revert  (mirror of do)
+#
+#   Usage:
+#     arrow formula desktop gnome        # do (default)
+#     arrow formula desktop gnome undo   # undo
 
-# ── Desktop environments ───────────────────────────────────────────────────────
+# ── Formula: desktop/gnome ────────────────────────────────────────────────────
 
-_setup_desktop_menu() {
-  printf "\n  ${BOLD}Escolha um ambiente de desktop:${RESET}\n\n" >&2
-  printf "    ${CYAN}1${RESET}  GNOME       (completo, display manager: gdm)\n"    >&2
-  printf "    ${CYAN}2${RESET}  KDE Plasma  (completo, display manager: sddm)\n"   >&2
-  printf "    ${CYAN}3${RESET}  XFCE        (leve, display manager: lightdm)\n"    >&2
-  printf "    ${CYAN}4${RESET}  Sway        (Wayland tiling, ideal para ARM)\n"    >&2
-  printf "    ${CYAN}5${RESET}  i3          (X11 tiling, leve)\n"                  >&2
-  printf "\n  Opção [1-5]: " >&2
-  local choice
-  read -r choice </dev/tty
-  case "${choice:-1}" in
-    1) echo "gnome"   ;;
-    2) echo "kde"     ;;
-    3) echo "xfce"    ;;
-    4) echo "sway"    ;;
-    5) echo "i3"      ;;
-    *) _die "Opção inválida: '${choice}'" ;;
-  esac
+_formula_desktop_gnome_do() {
+  _section "Instalar GNOME"
+  _step 1 2 "Instalar pacotes"
+  _cmd "pacman -Syu gnome gdm"
+  _step 2 2 "Habilitar display manager"
+  _cmd "systemctl enable gdm"
+  _blank
+  _ask "Instalar GNOME?" || { _warn "Cancelado."; return; }
+  _blank
+  _run _pacman -Syu gnome gdm
+  _run _asroot systemctl enable gdm
+  _ok "GNOME instalado. Reinicie para entrar no desktop."
 }
 
-_setup_desktop() {
-  local de="${1:-}"
+_formula_desktop_gnome_undo() {
+  _section "Remover GNOME"
+  _step 1 2 "Desabilitar display manager"
+  _cmd "systemctl disable gdm"
+  _step 2 2 "Remover pacotes"
+  _cmd "pacman -Rns gnome gdm"
+  _blank
+  _ask "Remover GNOME?" "${RED}${BOLD}" || { _warn "Cancelado."; return; }
+  _blank
+  _run _asroot systemctl disable gdm 2>/dev/null || true
+  _run _pacman -Rns gnome gdm
+}
 
-  # If no DE given, prompt
+# ── Formula: desktop/kde ──────────────────────────────────────────────────────
+
+_formula_desktop_kde_do() {
+  _section "Instalar KDE Plasma"
+  _step 1 2 "Instalar pacotes"
+  _cmd "pacman -Syu plasma sddm"
+  _step 2 2 "Habilitar display manager"
+  _cmd "systemctl enable sddm"
+  _blank
+  _ask "Instalar KDE Plasma?" || { _warn "Cancelado."; return; }
+  _blank
+  _run _pacman -Syu plasma sddm
+  _run _asroot systemctl enable sddm
+  _ok "KDE Plasma instalado. Reinicie para entrar no desktop."
+}
+
+_formula_desktop_kde_undo() {
+  _section "Remover KDE Plasma"
+  _step 1 2 "Desabilitar display manager"
+  _cmd "systemctl disable sddm"
+  _step 2 2 "Remover pacotes"
+  _cmd "pacman -Rns plasma sddm"
+  _blank
+  _ask "Remover KDE Plasma?" "${RED}${BOLD}" || { _warn "Cancelado."; return; }
+  _blank
+  _run _asroot systemctl disable sddm 2>/dev/null || true
+  _run _pacman -Rns plasma sddm
+}
+
+# ── Formula: desktop/xfce ─────────────────────────────────────────────────────
+
+_formula_desktop_xfce_do() {
+  _section "Instalar XFCE"
+  _step 1 2 "Instalar pacotes"
+  _cmd "pacman -Syu xfce4 xfce4-goodies lightdm lightdm-gtk-greeter"
+  _step 2 2 "Habilitar display manager"
+  _cmd "systemctl enable lightdm"
+  _blank
+  _ask "Instalar XFCE?" || { _warn "Cancelado."; return; }
+  _blank
+  _run _pacman -Syu xfce4 xfce4-goodies lightdm lightdm-gtk-greeter
+  _run _asroot systemctl enable lightdm
+  _ok "XFCE instalado. Reinicie para entrar no desktop."
+}
+
+_formula_desktop_xfce_undo() {
+  _section "Remover XFCE"
+  _step 1 2 "Desabilitar display manager"
+  _cmd "systemctl disable lightdm"
+  _step 2 2 "Remover pacotes"
+  _cmd "pacman -Rns xfce4 xfce4-goodies lightdm lightdm-gtk-greeter"
+  _blank
+  _ask "Remover XFCE?" "${RED}${BOLD}" || { _warn "Cancelado."; return; }
+  _blank
+  _run _asroot systemctl disable lightdm 2>/dev/null || true
+  _run _pacman -Rns xfce4 xfce4-goodies lightdm lightdm-gtk-greeter
+}
+
+# ── Formula: desktop/openbox ──────────────────────────────────────────────────
+
+_formula_desktop_openbox_do() {
+  _section "Instalar Openbox"
+  _step 1 2 "Instalar pacotes"
+  _cmd "pacman -Syu openbox obconf lxappearance lightdm lightdm-gtk-greeter"
+  _step 2 2 "Habilitar display manager"
+  _cmd "systemctl enable lightdm"
+  _blank
+  _ask "Instalar Openbox?" || { _warn "Cancelado."; return; }
+  _blank
+  _run _pacman -Syu openbox obconf lxappearance lightdm lightdm-gtk-greeter
+  _run _asroot systemctl enable lightdm
+  _ok "Openbox instalado. Reinicie para entrar no desktop."
+}
+
+_formula_desktop_openbox_undo() {
+  _section "Remover Openbox"
+  _step 1 2 "Desabilitar display manager"
+  _cmd "systemctl disable lightdm"
+  _step 2 2 "Remover pacotes"
+  _cmd "pacman -Rns openbox obconf lxappearance lightdm lightdm-gtk-greeter"
+  _blank
+  _ask "Remover Openbox?" "${RED}${BOLD}" || { _warn "Cancelado."; return; }
+  _blank
+  _run _asroot systemctl disable lightdm 2>/dev/null || true
+  _run _pacman -Rns openbox obconf lxappearance lightdm lightdm-gtk-greeter
+}
+
+# ── Formula: desktop/sway ─────────────────────────────────────────────────────
+
+_formula_desktop_sway_do() {
+  _section "Instalar Sway"
+  _step 1 2 "Instalar pacotes"
+  _cmd "pacman -Syu sway waybar wofi foot xdg-desktop-portal-wlr"
+  _step 2 2 "Configurar auto-start"
+  _cmd "echo 'exec sway' >> ~/.bash_profile"
+  _blank
+  _ask "Instalar Sway?" || { _warn "Cancelado."; return; }
+  _blank
+  _run _pacman -Syu sway waybar wofi foot xdg-desktop-portal-wlr
+  _blank
+  _ok "Sway instalado."
+  _info "Adicione 'exec sway' ao ~/.bash_profile para iniciar automaticamente."
+  _warn "Wayland não requer display manager."
+}
+
+_formula_desktop_sway_undo() {
+  _section "Remover Sway"
+  _step 1 1 "Remover pacotes"
+  _cmd "pacman -Rns sway waybar wofi foot xdg-desktop-portal-wlr"
+  _blank
+  _ask "Remover Sway?" "${RED}${BOLD}" || { _warn "Cancelado."; return; }
+  _blank
+  _run _pacman -Rns sway waybar wofi foot xdg-desktop-portal-wlr
+}
+
+# ── Formula: desktop/i3 ───────────────────────────────────────────────────────
+
+_formula_desktop_i3_do() {
+  _section "Instalar i3"
+  _step 1 2 "Instalar pacotes"
+  _cmd "pacman -Syu i3-wm i3status dmenu xterm xorg-server xorg-xinit lightdm lightdm-gtk-greeter"
+  _step 2 2 "Habilitar display manager"
+  _cmd "systemctl enable lightdm"
+  _blank
+  _ask "Instalar i3?" || { _warn "Cancelado."; return; }
+  _blank
+  _run _pacman -Syu i3-wm i3status dmenu xterm xorg-server xorg-xinit lightdm lightdm-gtk-greeter
+  _run _asroot systemctl enable lightdm
+  _ok "i3 instalado. Reinicie para entrar no desktop."
+}
+
+_formula_desktop_i3_undo() {
+  _section "Remover i3"
+  _step 1 2 "Desabilitar display manager"
+  _cmd "systemctl disable lightdm"
+  _step 2 2 "Remover pacotes"
+  _cmd "pacman -Rns i3-wm i3status dmenu xterm xorg-server xorg-xinit lightdm lightdm-gtk-greeter"
+  _blank
+  _ask "Remover i3?" "${RED}${BOLD}" || { _warn "Cancelado."; return; }
+  _blank
+  _run _asroot systemctl disable lightdm 2>/dev/null || true
+  _run _pacman -Rns i3-wm i3status dmenu xterm xorg-server xorg-xinit lightdm lightdm-gtk-greeter
+}
+
+# ── Desktop dispatcher ────────────────────────────────────────────────────────
+
+_formula_desktop() {
+  local de="${1:-}" action="${2:-do}"
+
   if [[ -z "$de" ]]; then
-    de=$(_setup_desktop_menu)
+    printf "\n  ${BOLD}Escolha um ambiente de desktop:${RESET}\n\n" >&2
+    printf "    ${CYAN}1${RESET}  gnome    (completo, gdm)\n"      >&2
+    printf "    ${CYAN}2${RESET}  kde      (completo, sddm)\n"     >&2
+    printf "    ${CYAN}3${RESET}  xfce     (leve, lightdm)\n"      >&2
+    printf "    ${CYAN}4${RESET}  openbox  (minimalista, lightdm)\n" >&2
+    printf "    ${CYAN}5${RESET}  sway     (Wayland tiling, ARM)\n" >&2
+    printf "    ${CYAN}6${RESET}  i3       (X11 tiling)\n"         >&2
+    printf "\n  Opção [1-6]: " >&2
+    local choice
+    read -r choice </dev/tty
+    case "${choice:-1}" in
+      1) de="gnome"   ;;
+      2) de="kde"     ;;
+      3) de="xfce"    ;;
+      4) de="openbox" ;;
+      5) de="sway"    ;;
+      6) de="i3"      ;;
+      *) _die "Opção inválida: '${choice}'" ;;
+    esac
   fi
 
   case "$de" in
-    gnome)
-      local pkgs=(gnome gdm)
-      local dm="gdm"
-      local label="GNOME"
-      ;;
-    kde | plasma)
-      local pkgs=(plasma sddm)
-      local dm="sddm"
-      local label="KDE Plasma"
-      ;;
-    xfce)
-      local pkgs=(xfce4 xfce4-goodies lightdm lightdm-gtk-greeter)
-      local dm="lightdm"
-      local label="XFCE"
-      ;;
-    sway)
-      local pkgs=(sway waybar wofi foot xdg-desktop-portal-wlr)
-      local dm=""
-      local label="Sway"
-      ;;
-    i3)
-      local pkgs=(i3-wm i3status dmenu xterm xorg-server xorg-xinit lightdm lightdm-gtk-greeter)
-      local dm="lightdm"
-      local label="i3"
+    gnome | kde | xfce | openbox | sway | i3)
+      "_formula_desktop_${de}_${action}"
       ;;
     *)
       _err "Ambiente desconhecido: '${de}'"
-      printf "\n  Ambientes disponíveis: gnome  kde  xfce  sway  i3\n\n"
+      printf "\n  Disponíveis: gnome  kde  xfce  openbox  sway  i3\n\n"
       return 1
       ;;
   esac
-
-  _section "Instalar ${label}"
-
-  _step 1 2 "Instalar pacotes"
-  _cmd "pacman -Syu ${pkgs[*]}"
-
-  if [[ -n "$dm" ]]; then
-    _step 2 2 "Habilitar display manager ao boot"
-    _cmd "systemctl enable ${dm}"
-  else
-    _step 2 2 "Iniciar via .bash_profile / .zprofile"
-    _cmd "echo 'exec sway' >> ~/.bash_profile"
-  fi
-
-  _blank
-  _ask "Instalar ${label}?" || { _warn "Cancelado."; return; }
-  _blank
-
-  _run _pacman -Syu "${pkgs[@]}"
-
-  if [[ -n "$dm" ]]; then
-    _run _asroot systemctl enable "$dm"
-    _blank
-    _ok "${label} instalado. Reinicie para entrar no desktop."
-    _info "Ou inicie agora: systemctl start ${dm}"
-  else
-    _blank
-    _ok "${label} instalado."
-    _info "Adicione 'exec sway' ao ~/.bash_profile para iniciar automaticamente."
-    _warn "No Wayland, não é necessário um display manager."
-  fi
 }
 
-# ── Setup menu ─────────────────────────────────────────────────────────────────
+# ── Formula menu ──────────────────────────────────────────────────────────────
 
-_setup_menu() {
-  _section "arrow setup"
+_formula_menu() {
+  _section "arrow formula"
   printf "  ${BOLD}O que deseja configurar?${RESET}\n\n"
-  printf "    ${CYAN}1${RESET}  desktop   Instalar ambiente de desktop\n"
+  printf "    ${CYAN}1${RESET}  desktop   Ambiente de desktop\n"
   printf "\n  Opção: "
   local choice
   read -r choice </dev/tty
   case "${choice:-}" in
-    1 | desktop) _setup_desktop ;;
+    1 | desktop) _formula_desktop ;;
     *) _err "Opção inválida: '${choice}'"; return 1 ;;
   esac
 }
 
-# arrow setup [categoria] [args]
-cmd_setup() {
+# arrow formula [categoria] [nome] [undo]
+# arrow setup   [categoria] [nome] [undo]   (alias)
+cmd_formula() {
   local category="${1:-}"; shift || true
 
   case "$category" in
-    desktop) _setup_desktop "${1:-}" ;;
-    "")      _setup_menu ;;
+    desktop) _formula_desktop "${1:-}" "${2:-do}" ;;
+    "")      _formula_menu ;;
     *)
       _err "Categoria desconhecida: '${category}'"
       printf "\n  Categorias disponíveis: desktop\n\n"
@@ -124,3 +250,5 @@ cmd_setup() {
       ;;
   esac
 }
+
+cmd_setup() { cmd_formula "$@"; }

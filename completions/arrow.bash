@@ -24,7 +24,7 @@ _arrow() {
     info files own deps
     list ls history log
     orphans clean purge
-    howto setup
+    howto formula setup
     self sharpen reforge reinstall
     help version
   )
@@ -46,12 +46,16 @@ _arrow() {
       COMPREPLY=($(compgen -W "user.add user.sudoers user.remove user.passwd list" -- "$cur"))
       return
       ;;
-    setup)
+    formula | setup)
       COMPREPLY=($(compgen -W "desktop" -- "$cur"))
       return
       ;;
     desktop)
-      COMPREPLY=($(compgen -W "gnome kde xfce sway i3" -- "$cur"))
+      COMPREPLY=($(compgen -W "gnome kde xfce openbox sway i3" -- "$cur"))
+      return
+      ;;
+    gnome | kde | xfce | openbox | sway | i3)
+      COMPREPLY=($(compgen -W "undo" -- "$cur"))
       return
       ;;
     self)
