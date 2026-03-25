@@ -194,24 +194,21 @@ _spell_layer_archcraft_do() {
   boot_avail=$(df /boot 2>/dev/null | awk 'NR==2 {print $4}')
   local boot_avail_mb=$(( ${boot_avail:-0} / 1024 ))
   if [[ ${boot_avail:-0} -lt 307200 ]]; then
-    _warn "Espaço insuficiente em /boot: ${boot_avail_mb}MB disponíveis (mínimo: 300MB)"
+    _err "Espaço insuficiente em /boot: ${boot_avail_mb}MB disponíveis (mínimo: 300MB)"
     _blank
-    _info "O Archcraft faz upgrade do sistema incluindo o kernel."
-    _info "Para liberar espaço, remova o initramfs de fallback (raramente usado):"
+    _info "O Archcraft faz upgrade completo do sistema, incluindo o kernel."
+    _info "Libere espaço em /boot antes de continuar."
     _blank
-    _cmd "sudo rm /boot/initramfs-linux-fallback.img"
-    _blank
-    local boot_fallback_mb=0
     if [[ -f /boot/initramfs-linux-fallback.img ]]; then
+      local boot_fallback_mb
       boot_fallback_mb=$(du -m /boot/initramfs-linux-fallback.img 2>/dev/null | cut -f1)
-      _info "Isso liberaria ~${boot_fallback_mb}MB."
+      _warn "O initramfs de fallback ocupa ~${boot_fallback_mb}MB e raramente é necessário."
+      _info "Para removê-lo:"
+      _cmd "sudo rm /boot/initramfs-linux-fallback.img"
     fi
     _blank
-    _ask "Remover initramfs-fallback agora e continuar?" || { _warn "Cancelado. Libere espaço em /boot e tente novamente."; return 1; }
-    _asroot rm -f /boot/initramfs-linux-fallback.img \
-      && _ok "initramfs-fallback removido." \
-      || { _err "Falha ao remover. Tente manualmente: sudo rm /boot/initramfs-linux-fallback.img"; return 1; }
-    _blank
+    _warn "Após liberar espaço, execute novamente: arrow spell layer archcraft"
+    return 1
   fi
 
   _step 1 4 "Detectar versão mais recente"
