@@ -41,6 +41,7 @@ _arrow() {
         'self:manage arrow itself (update, remove)'
         'sharpen:update arrow to the latest version'
         'reforge:alias for sharpen'
+        'reinstall:force reinstall arrow'
         'aur:AUR helper commands'
         'help:show this help'
         'version:print version'

@@ -40,46 +40,39 @@ cmd_add() {
     return
   fi
 
-  # ── Install from pacman repos ────────────────────────────────────────────────
-  if [[ ${#to_install[@]} -gt 0 ]]; then
-    _blank
-    if $upgrade; then
-      _preview "Instalar pacote(s)" \
-        "pacman -Syu  # -S sync  -y atualiza db  -u upgrade" \
-        "pacman -S ${to_install[*]}  # instala o(s) pacote(s)"
-    elif $sync; then
-      _preview "Instalar pacote(s) sem upgrade" \
-        "pacman -Syy  # -S sync  -yy força refresh do db" \
-        "pacman -S ${to_install[*]}  # instala o(s) pacote(s)"
-    else
-      _preview "Instalar pacote(s) sem sincronizar" \
-        "pacman -S ${to_install[*]}  # -S instalar"
-    fi
-
-    _ask "Instalar?" || { _warn "Cancelado."; return; }
-    _blank
-
-    if $upgrade; then
-      _run _pacman -Syu
-      _run _pacman -S "${to_install[@]}"
-    elif $sync; then
-      _run _pacman -Syy
-      _run _pacman -S "${to_install[@]}"
-    else
-      _run _pacman -S "${to_install[@]}"
-    fi
+  # Resolve AUR helper upfront (may prompt user to choose yay/paru).
+  local helper=""
+  if [[ ${#aur_pkgs[@]} -gt 0 ]]; then
+    helper=$(_ensure_aur_helper) || return 1
   fi
 
-  # ── Install from AUR ─────────────────────────────────────────────────────────
+  # ── Build unified preview with all commands ──────────────────────────────────
+  local preview_cmds=()
+  if [[ ${#to_install[@]} -gt 0 ]]; then
+    if $upgrade; then
+      preview_cmds+=("pacman -Syu  # -S sync  -y atualiza db  -u upgrade")
+    elif $sync; then
+      preview_cmds+=("pacman -Syy  # -S sync  -yy força refresh do db")
+    fi
+    preview_cmds+=("pacman -S ${to_install[*]}  # instala pacote(s) dos repos")
+  fi
   if [[ ${#aur_pkgs[@]} -gt 0 ]]; then
-    _blank
-    local helper
-    helper=$(_ensure_aur_helper) || return 1
+    preview_cmds+=("${helper} -S ${aur_pkgs[*]}  # AUR")
+  fi
 
-    _preview "Instalar do AUR via ${helper}" \
-      "${helper} -S ${aur_pkgs[*]}  # AUR"
-    _ask "Instalar do AUR?" || { _warn "Cancelado."; return; }
-    _blank
+  _blank
+  _preview "Instalar pacote(s)" "${preview_cmds[@]}"
+  _ask "Instalar?" || { _warn "Cancelado."; return; }
+  _blank
+
+  # ── Execute ──────────────────────────────────────────────────────────────────
+  if [[ ${#to_install[@]} -gt 0 ]]; then
+    $upgrade && _run _pacman -Syu
+    $sync && ! $upgrade && _run _pacman -Syy
+    _run _pacman -S "${to_install[@]}"
+  fi
+
+  if [[ ${#aur_pkgs[@]} -gt 0 ]]; then
     _run "$helper" -S --noconfirm "${aur_pkgs[@]}"
   fi
 }

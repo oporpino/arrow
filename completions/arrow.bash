@@ -25,7 +25,7 @@ _arrow() {
     list ls history log
     orphans clean purge
     howto
-    self sharpen reforge
+    self sharpen reforge reinstall
     aur
     help version
   )
