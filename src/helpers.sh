@@ -49,16 +49,31 @@ _cmd() {
 #
 _preview() {
   local label="$1"; shift
+  local -a cmd_parts=() note_parts=()
+  local max_len=0
+
+  # First pass: split commands from annotations and find longest command.
+  for c in "$@"; do
+    local cmd_part="${c%%  #*}"
+    local note_part=""
+    [[ "$cmd_part" != "$c" ]] && note_part="${c#*  #}"
+    cmd_parts+=("$cmd_part")
+    note_parts+=("$note_part")
+    (( ${#cmd_part} > max_len )) && max_len=${#cmd_part}
+  done
+
   echo
   echo -e "  ${DIM}┌─${RESET} ${BOLD}${label}${RESET}"
-  for c in "$@"; do
-    # Split on "  #" to separate command from inline annotation.
-    local cmd_part="${c%%  #*}"
-    if [[ "$cmd_part" != "$c" ]]; then
-      local note_part="${c#*  #}"
-      echo -e "  ${DIM}│${RESET}  ${DIM_CYAN}\$${RESET}  ${WHITE}${cmd_part}${RESET}  ${DIM_WHITE}# ${note_part}${RESET}"
+  local i
+  for i in "${!cmd_parts[@]}"; do
+    local cmd="${cmd_parts[$i]}"
+    local note="${note_parts[$i]}"
+    local pad
+    pad=$(printf '%*s' $(( max_len - ${#cmd} )) '')
+    if [[ -n "$note" ]]; then
+      echo -e "  ${DIM}│${RESET}  ${DIM_CYAN}\$${RESET}  ${CYAN}${cmd}${RESET}${pad}  ${DIM_WHITE}# ${note}${RESET}"
     else
-      echo -e "  ${DIM}│${RESET}  ${DIM_CYAN}\$${RESET}  ${WHITE}${c}${RESET}"
+      echo -e "  ${DIM}│${RESET}  ${DIM_CYAN}\$${RESET}  ${CYAN}${cmd}${RESET}"
     fi
   done
   echo -e "  ${DIM}└────────────────────────────────────────${RESET}"
