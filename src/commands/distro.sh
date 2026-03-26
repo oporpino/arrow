@@ -207,6 +207,13 @@ _distro_morph_archcraft() {
   _blank
 
   # Step 4 — run as root
+  # Ensure pacman sandbox is disabled system-wide before running the Archcraft
+  # installer — it calls pacman directly and ARM kernels lack Landlock support.
+  if ! grep -q '^DisableSandbox' /etc/pacman.conf 2>/dev/null; then
+    _info "Disabling pacman sandbox in /etc/pacman.conf (ARM kernel, no Landlock)..."
+    _asroot sed -i '/^\[options\]/a DisableSandbox' /etc/pacman.conf
+  fi
+
   if (cd "$workdir" && _asroot bash install.sh); then
     rm -rf "$workdir"
     if [[ -n "$boot_backup" ]]; then
