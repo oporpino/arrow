@@ -92,6 +92,7 @@ complete -c arrow -f -n '__arrow_using_subcommand howto' -a user.add     -d 'Cre
 complete -c arrow -f -n '__arrow_using_subcommand howto' -a user.sudoers -d 'Add user to sudoers'
 complete -c arrow -f -n '__arrow_using_subcommand howto' -a user.remove  -d 'Remove user from system'
 complete -c arrow -f -n '__arrow_using_subcommand howto' -a user.passwd  -d 'Change user password'
+complete -c arrow -f -n '__arrow_using_subcommand howto' -a disk.resize -d 'Expand partition and filesystem'
 complete -c arrow -f -n '__arrow_using_subcommand howto' -a list         -d 'List available guides'
 
 # 'spell' / 'setup' categories

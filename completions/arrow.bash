@@ -43,7 +43,7 @@ _arrow() {
       return
       ;;
     howto)
-      COMPREPLY=($(compgen -W "user.add user.sudoers user.remove user.passwd list" -- "$cur"))
+      COMPREPLY=($(compgen -W "user.add user.sudoers user.remove user.passwd disk.resize list" -- "$cur"))
       return
       ;;
     distro)

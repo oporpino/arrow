@@ -62,7 +62,7 @@ _arrow() {
           _values 'option' '--all[wipe the entire package cache]'
           ;;
         howto)
-          _values 'guide' 'user.add[create new user]' 'user.sudoers[add user to sudoers]' 'user.remove[remove user from system]' 'user.passwd[change user password]' 'list[list available guides]'
+          _values 'guide' 'user.add[create new user]' 'user.sudoers[add user to sudoers]' 'user.remove[remove user from system]' 'user.passwd[change user password]' 'disk.resize[expand partition and filesystem]' 'list[list available guides]'
           ;;
         spell | setup)
           _values 'category' 'desktop[install a desktop environment]'
