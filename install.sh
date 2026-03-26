@@ -324,7 +324,11 @@ _verify() {
   fi
 
   _info "To enable tab completions in the current shell:"
-  echo -e "  ${DIM}source /etc/bash.bashrc${RESET}"
+  case "${SHELL:-}" in
+    */zsh)  echo -e "  ${DIM}autoload -Uz compinit && compinit${RESET}" ;;
+    */fish) echo -e "  ${DIM}(completions load automatically in fish)${RESET}" ;;
+    *)      echo -e "  ${DIM}source /etc/bash.bashrc${RESET}" ;;
+  esac
 }
 
 # ── Main ──────────────────────────────────────────────────────────────────────
