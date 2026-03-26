@@ -212,14 +212,14 @@ _distro_morph_archcraft() {
   _warn "  your_password  — password for the new user"
   _blank
   local _editor
-  for _editor in "${EDITOR:-}" nano vim vi; do
+  for _editor in "${EDITOR:-}" nvim vim nano vi; do
     [[ -n "$_editor" ]] && command -v "$_editor" &>/dev/null && break
     _editor=""
   done
   if [[ -z "$_editor" ]]; then
-    _warn "No editor found. Installing nano..."
-    _pkg -S nano || { _err "Could not install an editor."; return 1; }
-    _editor=nano
+    _warn "No editor found. Installing vim..."
+    _pkg -S vim || { _err "Could not install an editor."; return 1; }
+    _editor=vim
   fi
   "$_editor" "$workdir/customize.sh"
   _blank
