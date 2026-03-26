@@ -171,16 +171,25 @@ _howto_disk_resize() {
   read -r disk </dev/tty
   [[ -z "$disk" ]] && { _warn "Cancelled."; return; }
 
+  # Show free space so the user can pick a sensible end position.
+  _info "Free space on /dev/${disk}:"
+  if command -v parted &>/dev/null; then
+    _asroot parted /dev/"$disk" print free 2>/dev/null \
+      | grep -E 'Free Space|Number' || true
+  else
+    _warn "Install parted first to see free space (step 1 will do it)."
+  fi
+  _blank
+
   printf "  Partition number (e.g. 2): "
   local part_num
   read -r part_num </dev/tty
   [[ -z "$part_num" ]] && { _warn "Cancelled."; return; }
 
-  printf "  Use how much of the free space? (e.g. 50%%, default 100%%): "
-  local pct
-  read -r pct </dev/tty
-  pct="${pct:-100%}"
-  [[ "$pct" != *% ]] && pct="${pct}%"
+  printf "  New end position — e.g. 30G, 50G, or 100%% for all: "
+  local end_pos
+  read -r end_pos </dev/tty
+  end_pos="${end_pos:-100%}"
 
   local dev="/dev/${disk}${part_num}"
   local fstype
@@ -189,8 +198,8 @@ _howto_disk_resize() {
   _step 1 3 "Install parted"
   _cmd "arrow add parted"
 
-  _step 2 3 "Expand /dev/${disk} partition ${part_num} to ${pct}"
-  _cmd "parted /dev/${disk} resizepart ${part_num} ${pct}"
+  _step 2 3 "Expand /dev/${disk} partition ${part_num} to ${end_pos}"
+  _cmd "parted /dev/${disk} resizepart ${part_num} ${end_pos}"
 
   _step 3 3 "Resize the ${fstype:-filesystem} on ${dev}"
   case "${fstype}" in
@@ -199,7 +208,7 @@ _howto_disk_resize() {
   esac
 
   _blank
-  _warn "parted may ask: Fix/Ignore? → Fix  |  End? → ${pct}"
+  _warn "parted may ask: Fix/Ignore? → Fix  |  End? → ${end_pos}"
   _blank
   _ask "Run now?" || { _warn "Cancelled."; return; }
   _blank
@@ -212,7 +221,7 @@ _howto_disk_resize() {
   fi
 
   # Step 2 — expand partition
-  _run _asroot parted /dev/"$disk" resizepart "$part_num" "$pct" || return 1
+  _run _asroot parted /dev/"$disk" resizepart "$part_num" "$end_pos" || return 1
 
   # Step 3 — resize filesystem
   case "${fstype}" in
