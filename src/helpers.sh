@@ -245,8 +245,10 @@ _ensure_aur_helper() {
 }
 
 # Detect --disable-sandbox support once (needed on kernels without Landlock, e.g. ARM).
+# Use --help instead of --version: in pacman 7.x, --version triggers a sandbox check
+# which itself fails on kernels without Landlock, making detection unreliable.
 _PKG_SANDBOX=""
-pacman --disable-sandbox --version &>/dev/null && _PKG_SANDBOX="--disable-sandbox"
+pacman --help 2>/dev/null | grep -q -- '--disable-sandbox' && _PKG_SANDBOX="--disable-sandbox"
 
 # Cache the AUR helper at startup (empty string if none installed).
 # AUR helpers (yay, paru) are drop-in replacements for pacman and also handle

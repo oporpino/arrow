@@ -91,7 +91,7 @@ _offer_upgrade() {
   read -r ans </dev/tty
   if [[ "${ans,,}" == "y" ]]; then
     local _sandbox=""
-    pacman --disable-sandbox --version &>/dev/null && _sandbox="--disable-sandbox"
+    pacman --help 2>/dev/null | grep -q -- '--disable-sandbox' && _sandbox="--disable-sandbox"
     _info "Upgrading the system…"
     _asroot pacman -Syu --noconfirm ${_sandbox}
     echo
@@ -101,7 +101,7 @@ _offer_upgrade() {
 _check_deps() {
   # Kernels without Landlock support (e.g. ARM) need --disable-sandbox.
   local _sandbox=""
-  pacman --disable-sandbox --version &>/dev/null && _sandbox="--disable-sandbox"
+  pacman --help 2>/dev/null | grep -q -- '--disable-sandbox' && _sandbox="--disable-sandbox"
 
   local missing=()
   for dep in curl tar; do
