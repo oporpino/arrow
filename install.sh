@@ -85,17 +85,13 @@ _check_os() {
 
 _ensure_pacman_sandbox() {
   ! command -v pacman &>/dev/null && return 0
-  # Some kernels (e.g. Arch Linux ARM) lack Landlock support required by
-  # pacman's sandbox. Adding DisableSandbox to pacman.conf makes all pacman
-  # calls work — including those inside third-party installers.
-  if grep -q '^DisableSandbox' /etc/pacman.conf 2>/dev/null; then
-    return 0
-  fi
-  # Test if sandbox causes an error; if so, add DisableSandbox permanently.
-  if pacman -h 2>&1 | grep -q "Landlock\|sandbox user"; then
-    _warn "Kernel lacks Landlock support — disabling pacman sandbox in /etc/pacman.conf"
-    _asroot sed -i '/^\[options\]/a DisableSandbox' /etc/pacman.conf
-  fi
+  grep -q '^DisableSandbox' /etc/pacman.conf 2>/dev/null && return 0
+  # Use --disable-sandbox when probing: it suppresses the sandbox check before
+  # the command runs, so this works even on ARM kernels without Landlock.
+  # If the flag is recognized (-h exits 0), add DisableSandbox to pacman.conf
+  # so all subsequent pacman calls (including inside third-party installers) work.
+  pacman --disable-sandbox -h &>/dev/null || return 0
+  _asroot sed -i '/^\[options\]/a DisableSandbox' /etc/pacman.conf
 }
 
 _offer_upgrade() {
