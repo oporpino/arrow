@@ -83,15 +83,13 @@ _check_os() {
   fi
 }
 
-_ensure_pacman_sandbox() {
-  ! command -v pacman &>/dev/null && return 0
-  grep -q '^DisableSandbox' /etc/pacman.conf 2>/dev/null && return 0
-  grep -q '^\[options\]' /etc/pacman.conf 2>/dev/null || return 0
-  # Add DisableSandbox unconditionally: ARM kernels lack Landlock, and pacman 7.x
-  # requires it for sandboxing. On kernels with Landlock this is a no-op in effect.
-  # Older pacman versions ignore unknown pacman.conf options, so this is safe.
-  _asroot sed -i '/^\[options\]/a DisableSandbox' /etc/pacman.conf
-}
+# Detect --disable-sandbox once at startup.
+# pacman 7.x requires Landlock for sandboxing; ARM kernels often lack it.
+# Reading help text does not trigger the sandbox, so this detection is safe.
+_PACMAN_OPTS=""
+command -v pacman &>/dev/null \
+  && pacman -h 2>/dev/null | grep -q -- '--disable-sandbox' \
+  && _PACMAN_OPTS="--disable-sandbox"
 
 _offer_upgrade() {
   ! command -v pacman &>/dev/null && return 0
@@ -101,7 +99,8 @@ _offer_upgrade() {
   read -r ans </dev/tty
   if [[ "${ans,,}" == "y" ]]; then
     _info "Upgrading the system…"
-    _asroot pacman -Syu --noconfirm
+    # shellcheck disable=SC2086
+    _asroot pacman -Syu --noconfirm ${_PACMAN_OPTS}
     echo
   fi
 }
@@ -126,16 +125,20 @@ _check_deps() {
     if [[ ${#missing[@]} -gt 0 ]]; then
       _warn "Missing dependencies: ${missing[*]}"
       _info "Syncing package databases…"
-      _asroot pacman -Syy --noconfirm
+      # shellcheck disable=SC2086
+      _asroot pacman -Syy --noconfirm ${_PACMAN_OPTS}
       synced=true
-      _asroot pacman -S --noconfirm "${missing[@]}"
+      # shellcheck disable=SC2086
+      _asroot pacman -S --noconfirm ${_PACMAN_OPTS} "${missing[@]}"
     fi
 
     # Install bash-completion — optional, suppress noisy pacman output on failure.
     if $need_bash_comp; then
       _info "Installing bash-completion…"
-      $synced || _asroot pacman -Syy --noconfirm &>/dev/null
-      _asroot pacman -S --noconfirm bash-completion &>/dev/null \
+      # shellcheck disable=SC2086
+      $synced || _asroot pacman -Syy --noconfirm ${_PACMAN_OPTS} &>/dev/null
+      # shellcheck disable=SC2086
+      _asroot pacman -S --noconfirm ${_PACMAN_OPTS} bash-completion &>/dev/null \
         || _warn "bash-completion unavailable on this mirror — tab completion may not work until installed."
     fi
   elif [[ ${#missing[@]} -gt 0 ]]; then
@@ -282,7 +285,6 @@ main() {
   _sep
 
   _check_os
-  _ensure_pacman_sandbox
   _offer_upgrade
   _check_deps
   _download
