@@ -343,20 +343,8 @@ _verify() {
     echo -e "  ${DIM}export PATH=\"\$PATH:${PREFIX}/bin\"${RESET}"
   fi
 
-  # Show how to activate completions right now (without restarting the shell).
-  _info "To activate completions in this session:"
-  case "${SHELL:-}" in
-    */zsh)
-      local zshrc="${ZDOTDIR:-$HOME}/.zshrc"
-      echo -e "  ${DIM}source ${zshrc}${RESET}"
-      ;;
-    */fish)
-      _ok "Fish completions are already active."
-      ;;
-    *)
-      echo -e "  ${DIM}source /etc/bash.bashrc${RESET}"
-      ;;
-  esac
+  # Completions take effect in the next shell session (compinit caches at startup).
+  _info "Open a new terminal to activate tab completions."
 }
 
 # ── Main ──────────────────────────────────────────────────────────────────────

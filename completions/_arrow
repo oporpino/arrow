@@ -1,4 +1,4 @@
-#compdef arrow
+#compdef arrow arw
 # zsh completion for arrow(1)
 # Install to a directory listed in $fpath, e.g. /usr/share/zsh/site-functions/
 
