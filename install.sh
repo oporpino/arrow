@@ -250,7 +250,8 @@ _verify() {
     echo -e "  ${DIM}export PATH=\"\$PATH:${PREFIX}/bin\"${RESET}"
   fi
 
-  _info "Open a new terminal for tab completions to take effect."
+  _info "To enable tab completions in the current shell:"
+  echo -e "  ${DIM}source /etc/bash.bashrc${RESET}"
 }
 
 # ── Main ──────────────────────────────────────────────────────────────────────
