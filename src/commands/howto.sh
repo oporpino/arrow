@@ -162,34 +162,53 @@ _howto_passwd() {
 _howto_disk_resize() {
   _section "Resize a partition to use all available space"
 
-  _info "First, check your current layout:"
-  _cmd "lsblk"
+  _info "Current disk layout:"
+  lsblk
   _blank
-  _warn "Identify your disk (e.g. vda, sda) and partition number (e.g. 2 for vda2)."
-  _blank
+
+  printf "  Disk (e.g. vda, sda): "
+  local disk
+  read -r disk </dev/tty
+  [[ -z "$disk" ]] && { _warn "Cancelled."; return; }
+
+  printf "  Partition number (e.g. 2): "
+  local part_num
+  read -r part_num </dev/tty
+  [[ -z "$part_num" ]] && { _warn "Cancelled."; return; }
+
+  local dev="/dev/${disk}${part_num}"
+  local fstype
+  fstype=$(lsblk -no FSTYPE "$dev" 2>/dev/null)
 
   _step 1 3 "Install parted"
-  _cmd "arrow add parted"
+  _step 2 3 "Expand /dev/${disk} partition ${part_num} to 100%"
+  _step 3 3 "Resize the ${fstype:-filesystem} on ${dev}"
 
-  _step 2 3 "Expand the partition to fill the disk"
-  _cmd "parted /dev/vda resizepart 2 100%"
   _blank
-  _info "parted may ask to:"
-  _info "  Fix/Ignore?      → Fix   (fix the GPT table)"
-  _info "  Partition number → 2     (your partition number)"
-  _info "  End?             → 100%  (use all remaining space)"
+  _warn "parted may ask: Fix/Ignore? → answer Fix  |  End? → answer 100%"
+  _blank
+  _ask "Run now?" || { _warn "Cancelled."; return; }
   _blank
 
-  _step 3 3 "Resize the filesystem"
-  _cmd "resize2fs /dev/vda2    # ext4"
-  _cmd "btrfs filesystem resize max /    # btrfs"
-  _blank
+  # Step 1 — install parted if missing
+  if ! command -v parted &>/dev/null; then
+    _run _pkg -S parted || return 1
+  else
+    _ok "parted already installed."
+  fi
 
-  _info "Verify the result:"
-  _cmd "df -h /"
+  # Step 2 — expand partition
+  _run _asroot parted /dev/"$disk" resizepart "$part_num" 100% || return 1
+
+  # Step 3 — resize filesystem
+  case "${fstype}" in
+    btrfs) _run _asroot btrfs filesystem resize max / || return 1 ;;
+    *)     _run _asroot resize2fs "$dev"              || return 1 ;;
+  esac
+
   _blank
-  _warn "Replace vda/vda2 with your actual disk and partition."
-  _warn "A reboot is NOT required — the resize takes effect immediately."
+  _ok "Done. Verifying..."
+  df -h /
 }
 
 # ── Registry ──────────────────────────────────────────────────────────────────
