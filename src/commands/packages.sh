@@ -33,9 +33,27 @@ cmd_add() {
     fi
   done
 
-  [[ ${#already[@]}   -gt 0 ]] && _warn "Already installed: ${already[*]}"
-  [[ ${#aur_pkgs[@]}  -gt 0 ]] && _info "Found in AUR: ${BOLD}${aur_pkgs[*]}${RESET}"
-  [[ ${#not_found[@]} -gt 0 ]] && _err  "Not found: ${not_found[*]}"
+  [[ ${#already[@]}  -gt 0 ]] && _warn "Already installed: ${already[*]}"
+  [[ ${#aur_pkgs[@]} -gt 0 ]] && _info "Found in AUR: ${BOLD}${aur_pkgs[*]}${RESET}"
+
+  if [[ ${#not_found[@]} -gt 0 ]]; then
+    _err "Not found: ${not_found[*]}"
+    # Check if the database might just be stale (no entries at all).
+    local db_count
+    db_count=$(pacman -Sl 2>/dev/null | wc -l)
+    if [[ "$db_count" -lt 100 ]]; then
+      _warn "Package database appears empty or stale."
+      _info "Run ${BOLD}arrow update${RESET} to refresh it, then try again."
+    else
+      # Suggest close matches from the repos.
+      local pkg
+      for pkg in "${not_found[@]}"; do
+        local matches
+        matches=$(pacman -Ssq "^${pkg}" 2>/dev/null | head -3 | tr '\n' ' ')
+        [[ -n "$matches" ]] && _info "Did you mean: ${BOLD}${matches}${RESET}"
+      done
+    fi
+  fi
 
   if [[ ${#to_install[@]} -eq 0 && ${#aur_pkgs[@]} -eq 0 ]]; then
     [[ ${#not_found[@]} -gt 0 ]] && return 1
