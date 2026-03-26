@@ -83,6 +83,21 @@ _check_os() {
   fi
 }
 
+_offer_upgrade() {
+  ! command -v pacman &>/dev/null && return 0
+  echo
+  printf "  Sync and upgrade the system before installing? [y/N] "
+  local ans
+  read -r ans </dev/tty
+  if [[ "${ans,,}" == "y" ]]; then
+    local _sandbox=""
+    pacman --disable-sandbox --version &>/dev/null && _sandbox="--disable-sandbox"
+    _info "Upgrading the system…"
+    _asroot pacman -Syu --noconfirm ${_sandbox}
+    echo
+  fi
+}
+
 _check_deps() {
   # Kernels without Landlock support (e.g. ARM) need --disable-sandbox.
   local _sandbox=""
@@ -263,6 +278,7 @@ main() {
   _sep
 
   _check_os
+  _offer_upgrade
   _check_deps
   _download
   _build
