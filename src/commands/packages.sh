@@ -45,11 +45,11 @@ cmd_add() {
       _warn "Package database appears empty or stale."
       _info "Run ${BOLD}arrow update${RESET} to refresh it, then try again."
     else
-      # Suggest close matches from the repos.
+      # Suggest close matches by package name only.
       local pkg
       for pkg in "${not_found[@]}"; do
         local matches
-        matches=$(pacman -Ssq "^${pkg}" 2>/dev/null | head -3 | tr '\n' ' ')
+        matches=$(pacman -Slq 2>/dev/null | grep -i "^${pkg}" | head -3 | tr '\n' ' ')
         [[ -n "$matches" ]] && _info "Did you mean: ${BOLD}${matches}${RESET}"
       done
     fi
