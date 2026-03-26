@@ -211,7 +211,17 @@ _distro_morph_archcraft() {
   _warn "  your_username  — new user (do not use 'alarm')"
   _warn "  your_password  — password for the new user"
   _blank
-  "${EDITOR:-nano}" "$workdir/customize.sh"
+  local _editor
+  for _editor in "${EDITOR:-}" nano vim vi; do
+    [[ -n "$_editor" ]] && command -v "$_editor" &>/dev/null && break
+    _editor=""
+  done
+  if [[ -z "$_editor" ]]; then
+    _warn "No editor found. Installing nano..."
+    _pkg -S nano || { _err "Could not install an editor."; return 1; }
+    _editor=nano
+  fi
+  "$_editor" "$workdir/customize.sh"
   _blank
 
   _ask "Configuration looks good? Start the morph?" "${RED}${BOLD}" \
