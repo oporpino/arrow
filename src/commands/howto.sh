@@ -176,16 +176,30 @@ _howto_disk_resize() {
   read -r part_num </dev/tty
   [[ -z "$part_num" ]] && { _warn "Cancelled."; return; }
 
+  printf "  Use how much of the free space? (e.g. 50%%, default 100%%): "
+  local pct
+  read -r pct </dev/tty
+  pct="${pct:-100%}"
+  [[ "$pct" != *% ]] && pct="${pct}%"
+
   local dev="/dev/${disk}${part_num}"
   local fstype
   fstype=$(lsblk -no FSTYPE "$dev" 2>/dev/null)
 
   _step 1 3 "Install parted"
-  _step 2 3 "Expand /dev/${disk} partition ${part_num} to 100%"
+  _cmd "arrow add parted"
+
+  _step 2 3 "Expand /dev/${disk} partition ${part_num} to ${pct}"
+  _cmd "parted /dev/${disk} resizepart ${part_num} ${pct}"
+
   _step 3 3 "Resize the ${fstype:-filesystem} on ${dev}"
+  case "${fstype}" in
+    btrfs) _cmd "btrfs filesystem resize max /" ;;
+    *)     _cmd "resize2fs ${dev}" ;;
+  esac
 
   _blank
-  _warn "parted may ask: Fix/Ignore? → answer Fix  |  End? → answer 100%"
+  _warn "parted may ask: Fix/Ignore? → Fix  |  End? → ${pct}"
   _blank
   _ask "Run now?" || { _warn "Cancelled."; return; }
   _blank
@@ -198,7 +212,7 @@ _howto_disk_resize() {
   fi
 
   # Step 2 — expand partition
-  _run _asroot parted /dev/"$disk" resizepart "$part_num" 100% || return 1
+  _run _asroot parted /dev/"$disk" resizepart "$part_num" "$pct" || return 1
 
   # Step 3 — resize filesystem
   case "${fstype}" in
