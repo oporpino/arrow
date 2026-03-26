@@ -159,6 +159,79 @@ _howto_passwd() {
 # arrow howto disk.resize
 # Expand a partition and its filesystem to use all available disk space.
 # Typical use case: after resizing a virtual disk in UTM, VirtualBox, etc.
+# Resize one partition, then optionally expand another with freed space.
+# Usage: _resize_one <disk> <part_num> <end_pos>
+_resize_one() {
+  local disk="$1" part_num="$2" end_pos="$3"
+  local dev="/dev/${disk}${part_num}"
+  local fstype mount_point
+  fstype=$(lsblk -no FSTYPE "$dev" 2>/dev/null | head -1)
+  mount_point=$(lsblk -no MOUNTPOINT "$dev" 2>/dev/null | head -1)
+
+  local steps=3
+  _step 1 "$steps" "Install parted"
+  _cmd "arrow add parted"
+  _step 2 "$steps" "Resize /dev/${disk} partition ${part_num} to ${end_pos}"
+  _cmd "parted /dev/${disk} resizepart ${part_num} ${end_pos}"
+  _step 3 "$steps" "Resize the ${fstype:-filesystem} on ${dev}"
+  case "${fstype}" in
+    btrfs) _cmd "btrfs filesystem resize max ${mount_point:-/}" ;;
+    *)     _cmd "resize2fs ${dev}" ;;
+  esac
+
+  _blank
+  _warn "parted may ask: Fix/Ignore? → Fix  |  End? → ${end_pos}"
+  _blank
+  _ask "Run now?" || { _warn "Cancelled."; return 1; }
+  _blank
+
+  if ! command -v parted &>/dev/null; then
+    _run _pkg -S parted || return 1
+  else
+    _ok "parted already installed."
+  fi
+
+  _run _asroot parted /dev/"$disk" resizepart "$part_num" "$end_pos" || return 1
+
+  case "${fstype}" in
+    btrfs) _run _asroot btrfs filesystem resize max "${mount_point:-/}" || return 1 ;;
+    *)     _run _asroot resize2fs "$dev"                                 || return 1 ;;
+  esac
+}
+
+# Prompt for disk, partition, free-space display, and end position.
+# Prints: disk part_num end_pos (for eval / read)
+_resize_prompt() {
+  local disk="$1"
+
+  printf "  Partition number (e.g. 2): "
+  local part_num
+  read -r part_num </dev/tty
+  [[ -z "$part_num" ]] && return 1
+
+  _info "Free space on /dev/${disk}:"
+  if command -v parted &>/dev/null; then
+    _asroot parted /dev/"$disk" unit GB print free 2>/dev/null \
+      | awk '/Free Space/ {printf "    %s → %s  (%s free)\n", $1, $2, $3}'
+  else
+    _warn "parted not installed — step 1 will install it."
+  fi
+  local disk_size
+  disk_size=$(lsblk -no SIZE "/dev/${disk}" 2>/dev/null | head -1)
+  _blank
+  _warn "Enter the absolute END position (e.g. 30G, 60G — not a percentage)."
+  _warn "This is WHERE the partition ends on disk, not how much to add."
+  [[ -n "$disk_size" ]] && _info "Total disk size: ${disk_size}"
+  _blank
+
+  printf "  New end position (e.g. 30G, 60G): "
+  local end_pos
+  read -r end_pos </dev/tty
+  [[ -z "$end_pos" ]] && return 1
+
+  echo "$part_num $end_pos"
+}
+
 _howto_disk_resize() {
   _section "Resize a partition to use all available space"
 
@@ -170,74 +243,37 @@ _howto_disk_resize() {
   local disk
   read -r disk </dev/tty
   [[ -z "$disk" ]] && { _warn "Cancelled."; return; }
-
-  printf "  Partition number (e.g. 2): "
-  local part_num
-  read -r part_num </dev/tty
-  [[ -z "$part_num" ]] && { _warn "Cancelled."; return; }
-
-  # Show free space as absolute positions so the user can type a concrete value.
-  _info "Free space on /dev/${disk}:"
-  if command -v parted &>/dev/null; then
-    _asroot parted /dev/"$disk" unit GB print free 2>/dev/null \
-      | awk '/Free Space/ {printf "    %s → %s  (%s free)\n", $1, $2, $3}'
-  else
-    _warn "parted not installed — step 1 will install it."
-  fi
-  local disk_size
-  disk_size=$(lsblk -no SIZE "/dev/${disk}" 2>/dev/null | head -1)
-  _blank
-  _warn "Enter the absolute END position for the partition (e.g. 30G, 60G)."
-  _warn "This is WHERE the partition ends on disk — not how much to add."
-  [[ -n "$disk_size" ]] && _info "Total disk size: ${disk_size}"
   _blank
 
-  printf "  New end position (e.g. 30G, 60G): "
-  local end_pos
-  read -r end_pos </dev/tty
-  [[ -z "$end_pos" ]] && { _warn "Cancelled."; return; }
+  local answer
+  answer=$(_resize_prompt "$disk") || { _warn "Cancelled."; return; }
+  local part_num end_pos
+  read -r part_num end_pos <<< "$answer"
 
-  local dev="/dev/${disk}${part_num}"
-  local fstype
-  fstype=$(lsblk -no FSTYPE "$dev" 2>/dev/null)
-
-  _step 1 3 "Install parted"
-  _cmd "arrow add parted"
-
-  _step 2 3 "Expand /dev/${disk} partition ${part_num} to ${end_pos}"
-  _cmd "parted /dev/${disk} resizepart ${part_num} ${end_pos}"
-
-  _step 3 3 "Resize the ${fstype:-filesystem} on ${dev}"
-  case "${fstype}" in
-    btrfs) _cmd "btrfs filesystem resize max /" ;;
-    *)     _cmd "resize2fs ${dev}" ;;
-  esac
-
-  _blank
-  _warn "parted may ask: Fix/Ignore? → Fix  |  End? → ${end_pos}"
-  _blank
-  _ask "Run now?" || { _warn "Cancelled."; return; }
-  _blank
-
-  # Step 1 — install parted if missing
-  if ! command -v parted &>/dev/null; then
-    _run _pkg -S parted || return 1
-  else
-    _ok "parted already installed."
-  fi
-
-  # Step 2 — expand partition
-  _run _asroot parted /dev/"$disk" resizepart "$part_num" "$end_pos" || return 1
-
-  # Step 3 — resize filesystem
-  case "${fstype}" in
-    btrfs) _run _asroot btrfs filesystem resize max / || return 1 ;;
-    *)     _run _asroot resize2fs "$dev"              || return 1 ;;
-  esac
+  _resize_one "$disk" "$part_num" "$end_pos" || return 1
 
   _blank
   _ok "Done. Verifying..."
-  df -h /
+  df -h
+  _blank
+
+  # Offer to expand another partition with any freed space.
+  _info "Updated disk layout:"
+  lsblk
+  _blank
+  _ask "Expand another partition with the freed space?" || return 0
+  _blank
+
+  local answer2
+  answer2=$(_resize_prompt "$disk") || { _warn "Cancelled."; return; }
+  local part2 end2
+  read -r part2 end2 <<< "$answer2"
+
+  _resize_one "$disk" "$part2" "$end2" || return 1
+
+  _blank
+  _ok "All done. Verifying..."
+  df -h
 }
 
 # ── Registry ──────────────────────────────────────────────────────────────────
