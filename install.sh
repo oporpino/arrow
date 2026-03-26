@@ -83,6 +83,21 @@ _check_os() {
   fi
 }
 
+_ensure_pacman_sandbox() {
+  ! command -v pacman &>/dev/null && return 0
+  # Some kernels (e.g. Arch Linux ARM) lack Landlock support required by
+  # pacman's sandbox. Adding DisableSandbox to pacman.conf makes all pacman
+  # calls work — including those inside third-party installers.
+  if grep -q '^DisableSandbox' /etc/pacman.conf 2>/dev/null; then
+    return 0
+  fi
+  # Test if sandbox causes an error; if so, add DisableSandbox permanently.
+  if pacman -h 2>&1 | grep -q "Landlock\|sandbox user"; then
+    _warn "Kernel lacks Landlock support — disabling pacman sandbox in /etc/pacman.conf"
+    _asroot sed -i '/^\[options\]/a DisableSandbox' /etc/pacman.conf
+  fi
+}
+
 _offer_upgrade() {
   ! command -v pacman &>/dev/null && return 0
   echo
@@ -90,19 +105,13 @@ _offer_upgrade() {
   local ans
   read -r ans </dev/tty
   if [[ "${ans,,}" == "y" ]]; then
-    local _sandbox=""
-    pacman --help 2>/dev/null | grep -q -- '--disable-sandbox' && _sandbox="--disable-sandbox"
     _info "Upgrading the system…"
-    _asroot pacman -Syu --noconfirm ${_sandbox}
+    _asroot pacman -Syu --noconfirm
     echo
   fi
 }
 
 _check_deps() {
-  # Kernels without Landlock support (e.g. ARM) need --disable-sandbox.
-  local _sandbox=""
-  pacman --help 2>/dev/null | grep -q -- '--disable-sandbox' && _sandbox="--disable-sandbox"
-
   local missing=()
   for dep in curl tar; do
     command -v "$dep" &>/dev/null || missing+=("$dep")
@@ -122,16 +131,16 @@ _check_deps() {
     if [[ ${#missing[@]} -gt 0 ]]; then
       _warn "Missing dependencies: ${missing[*]}"
       _info "Syncing package databases…"
-      _asroot pacman -Syy --noconfirm ${_sandbox}
+      _asroot pacman -Syy --noconfirm
       synced=true
-      _asroot pacman -S --noconfirm ${_sandbox} "${missing[@]}"
+      _asroot pacman -S --noconfirm "${missing[@]}"
     fi
 
     # Install bash-completion — optional, suppress noisy pacman output on failure.
     if $need_bash_comp; then
       _info "Installing bash-completion…"
-      $synced || _asroot pacman -Syy --noconfirm ${_sandbox} &>/dev/null
-      _asroot pacman -S --noconfirm ${_sandbox} bash-completion &>/dev/null \
+      $synced || _asroot pacman -Syy --noconfirm &>/dev/null
+      _asroot pacman -S --noconfirm bash-completion &>/dev/null \
         || _warn "bash-completion unavailable on this mirror — tab completion may not work until installed."
     fi
   elif [[ ${#missing[@]} -gt 0 ]]; then
@@ -278,6 +287,7 @@ main() {
   _sep
 
   _check_os
+  _ensure_pacman_sandbox
   _offer_upgrade
   _check_deps
   _download
