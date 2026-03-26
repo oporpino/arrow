@@ -199,6 +199,35 @@ _howto_disk_resize() {
   _asroot parted /dev/"$disk" unit GB print free 2>/dev/null
   _blank
 
+  # Find which partitions have free space immediately after them.
+  local parted_free
+  parted_free=$(_asroot parted /dev/"$disk" unit GB print free 2>/dev/null)
+
+  _info "Partitions that can be expanded directly:"
+  local expandable=""
+  while IFS= read -r line; do
+    [[ "$line" != *"Free Space"* ]] && continue
+    local fs_start fs_size
+    fs_start=$(awk '{v=$1; gsub(/GB/,"",v); print v+0}' <<< "$line")
+    fs_size=$(awk '{v=$3; gsub(/GB/,"",v); print v+0}' <<< "$line")
+    [[ "$fs_size" == "0" || "$fs_size" == "0.0" ]] && continue
+    # Find the partition whose end matches this free space start.
+    local prev_num
+    prev_num=$(awk -v start="$fs_start" '
+      /^[0-9]/ {
+        e=$3; gsub(/GB/,"",e)
+        if (e+0 >= start-0.2 && e+0 <= start+0.2) print $1
+      }' <<< "$parted_free")
+    if [[ -n "$prev_num" ]]; then
+      local pm
+      pm=$(lsblk -no MOUNTPOINT "/dev/${disk}${prev_num}" 2>/dev/null | head -1)
+      echo -e "    ${CYAN}${prev_num}${RESET}  /dev/${disk}${prev_num} ${pm:+(${pm})}  — ${fs_size}GB free available"
+      expandable="${expandable} ${prev_num}"
+    fi
+  done <<< "$parted_free"
+  [[ -z "$expandable" ]] && _warn "No partitions can be expanded (disk is full)."
+  _blank
+
   # ── Destination partition (always required) ────────────────────────────────
 
   printf "  Expand which partition? (e.g. 6): "
@@ -215,16 +244,21 @@ _howto_disk_resize() {
 
   # Detect free space adjacent to destination partition.
   local free_gb
-  free_gb=$(_asroot parted /dev/"$disk" unit GB print free 2>/dev/null \
-    | awk -v end="$dst_end" '/Free Space/ {
-        s=$1; gsub(/GB/,"",s); e=$2; gsub(/GB/,"",e)
-        if (s+0 >= end-0.2 && s+0 <= end+0.2) { printf "%.1f", e-s; exit }
-      }')
+  free_gb=$(awk -v end="$dst_end" '/Free Space/ {
+      s=$1; gsub(/GB/,"",s); e=$2; gsub(/GB/,"",e)
+      if (s+0 >= end-0.2 && s+0 <= end+0.2) { printf "%.1f", e-s; exit }
+    }' <<< "$parted_free")
 
   if [[ -n "$free_gb" && "$free_gb" != "0.0" ]]; then
     _info "Free space adjacent to partition ${dst_num}: ${free_gb}GB"
+    _blank
   else
-    _info "No free space directly adjacent to partition ${dst_num}."
+    _warn "No free space directly adjacent to partition ${dst_num}."
+    _warn "To expand it, the partition right after it must be moved."
+    _warn "arrow does not automate partition moves — use gparted."
+    _blank
+    _info "Expandable partitions (adjacent to free space):${expandable}"
+    return 1
   fi
   _blank
 
