@@ -265,6 +265,55 @@ _fix_path() {
   fi
 }
 
+_setup_sudo() {
+  # Only relevant when running as root with pacman available.
+  [[ $EUID -ne 0 ]] && return 0
+  ! command -v pacman &>/dev/null && return 0
+
+  # Install sudo if missing.
+  if ! command -v sudo &>/dev/null; then
+    echo
+    printf "  Install sudo so normal users can run arrow commands? [y/N] "
+    local ans
+    read -r ans </dev/tty
+    [[ "${ans,,}" != "y" ]] && return 0
+    # shellcheck disable=SC2086
+    _asroot pacman -S --noconfirm ${_PACMAN_OPTS} sudo \
+      || { _warn "sudo install failed — skipping."; return 0; }
+    _ok "sudo installed."
+  fi
+
+  # Ask which user should get sudo access.
+  local non_root_users
+  non_root_users=$(awk -F: '$3 >= 1000 && $3 < 65534 {print $1}' /etc/passwd 2>/dev/null)
+  [[ -z "$non_root_users" ]] && return 0
+
+  echo
+  _info "Grant sudo access to a user (arrow commands require it):"
+  local i=1
+  local user_array=()
+  while IFS= read -r u; do
+    printf "    %s  %s\n" "${i}" "${u}"
+    user_array+=("$u")
+    (( i++ ))
+  done <<< "$non_root_users"
+  printf "    s  Skip\n"
+  printf "\n  User [1]: "
+  local choice
+  read -r choice </dev/tty
+  [[ "${choice,,}" == "s" || -z "$choice" && ${#user_array[@]} -eq 0 ]] && return 0
+  local idx=$(( ${choice:-1} - 1 ))
+  local target="${user_array[$idx]:-}"
+  [[ -z "$target" ]] && { _warn "Invalid choice — skipping."; return 0; }
+
+  # Add to wheel group and enable wheel in sudoers.
+  _asroot usermod -aG wheel "$target"
+  if ! grep -q '^%wheel ALL=(ALL:ALL) ALL' /etc/sudoers 2>/dev/null; then
+    _asroot sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
+  fi
+  _ok "${target} can now use sudo."
+}
+
 _verify() {
   if command -v arrow &>/dev/null && arrow version &>/dev/null 2>&1; then
     _ok "$(arrow version) is ready."
@@ -292,6 +341,7 @@ main() {
   _download
   _build
   _install
+  _setup_sudo
   _verify
 
   _sep

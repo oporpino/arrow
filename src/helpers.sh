@@ -159,8 +159,11 @@ _asroot() {
   elif command -v doas &>/dev/null; then
     doas "$@"
   else
-    _die "Root privileges required but sudo/doas are not installed." \
-         "Install sudo: pacman -S sudo   or run as root."
+    _err "Root privileges required but sudo/doas are not installed."
+    _info "Install sudo and grant access:"
+    _cmd "su -c 'pacman -S sudo'"
+    _cmd "su -c 'arrow howto user.sudoers ${USER}'"
+    exit 1
   fi
 }
 
