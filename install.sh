@@ -314,6 +314,26 @@ _setup_sudo() {
   _ok "${target} can now use sudo."
 }
 
+# Configures the current shell's RC file to load tab completions on startup.
+# - zsh:  adds "autoload -Uz compinit && compinit" to .zshrc if missing
+# - bash: completions are auto-loaded from /usr/share/bash-completion/ — nothing to add
+# - fish: vendor_completions.d is sourced automatically — nothing to add
+_setup_completions() {
+  case "${SHELL:-}" in
+    */zsh)
+      local zshrc="${ZDOTDIR:-$HOME}/.zshrc"
+      if ! grep -q 'compinit' "$zshrc" 2>/dev/null; then
+        {
+          echo ""
+          echo "# Added by arrow installer — enable tab completions"
+          echo "autoload -Uz compinit && compinit"
+        } >> "$zshrc"
+        _ok "Tab completions configured in ${zshrc}"
+      fi
+      ;;
+  esac
+}
+
 _verify() {
   if command -v arrow &>/dev/null && arrow version &>/dev/null 2>&1; then
     _ok "$(arrow version) is ready."
@@ -323,11 +343,19 @@ _verify() {
     echo -e "  ${DIM}export PATH=\"\$PATH:${PREFIX}/bin\"${RESET}"
   fi
 
-  _info "To enable tab completions in the current shell:"
+  # Show how to activate completions right now (without restarting the shell).
+  _info "To activate completions in this session:"
   case "${SHELL:-}" in
-    */zsh)  echo -e "  ${DIM}autoload -Uz compinit && compinit${RESET}" ;;
-    */fish) echo -e "  ${DIM}(completions load automatically in fish)${RESET}" ;;
-    *)      echo -e "  ${DIM}source /etc/bash.bashrc${RESET}" ;;
+    */zsh)
+      local zshrc="${ZDOTDIR:-$HOME}/.zshrc"
+      echo -e "  ${DIM}source ${zshrc}${RESET}"
+      ;;
+    */fish)
+      _ok "Fish completions are already active."
+      ;;
+    *)
+      echo -e "  ${DIM}source /etc/bash.bashrc${RESET}"
+      ;;
   esac
 }
 
@@ -345,6 +373,7 @@ main() {
   _download
   _build
   _install
+  _setup_completions
   _setup_sudo
   _verify
 
