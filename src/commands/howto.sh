@@ -199,15 +199,17 @@ _resize_one() {
   esac
 }
 
-# Prompt for disk, partition, free-space display, and end position.
-# Prints: disk part_num end_pos (for eval / read)
+# Prompt for partition number and new end position.
+# Writes results into the caller's variables via nameref (no subshell).
+# Usage: _resize_prompt <disk> <var_part_num> <var_end_pos>
 _resize_prompt() {
   local disk="$1"
+  local -n _rp_part="$2"
+  local -n _rp_end="$3"
 
   printf "  Partition number (e.g. 2): "
-  local part_num
-  read -r part_num </dev/tty
-  [[ -z "$part_num" ]] && return 1
+  read -r _rp_part </dev/tty
+  [[ -z "$_rp_part" ]] && return 1
 
   _info "Free space on /dev/${disk}:"
   if command -v parted &>/dev/null; then
@@ -225,11 +227,8 @@ _resize_prompt() {
   _blank
 
   printf "  New end position (e.g. 30G, 60G): "
-  local end_pos
-  read -r end_pos </dev/tty
-  [[ -z "$end_pos" ]] && return 1
-
-  echo "$part_num $end_pos"
+  read -r _rp_end </dev/tty
+  [[ -z "$_rp_end" ]] && return 1
 }
 
 _howto_disk_resize() {
@@ -245,10 +244,8 @@ _howto_disk_resize() {
   [[ -z "$disk" ]] && { _warn "Cancelled."; return; }
   _blank
 
-  local answer
-  answer=$(_resize_prompt "$disk") || { _warn "Cancelled."; return; }
   local part_num end_pos
-  read -r part_num end_pos <<< "$answer"
+  _resize_prompt "$disk" part_num end_pos || { _warn "Cancelled."; return; }
 
   _resize_one "$disk" "$part_num" "$end_pos" || return 1
 
@@ -264,10 +261,8 @@ _howto_disk_resize() {
   _ask "Expand another partition with the freed space?" || return 0
   _blank
 
-  local answer2
-  answer2=$(_resize_prompt "$disk") || { _warn "Cancelled."; return; }
   local part2 end2
-  read -r part2 end2 <<< "$answer2"
+  _resize_prompt "$disk" part2 end2 || { _warn "Cancelled."; return; }
 
   _resize_one "$disk" "$part2" "$end2" || return 1
 
