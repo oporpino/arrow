@@ -85,10 +85,12 @@ _check_os() {
 
 # Detect --disable-sandbox once at startup.
 # pacman 7.x requires Landlock for sandboxing; ARM kernels often lack it.
-# Reading help text does not trigger the sandbox, so this detection is safe.
+# Query (-Qq) does not trigger the sandbox, so this probe is safe on ARM.
+# If --disable-sandbox is an unrecognized flag, pacman exits non-zero and
+# we leave _PACMAN_OPTS empty (older pacman doesn't need it anyway).
 _PACMAN_OPTS=""
 command -v pacman &>/dev/null \
-  && pacman -h 2>/dev/null | grep -q -- '--disable-sandbox' \
+  && pacman --disable-sandbox -Qq pacman &>/dev/null \
   && _PACMAN_OPTS="--disable-sandbox"
 
 _offer_upgrade() {
