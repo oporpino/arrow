@@ -176,7 +176,7 @@ _disk_fs_info() {
 }
 
 _howto_disk_resize() {
-  _section "Move space from one partition to another"
+  _section "Expand a partition"
 
   # Ensure parted is installed before showing any layout.
   if ! command -v parted &>/dev/null; then
@@ -199,56 +199,101 @@ _howto_disk_resize() {
   _asroot parted /dev/"$disk" unit GB print free 2>/dev/null
   _blank
 
-  printf "  Take space FROM partition (e.g. 6): "
-  local src_num
-  read -r src_num </dev/tty
-  [[ -z "$src_num" ]] && { _warn "Cancelled."; return; }
+  # ── Destination partition (always required) ────────────────────────────────
 
-  printf "  How much to take? (e.g. 10G): "
-  local amount
-  read -r amount </dev/tty
-  [[ -z "$amount" ]] && { _warn "Cancelled."; return; }
-
-  printf "  Give space TO partition (e.g. 5): "
+  printf "  Expand which partition? (e.g. 6): "
   local dst_num
   read -r dst_num </dev/tty
   [[ -z "$dst_num" ]] && { _warn "Cancelled."; return; }
 
-  # Strip unit suffix to get a plain number for arithmetic.
-  local amount_gb="${amount//[GgBb]/}"
-
-  local src_dev="/dev/${disk}${src_num}"
   local dst_dev="/dev/${disk}${dst_num}"
-
-  local src_fs src_mount dst_fs dst_mount
-  _disk_fs_info "$src_dev" src_fs src_mount
+  local dst_fs dst_mount
   _disk_fs_info "$dst_dev" dst_fs dst_mount
 
-  # Calculate new partition end positions.
-  local src_end dst_end
-  _disk_part_end "$disk" "$src_num" src_end
+  local dst_end
   _disk_part_end "$disk" "$dst_num" dst_end
 
-  local src_new_end dst_new_end
-  src_new_end=$(awk -v e="$src_end" -v a="$amount_gb" 'BEGIN{printf "%.1fGB", e-a}')
-  dst_new_end=$(awk -v e="$dst_end" -v a="$amount_gb" 'BEGIN{printf "%.1fGB", e+a}')
+  # Detect free space adjacent to destination partition.
+  local free_gb
+  free_gb=$(_asroot parted /dev/"$disk" unit GB print free 2>/dev/null \
+    | awk -v end="$dst_end" '/Free Space/ {
+        s=$1; gsub(/GB/,"",s); e=$2; gsub(/GB/,"",e)
+        if (s+0 >= end-0.2 && s+0 <= end+0.2) { printf "%.1f", e-s; exit }
+      }')
+
+  if [[ -n "$free_gb" && "$free_gb" != "0.0" ]]; then
+    _info "Free space adjacent to partition ${dst_num}: ${free_gb}GB"
+  else
+    _info "No free space directly adjacent to partition ${dst_num}."
+  fi
+  _blank
+
+  # ── Optional: take space from another partition first ─────────────────────
+
+  local src_num="" amount_gb=""
+  if _ask "Take space from another partition first?"; then
+    _blank
+    printf "  Shrink which partition? (e.g. 5): "
+    read -r src_num </dev/tty
+    [[ -z "$src_num" ]] && { _warn "Cancelled."; return; }
+
+    printf "  How much to take? (e.g. 10G): "
+    local amount
+    read -r amount </dev/tty
+    [[ -z "$amount" ]] && { _warn "Cancelled."; return; }
+    amount_gb="${amount//[GgBb]/}"
+  fi
+  _blank
+
+  # ── Amount to add to destination ───────────────────────────────────────────
+
+  local total_add_gb
+  if [[ -n "$amount_gb" && -n "$free_gb" ]]; then
+    total_add_gb=$(awk -v a="$amount_gb" -v f="$free_gb" 'BEGIN{printf "%.1f", a+f}')
+  elif [[ -n "$amount_gb" ]]; then
+    total_add_gb="$amount_gb"
+  elif [[ -n "$free_gb" ]]; then
+    total_add_gb="$free_gb"
+  else
+    _err "No space available to expand partition ${dst_num}."
+    return 1
+  fi
+
+  local dst_new_end
+  dst_new_end=$(awk -v e="$dst_end" -v a="$total_add_gb" 'BEGIN{printf "%.1fGB", e+a}')
 
   # ── Show plan ──────────────────────────────────────────────────────────────
-  # Shrink source first (filesystem before partition), then expand destination.
 
-  _step 1 4 "Shrink ${src_fs:-filesystem} on ${src_dev} by ${amount}"
-  case "${src_fs}" in
-    btrfs) _cmd "btrfs filesystem resize -${amount} ${src_mount}" ;;
-    *)     _cmd "resize2fs ${src_dev} $(awk -v e="$src_end" -v a="$amount_gb" 'BEGIN{printf "%dG", int(e-a)}')" ;;
-  esac
+  local total_steps=2
+  [[ -n "$src_num" ]] && total_steps=4
+  local step=0
 
-  _step 2 4 "Shrink partition ${src_num} to ${src_new_end}"
-  _cmd "parted /dev/${disk} resizepart ${src_num} ${src_new_end}"
+  if [[ -n "$src_num" ]]; then
+    local src_dev="/dev/${disk}${src_num}"
+    local src_fs src_mount
+    _disk_fs_info "$src_dev" src_fs src_mount
+    local src_end src_new_end
+    _disk_part_end "$disk" "$src_num" src_end
+    src_new_end=$(awk -v e="$src_end" -v a="$amount_gb" 'BEGIN{printf "%.1fGB", e-a}')
 
-  _step 3 4 "Expand partition ${dst_num} to ${dst_new_end}"
+    (( step++ ))
+    _step "$step" "$total_steps" "Shrink ${src_fs:-filesystem} on ${src_dev} by ${amount_gb}G"
+    case "${src_fs}" in
+      btrfs) _cmd "btrfs filesystem resize -${amount_gb}G ${src_mount}" ;;
+      *)     _cmd "resize2fs ${src_dev} $(awk -v e="$src_end" -v a="$amount_gb" 'BEGIN{printf "%dG", int(e-a)}')" ;;
+    esac
+
+    (( step++ ))
+    _step "$step" "$total_steps" "Shrink partition ${src_num} to ${src_new_end}"
+    _cmd "parted /dev/${disk} resizepart ${src_num} ${src_new_end}"
+  fi
+
+  (( step++ ))
+  _step "$step" "$total_steps" "Expand partition ${dst_num} to ${dst_new_end} (+${total_add_gb}GB)"
   _cmd "parted /dev/${disk} resizepart ${dst_num} ${dst_new_end}"
 
-  _step 4 4 "Expand ${dst_fs:-filesystem} on ${dst_dev}"
+  (( step++ ))
+  _step "$step" "$total_steps" "Expand ${dst_fs:-filesystem} on ${dst_dev}"
   case "${dst_fs}" in
     btrfs) _cmd "btrfs filesystem resize max ${dst_mount:-/}" ;;
     *)     _cmd "resize2fs ${dst_dev}" ;;
@@ -263,25 +308,30 @@ _howto_disk_resize() {
 
   # ── Execute ────────────────────────────────────────────────────────────────
 
-  # Step 1 — shrink source filesystem
-  case "${src_fs}" in
-    btrfs)
-      _run _asroot btrfs filesystem resize "-${amount}" "$src_mount" || return 1
-      ;;
-    *)
-      local src_new_size
-      src_new_size=$(awk -v e="$src_end" -v a="$amount_gb" 'BEGIN{printf "%dG", int(e-a)}')
-      _run _asroot resize2fs "$src_dev" "$src_new_size" || return 1
-      ;;
-  esac
+  if [[ -n "$src_num" ]]; then
+    local src_dev="/dev/${disk}${src_num}"
+    local src_fs src_mount
+    _disk_fs_info "$src_dev" src_fs src_mount
+    local src_end src_new_end
+    _disk_part_end "$disk" "$src_num" src_end
+    src_new_end=$(awk -v e="$src_end" -v a="$amount_gb" 'BEGIN{printf "%.1fGB", e-a}')
 
-  # Step 2 — shrink source partition
-  _run _asroot parted /dev/"$disk" resizepart "$src_num" "$src_new_end" || return 1
+    case "${src_fs}" in
+      btrfs)
+        _run _asroot btrfs filesystem resize "-${amount_gb}G" "$src_mount" || return 1
+        ;;
+      *)
+        local src_new_size
+        src_new_size=$(awk -v e="$src_end" -v a="$amount_gb" 'BEGIN{printf "%dG", int(e-a)}')
+        _run _asroot resize2fs "$src_dev" "$src_new_size" || return 1
+        ;;
+    esac
 
-  # Step 3 — expand destination partition
+    _run _asroot parted /dev/"$disk" resizepart "$src_num" "$src_new_end" || return 1
+  fi
+
   _run _asroot parted /dev/"$disk" resizepart "$dst_num" "$dst_new_end" || return 1
 
-  # Step 4 — expand destination filesystem
   case "${dst_fs}" in
     btrfs) _run _asroot btrfs filesystem resize max "${dst_mount:-/}" || return 1 ;;
     *)     _run _asroot resize2fs "$dst_dev"                           || return 1 ;;
