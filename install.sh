@@ -86,11 +86,10 @@ _check_os() {
 _ensure_pacman_sandbox() {
   ! command -v pacman &>/dev/null && return 0
   grep -q '^DisableSandbox' /etc/pacman.conf 2>/dev/null && return 0
-  # pacman -h outputs static help text without triggering the sandbox — safe on
-  # ARM kernels without Landlock. If --disable-sandbox is listed, the kernel may
-  # lack Landlock; add DisableSandbox to pacman.conf so all subsequent calls work,
-  # including those inside third-party installers like the Archcraft morph.
-  pacman -h 2>/dev/null | grep -q -- '--disable-sandbox' || return 0
+  grep -q '^\[options\]' /etc/pacman.conf 2>/dev/null || return 0
+  # Add DisableSandbox unconditionally: ARM kernels lack Landlock, and pacman 7.x
+  # requires it for sandboxing. On kernels with Landlock this is a no-op in effect.
+  # Older pacman versions ignore unknown pacman.conf options, so this is safe.
   _asroot sed -i '/^\[options\]/a DisableSandbox' /etc/pacman.conf
 }
 
@@ -101,10 +100,8 @@ _offer_upgrade() {
   local ans
   read -r ans </dev/tty
   if [[ "${ans,,}" == "y" ]]; then
-    local _sandbox=""
-    pacman -h 2>/dev/null | grep -q -- '--disable-sandbox' && _sandbox="--disable-sandbox"
     _info "Upgrading the system…"
-    _asroot pacman -Syu --noconfirm ${_sandbox}
+    _asroot pacman -Syu --noconfirm
     echo
   fi
 }
