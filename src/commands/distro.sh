@@ -101,6 +101,18 @@ _distro_morph_archcraft() {
   # Guard: Arch Linux ARM only (Archcraft ARM installer is ARM-specific)
   _distro_require_archarm || return 1
 
+  # Pre-flight: archlinuxarm-keyring
+  # The Archcraft installer initializes the archlinuxarm keyring directly;
+  # if the package is missing, it exits with a fatal error.
+  if ! pacman -Qq archlinuxarm-keyring &>/dev/null; then
+    _info "Installing archlinuxarm-keyring (required by the Archcraft installer)..."
+    _run _pkg -S archlinuxarm-keyring || return 1
+    _asroot pacman-key --populate archlinuxarm \
+      || { _err "Failed to populate archlinuxarm keyring."; return 1; }
+    _ok "Keyring ready."
+    _blank
+  fi
+
   # Pre-flight: / space (check before touching /boot)
   local root_avail root_avail_gb
   root_avail=$(df / 2>/dev/null | awk 'NR==2 {print $4}')
