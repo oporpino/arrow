@@ -171,25 +171,31 @@ _howto_disk_resize() {
   read -r disk </dev/tty
   [[ -z "$disk" ]] && { _warn "Cancelled."; return; }
 
-  # Show free space so the user can pick a sensible end position.
-  _info "Free space on /dev/${disk}:"
-  if command -v parted &>/dev/null; then
-    _asroot parted /dev/"$disk" print free 2>/dev/null \
-      | grep -E 'Free Space|Number' || true
-  else
-    _warn "Install parted first to see free space (step 1 will do it)."
-  fi
-  _blank
-
   printf "  Partition number (e.g. 2): "
   local part_num
   read -r part_num </dev/tty
   [[ -z "$part_num" ]] && { _warn "Cancelled."; return; }
 
-  printf "  New end position — e.g. 30G, 50G, or 100%% for all: "
+  # Show free space as absolute positions so the user can type a concrete value.
+  _info "Free space on /dev/${disk}:"
+  if command -v parted &>/dev/null; then
+    _asroot parted /dev/"$disk" unit GB print free 2>/dev/null \
+      | awk '/Free Space/ {printf "    %s → %s  (%s free)\n", $1, $2, $3}'
+  else
+    _warn "parted not installed — step 1 will install it."
+  fi
+  local disk_size
+  disk_size=$(lsblk -no SIZE "/dev/${disk}" 2>/dev/null | head -1)
+  _blank
+  _warn "Enter the absolute END position for the partition (e.g. 30G, 60G)."
+  _warn "This is WHERE the partition ends on disk — not how much to add."
+  [[ -n "$disk_size" ]] && _info "Total disk size: ${disk_size}"
+  _blank
+
+  printf "  New end position (e.g. 30G, 60G): "
   local end_pos
   read -r end_pos </dev/tty
-  end_pos="${end_pos:-100%}"
+  [[ -z "$end_pos" ]] && { _warn "Cancelled."; return; }
 
   local dev="/dev/${disk}${part_num}"
   local fstype
