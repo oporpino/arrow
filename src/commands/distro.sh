@@ -247,6 +247,33 @@ _distro_morph_archcraft() {
     _info "Run: sudo reboot"
   else
     _err "Morph failed."
+
+    # Check for partially-failed packages logged by the Archcraft installer.
+    local failed_pkgs_file="${workdir}/failed_pkgs"
+    if [[ -s "$failed_pkgs_file" ]]; then
+      _blank
+      _warn "The following packages failed to install:"
+      while IFS= read -r pkg; do
+        echo -e "    ${YELLOW}•${RESET}  ${pkg}"
+      done < "$failed_pkgs_file"
+      _blank
+      _info "Syncing package databases and retrying failed packages..."
+      _asroot pacman -Syy --noconfirm ${_PKG_SANDBOX} &>/dev/null || true
+      local failed_list
+      failed_list=$(tr '\n' ' ' < "$failed_pkgs_file")
+      # shellcheck disable=SC2086
+      if _asroot pacman -S --noconfirm ${_PKG_SANDBOX} $failed_list; then
+        _ok "Failed packages installed. Morph may be complete."
+        _info "Reboot and verify: sudo reboot"
+        rm -rf "$workdir"
+        [[ -n "$boot_backup" ]] && _asroot rm -rf "$boot_backup"
+        return 0
+      else
+        _err "Some packages still failed. Install manually:"
+        _cmd "pacman -S ${failed_list}"
+      fi
+    fi
+
     rm -rf "$workdir"
     _distro_restore_boot "$boot_backup"
     return 1
