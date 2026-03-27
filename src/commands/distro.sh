@@ -236,6 +236,15 @@ _distro_morph_archcraft() {
     _asroot sed -i '/^\[options\]/a DisableSandbox' /etc/pacman.conf
   fi
 
+  # Remove duplicate repo sections from pacman.conf (can happen if the morph
+  # was retried — the Archcraft installer adds [archcraft-arm] each time it runs).
+  _asroot awk '
+    /^\[/ { repo=$0 }
+    repo && seen[repo]++ { skip=1 } !skip { print } skip && /^$/ { skip=0 }
+  ' /etc/pacman.conf > /tmp/pacman.conf.dedup \
+    && _asroot cp /tmp/pacman.conf.dedup /etc/pacman.conf \
+    && _asroot rm -f /tmp/pacman.conf.dedup
+
   if (cd "$workdir" && _asroot bash install.sh); then
     rm -rf "$workdir"
     if [[ -n "$boot_backup" ]]; then
