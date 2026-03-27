@@ -260,6 +260,17 @@ pacman --help 2>/dev/null | grep -q -- '--disable-sandbox' && _PKG_SANDBOX="--di
 _PKG_HELPER=""
 _PKG_HELPER=$(_aur_helper)
 
+# Verify the helper actually loads — it may be broken after a pacman upgrade
+# (e.g. libalpm.so version mismatch). If broken, fall back to pacman silently.
+if [[ -n "$_PKG_HELPER" ]]; then
+  if ! "$_PKG_HELPER" --version &>/dev/null 2>&1; then
+    _warn "${_PKG_HELPER} is broken (libalpm version mismatch after pacman upgrade)."
+    _info "Fix: remove and reinstall it — arrow will rebuild it from AUR automatically."
+    _cmd "sudo pacman -Rns ${_PKG_HELPER}"
+    _PKG_HELPER=""
+  fi
+fi
+
 # Runs package operations non-interactively with coloured output.
 # Uses the AUR helper when available (and not root), otherwise falls back to
 # pacman as root. Kernel console noise is suppressed during pacman calls.
