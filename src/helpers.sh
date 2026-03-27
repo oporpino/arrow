@@ -213,6 +213,17 @@ _aur_exists() {
 _ensure_aur_helper() {
   local helper
   helper=$(_aur_helper)
+
+  # If a helper binary exists but is broken (e.g. libalpm mismatch after upgrade),
+  # offer to remove it and rebuild from scratch.
+  if [[ -n "$helper" ]] && ! "$helper" --version &>/dev/null 2>&1; then
+    _warn "${helper} is broken (libalpm version mismatch after pacman upgrade)."
+    _ask "Remove ${helper} and rebuild from AUR?" || return 1
+    _asroot pacman -Rns "$helper" --noconfirm &>/dev/null || true
+    helper=""
+    _PKG_HELPER=""
+  fi
+
   [[ -n "$helper" ]] && return 0
 
   _blank
