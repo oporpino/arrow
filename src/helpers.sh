@@ -194,10 +194,10 @@ _aur_helper() {
 # Uses the installed AUR helper if available (faster); falls back to AUR API.
 _aur_exists() {
   local pkg="$1"
-  local helper
-  helper=$(_aur_helper)
-  if [[ -n "$helper" ]]; then
-    "$helper" -Si "$pkg" &>/dev/null 2>&1
+  # Use _PKG_HELPER (cleared if broken) rather than _aur_helper() which only
+  # checks command existence — a broken helper would return false negatives.
+  if [[ -n "$_PKG_HELPER" ]]; then
+    "$_PKG_HELPER" -Si "$pkg" &>/dev/null 2>&1
   else
     local result
     result=$(curl -fsSL --connect-timeout 3 --max-time 5 \
