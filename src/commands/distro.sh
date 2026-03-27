@@ -258,11 +258,11 @@ _distro_morph_archcraft() {
       done < "$failed_pkgs_file"
       _blank
       _info "Syncing package databases and retrying failed packages..."
-      _asroot pacman -Syy --noconfirm ${_PKG_SANDBOX} &>/dev/null || true
+      _pkg -Syy &>/dev/null || true
       local failed_list
       failed_list=$(tr '\n' ' ' < "$failed_pkgs_file")
       # shellcheck disable=SC2086
-      if _asroot pacman -S --noconfirm ${_PKG_SANDBOX} $failed_list; then
+      if _pkg -S $failed_list; then
         _ok "Failed packages installed. Morph may be complete."
         _info "Reboot and verify: sudo reboot"
         rm -rf "$workdir"
@@ -270,7 +270,7 @@ _distro_morph_archcraft() {
         return 0
       else
         _err "Some packages still failed. Install manually:"
-        _cmd "pacman -S ${failed_list}"
+        _cmd "arrow add ${failed_list}"
       fi
     fi
 
